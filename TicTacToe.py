@@ -1,3 +1,5 @@
+_zip = zip
+
 def mean(s):
     """Return the arithmetic mean of a sequence of numbers s.
 
@@ -40,24 +42,13 @@ def put_piece(board, row, column, player):
     """ Place a player's piece in a spot on the board."""
     assert row >= 0 and column >= 0 and row < len(board) and column < min([len(x) for x in board])
     """ in case rows/columns out of bounds"""
-    x = lst[:][:]
+    x = board[:][:]
     x[row][column] = player
     return board
 
-def check_win_row(board):
-    default = True
-    for x in range(0, len(board)):
-        for y in range(0, len(board[x])):
-            if board[x][y] != mean(board[x]):
-                default = False
-    return default
-
 #cannot find a good way to write so assume the board to be 2*2
-def check_win_column(board):
-    default = True
-    new_board = zip(board[0], board[1])
-    for x in range(0, len(board)):
-        for y in range(0, len(board[x])):
-            if board[x][y] != mean(board[x]):
-                default = False
-    return default
+def check_win(board):
+    if board[0][0] == board[0][1] or board[1][0] == board[1][1] or board[0][0] == board[1][0] or board[0][1] == board[1][1]:
+        return True
+    else:
+        return False
