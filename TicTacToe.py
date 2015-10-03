@@ -42,7 +42,7 @@ def put_piece(board, row, column, player):
     """ in case rows/columns out of bounds"""
     x = lst[:][:]
     x[row][column] = player
-    return x
+    return board
 
 def check_win_row(board):
     default = True
