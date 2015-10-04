@@ -30,7 +30,7 @@ def zip(*sequences):
     """
     return list(map(list, _zip(*sequences)))
 
-def create_board(rows, columns):
+def create_board(rows=2, columns=2):
     """ Returns a board with the given dimensions.
 
     >>> create_board(3, 5)

@@ -23,7 +23,7 @@ def int2base(x, base):
 	return ''.join(digits)
 
 def create_states(boardsize=4):
-	total = 3**4 
+	total = 3**boardsize
 	states = []
 	for i in range(0, total+1):
 		states.append(int2base(i,3))
