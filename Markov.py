@@ -25,7 +25,10 @@ def int2base(x, base):
 def create_states(boardsize=4):
 	total = 3**boardsize
 	states = []
-	for i in range(0, total+1):
-		states.append(int2base(i,3))
+	for i in range(0, total):
+		state = int2base(i,3)
+		if len(state) < boardsize:
+			state = (str(0)*(boardsize - len(state))) + state
+		states.append(state)
 	return states
 
