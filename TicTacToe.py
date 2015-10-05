@@ -52,3 +52,9 @@ def check_win(board):
         return True
     else:
         return False
+        
+def check_tie(board):
+    if board[0][0] != 0 and board[1][0] != 0 and board[0][1] != 0 and board[1][1] != 0:
+        return True
+    else:
+        return False
