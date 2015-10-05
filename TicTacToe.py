@@ -58,3 +58,20 @@ def check_tie(board):
         return True
     else:
         return False
+        
+        
+def other(who):
+    return 3 - who
+
+#human-player phase: we print a comment to ask
+def play(strategy1, strategy2, board):
+    who = 1
+    while not check_win and not check_tie:# try make a list of tuple for every move and return it with final
+        if who == 1:
+            row, column = strategy1(board)[0], strategy1(board)[1]
+            board = put_piece(board, row, column, who)
+        if who == 2:
+            row, column = strategy2(board)[0], strategy2(board)[1]
+            board = put_piece(board, row, column, who)
+        who = other(who)
+    return board
