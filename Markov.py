@@ -39,3 +39,35 @@ def create_states(numpieces=3, boardsize=4):
 		states.append(state)
 	return states
 
+#returns list of all legal possible configurations for a 2x2 board
+def state_space():
+	states = create_states()
+	invalid = []
+	for item in states:
+		x = 0
+		o = 0
+		#counts numbers of x's and o's to make sure no player skipped another's turn
+		for digit in range(4):
+			if item[digit] == '1':
+				x += 1
+			elif item[digit] == '2':
+				o += 1
+		if (x > 2) or (o > 2) or (x > 1 and o < 1) or (o > 1 and x < 1):
+			invalid.append(item)
+	for item in invalid:
+		states.remove(item)
+	return states
+
+
+
+
+
+# def legal_actions(player, curr_state, states):
+# 	laction_set = []
+# 	for x in states:
+# 		for i in range(4):
+# 			if curr_state[i] == 0 or curr_state[i] == player:
+# 				if x not in laction_set:
+# 					laction_set.append(x)
+# 	return laction_set
+
