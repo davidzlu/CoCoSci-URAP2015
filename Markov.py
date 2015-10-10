@@ -61,5 +61,24 @@ def state_space():
 		states.remove(item)
 	return states
 
+def action_space(board):
+    """Returns list of all possible actions for the given board"""
+    actions = []
+    for i in range(len(board)):
+        for j in range(len(board)):
+            actions.append([i,j])
+    return actions
+
+def legal_actions(curr_state, actions):
+    """Returns list of legal moves to make on your turn
+
+    curr_state: bit string representing current game curr_state
+    actions: list of all possible actions
+    """
+    laction_set = []
+    for item in actions:
+        if curr_state[actions.index(item)] == '0':
+            laction_set.append(item)
+    return laction_set
 
 

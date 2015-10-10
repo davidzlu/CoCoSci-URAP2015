@@ -1,5 +1,6 @@
 _zip = zip
 
+from Markov import create_states, state_space, action_space, legal_actions
 
 def mean(s):
     """Return the arithmetic mean of a sequence of numbers s.
@@ -38,26 +39,6 @@ def create_board(rows=2, columns=2):
     [[0, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 0, 0, 0, 0]]
     """
     return [[0 for x in range(0, columns)] for x in range(0, rows)]
-
-def action_space(board):
-    """Returns list of all possible actions for the given board"""
-    actions = []
-    for i in range(len(board)):
-        for j in range(len(board)):
-            actions.append([i,j])
-    return actions
-
-def legal_actions(curr_state, actions):
-    """Returns list of legal moves to make on your turn
-
-    curr_state: bit string representing current game curr_state
-    actions: list of all possible actions
-    """
-    laction_set = []
-    for item in actions:
-        if curr_state[actions.index(item)] == '0':
-            laction_set.append(item)
-    return laction_set
 
 def put_piece(board, row, column, player):
     """ Place a player's piece in a spot on the board."""
