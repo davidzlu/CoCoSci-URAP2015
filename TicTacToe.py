@@ -39,6 +39,13 @@ def create_board(rows=2, columns=2):
     """
     return [[0 for x in range(0, columns)] for x in range(0, rows)]
 
+def action_space(board):
+    actions = []
+    for i in range(len(board)):
+        for j in range(len(board)):
+            actions.append([i,j])
+    return actions
+
 def put_piece(board, row, column, player):
     """ Place a player's piece in a spot on the board."""
     assert row >= 0 and column >= 0 and row < len(board) and column < min([len(x) for x in board])
