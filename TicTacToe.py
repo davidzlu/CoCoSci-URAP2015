@@ -1,7 +1,5 @@
 _zip = zip
 
-# states = create_states(3,4)
-# curr_state = states[0]
 
 def mean(s):
     """Return the arithmetic mean of a sequence of numbers s.
@@ -55,6 +53,4 @@ def check_win(board):
         return True
     else:
         return False
-# def check_tie:
-# def random_policy:
-# def human_policy:
+
