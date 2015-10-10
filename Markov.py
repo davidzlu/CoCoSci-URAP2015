@@ -24,7 +24,10 @@ def int2base(x, base):
 
 def create_states(numpieces=3, boardsize=4):
 	"""
-	Returns a list of all possible states represented as bit strings
+	Returns a list of all possible states represented as bit strings where
+	string indexes correspond to spaces on the board like so:
+    0 = [0,0] 1 = [0,1]
+    2 = [1,0] 3 = [1,1]
 
 	numpieces: Number of configurations a particular space can take, 
 			   including the null configuration.
@@ -39,8 +42,8 @@ def create_states(numpieces=3, boardsize=4):
 		states.append(state)
 	return states
 
-#returns list of all legal possible configurations for a 2x2 board
 def state_space():
+	"""Returns a list of all legal states for a 2x2 game of TicTacToe"""
 	states = create_states()
 	invalid = []
 	for item in states:
@@ -52,22 +55,11 @@ def state_space():
 				x += 1
 			elif item[digit] == '2':
 				o += 1
-		if (x > 2) or (o > 2) or (x > 1 and o < 1) or (o > 1 and x < 1):
+		if (x > o+1) or (o > x+1):
 			invalid.append(item)
 	for item in invalid:
 		states.remove(item)
 	return states
 
 
-
-
-
-# def legal_actions(player, curr_state, states):
-# 	laction_set = []
-# 	for x in states:
-# 		for i in range(4):
-# 			if curr_state[i] == 0 or curr_state[i] == player:
-# 				if x not in laction_set:
-# 					laction_set.append(x)
-# 	return laction_set
 
