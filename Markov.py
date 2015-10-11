@@ -61,6 +61,21 @@ def state_space():
 		states.remove(item)
 	return states
 
+# def possible_states(player,curr_state, states):
+# """A function to return all possible states of the game from the current move
+#	onward. Currently does not support the case where curr_state == '0000' and
+#   result includes illegal states. Once working, it'll probably useful for 
+#	calculating transition_probs. Feel free to rewrite entirely."""
+# 	pstates = []
+# 	for item in states:
+# 		for digit in range(len(curr_state)):
+# 			if item[digit] == curr_state[digit] and curr_state[digit] != '0':
+# 				if item not in pstates:
+# 					pstates.append(item)
+# 	pstates.remove(curr_state)
+# 	return pstates
+
+
 def action_space(board):
     """Returns list of all possible actions for the given board"""
     actions = []
@@ -80,5 +95,13 @@ def legal_actions(curr_state, actions):
         if curr_state[actions.index(item)] == '0':
             laction_set.append(item)
     return laction_set
+
+def board2state(board):
+	"""Returns string representation of the board passed in"""
+	s = ''
+	for i in board:
+		for j in i:
+			s += str(j)
+	return s
 
 
