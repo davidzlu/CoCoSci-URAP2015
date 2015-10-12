@@ -2,6 +2,8 @@ _zip = zip
 
 from Markov import create_states, state_space, action_space, legal_actions, board2state
 
+import random
+
 def mean(s):
     """Return the arithmetic mean of a sequence of numbers s.
 
@@ -79,4 +81,9 @@ def play(strategy1, strategy2):
         who = other(who)
     return board
 
+def random_policy(board):
+    actions = action_space(board)
+    curr_state = board2state(board)
+    moves = legal_actions(curr_state, actions)
+    return random.choice(moves)
 
