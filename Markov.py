@@ -3,11 +3,10 @@ from TicTacToe import *
 import random
 digs = string.digits
 
-"""The following code to convert an integer to a string in base x 
-is adapted from http://stackoverflow.com/a/2267446
-Meant to be the inverse of the built in function int(x, base) where 
-x must be a string if a base other than 10 is specified."""
 def int2base(x, base):
+	"""Code which converts an integer into a string in base x 
+	Adapted from http://stackoverflow.com/a/2267446
+	Meant as an inverse of the built in function int(x, base)"""
 	if x < 0:
 		sign = -1
 	elif x == 0:
@@ -24,11 +23,22 @@ def int2base(x, base):
 	digits.reverse()
 	return ''.join(digits)
 
-def create_states(boardsize=4):
-	total = 3**boardsize
+
+def create_states(numpieces=3, boardsize=4):
+	"""
+	Returns a list of all possible states represented as bit strings where
+	string indexes correspond to spaces on the board like so:
+    0 = [0,0] 1 = [0,1]
+    2 = [1,0] 3 = [1,1]
+
+	numpieces: Number of configurations a particular space can take, 
+			   including the null configuration.
+	boardsize: Number of spaces on the gameboard
+	"""
+	total = numpieces**boardsize
 	states = []
 	for i in range(0, total):
-		state = int2base(i,3)
+		state = int2base(i,numpieces)
 		if len(state) < boardsize:
 			state = (str(0)*(boardsize - len(state))) + state
 		states.append(state)
@@ -65,6 +75,20 @@ def create_state_tree(states):
 				state_tree[cur_state].append(next_state)
 	return state_tree
 
+# def possible_states(player,curr_state, states):
+# """A function to return all possible states of the game from the current move
+#	onward. Currently does not support the case where curr_state == '0000' and
+#   result includes illegal states. Once working, it'll probably useful for 
+#	calculating transition_probs. Feel free to rewrite entirely."""
+# 	pstates = []
+# 	for item in states:
+# 		for digit in range(len(curr_state)):
+# 			if item[digit] == curr_state[digit] and curr_state[digit] != '0':
+# 				if item not in pstates:
+# 					pstates.append(item)
+# 	pstates.remove(curr_state)
+# 	return pstates
+
 def action_space(board):
     """Returns list of all possible actions for the given board"""
     actions = []
@@ -75,6 +99,7 @@ def action_space(board):
 
 def legal_actions(curr_state, actions):
     """Returns list of legal moves to make on your turn
+
     curr_state: bit string representing current game curr_state
     actions: list of all possible actions
     """
@@ -96,7 +121,7 @@ def valid_transition(cur_state, next_state):
 	if cur_state == next_state:
 		return False
 	num_differs = 0
-	for i in range(0, len(cur_state)):	
+	for i in range(0, len(cur_state)):
 		if cur_state[i] != '0' and next_state[i] != cur_state[i]:
 			return False
 		if cur_state[i] != next_state[i]:
@@ -126,37 +151,5 @@ def reward_function(cur_state, action, next_state):
 	return None
 
 def simulate_transition():
-
+	""" Simulates a move on the board. """
 	return None
-
-def main():
-	board = create_board()
-	player = 1
-	move = [-1, -1]
-	while not check_win(board):
-		if player == 2:
-			while not valid_move(board, move[0], move[1]):
-				move[0] = random.randint(0, 2)
-				move[1] = random.randint(0, 2)
-			board = put_piece(board, move[0], move[1], player)
-			player = 1
-		elif player == 1:
-			#Find current state
-			#Take action
-			#Receive reward, adjust probability of transition
-			player = 2
-			return
-
-#modeling environment, not choosing action
-#policy of human interaction as well
-#after playthrough, output useful information, i.e. states, moves
-
-#filter by min number ratings (100)
-#find games that can be approximated w/ Markov model
-#low, moderately low, middle, mid high, high
-
-if __name__ == "__main__":
- 	states = state_space()
- 	state_tree = create_state_tree(states)
- 	prob = transition_prob('1200', '0000', [0,0], state_tree)
- 	prob = transition_prob('1212', '1200', [1,0], state_tree)

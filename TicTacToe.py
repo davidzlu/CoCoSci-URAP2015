@@ -1,11 +1,10 @@
 _zip = zip
 
-from Markov import *
+from Markov import create_states, state_space, action_space, legal_actions, board2state
 import random
 
 def mean(s):
     """Return the arithmetic mean of a sequence of numbers s.
-
     >>> mean([-1, 3])
     1.0
     >>> mean([0, -3, 2, -1])
@@ -17,7 +16,6 @@ def mean(s):
 def zip(*sequences):
     """Returns a list of lists, where the i-th list contains the i-th
     element from each of the argument sequences.
-
     >>> zip(range(0, 3), range(3, 6))
     [[0, 3], [1, 4], [2, 5]]
     >>> for a, b in zip([1, 2, 3], [4, 5, 6]):
@@ -35,7 +33,6 @@ def zip(*sequences):
 
 def create_board(rows=2, columns=2):
     """ Returns a board with the given dimensions.
-
     >>> create_board(3, 5)
     [[0, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 0, 0, 0, 0]]
     """
@@ -49,54 +46,19 @@ def put_piece(board, row, column, player):
     x[row][column] = player
     return board
 
-def valid_move(board, row, column):
-    if row < 0 or column < 0:
-        return False
-    return board[row][column] == 0
-
 #cannot find a good way to write so assume the board to be 2*2
 def check_win(board):
-    row_win = check_row_win(board)
-    column_win = check_column_win(board)
-    if row_win[0]:
-        return row_win
-    if column_win[0]:
-        return column_win
-
-def check_row_win(board):
-    """ Takes in board and returns True if a player has won, along with 
-    1 or 2 depending on which player won. """
-    for row in board:
-        player = row[0]
-        num_in_row = 0
-        if player != 0:
-            for space in row:
-                if space == player:
-                    num_in_row += 1
-        if num_in_row == len(row):
-            return True, player
-    return False, 0
-
-def check_column_win(board):
-    """ Takes in board and returns True if a player has won, along with 
-    1 or 2 depending on which player won. """
-    for column in range(0, board.len()):
-        player = board[0][column]
-        num_in_column = 0
-        if player != 0:
-            for row in board:
-                if row[i] == player:
-                    num_in_column += 1
-        if num_in_column == len(board):
-            return True, player
-    return False, 0
-
+    if board[0][0] == board[0][1] or board[1][0] == board[1][1] or board[0][0] == board[1][0] or board[0][1] == board[1][1]:
+        return True
+    else:
+        return False
+        
 def check_tie(board):
     if board[0][0] != 0 and board[1][0] != 0 and board[0][1] != 0 and board[1][1] != 0:
         return True
     else:
         return False
-
+        
 def random_policy(board):
     board_str = board2state(board)
     actions = action_space(board)
@@ -105,7 +67,7 @@ def random_policy(board):
         i = random.randint(0, len(legal_acts) - 1)
         return legal_acts[i]
     return None
-        
+
 def other(who):
     return 3 - who
 
