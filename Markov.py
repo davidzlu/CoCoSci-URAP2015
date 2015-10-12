@@ -1,4 +1,6 @@
 import string
+from TicTacToe import *
+import random
 digs = string.digits
 
 def int2base(x, base):
@@ -61,6 +63,18 @@ def state_space():
 		states.remove(item)
 	return states
 
+def create_state_tree(states):
+	""" Takes in list of states as base 3 string of digits.
+	Creates dictionary that maps a state to a list of all the ones
+	rechable from it."""
+	state_tree = {}
+	for cur_state in states:
+		state_tree[cur_state] = []
+		for next_state in states:
+			if valid_transition(cur_state, next_state):
+				state_tree[cur_state].append(next_state)
+	return state_tree
+
 # def possible_states(player,curr_state, states):
 # """A function to return all possible states of the game from the current move
 #	onward. Currently does not support the case where curr_state == '0000' and
@@ -74,7 +88,6 @@ def state_space():
 # 					pstates.append(item)
 # 	pstates.remove(curr_state)
 # 	return pstates
-
 
 def action_space(board):
     """Returns list of all possible actions for the given board"""
@@ -104,4 +117,39 @@ def board2state(board):
 			s += str(j)
 	return s
 
+def valid_transition(cur_state, next_state):
+	if cur_state == next_state:
+		return False
+	num_differs = 0
+	for i in range(0, len(cur_state)):
+		if cur_state[i] != '0' and next_state[i] != cur_state[i]:
+			return False
+		if cur_state[i] != next_state[i]:
+			num_differs += 1
+	if num_differs == 2:
+		return True
+	return False
 
+def transition_prob(next_state, cur_state, action, state_tree):
+    """ Return probability of transitioning into next_state from
+    cur_state and action. """
+    if next_state in state_tree[cur_state]:
+    	num_rechable_states = 0
+    	for state in state_tree[cur_state]:
+    		space_check = 2*action[0] + action[1]
+    		if state[space_check] == '1':
+    			num_rechable_states += 1
+    	if num_rechable_states > 0:
+    		return 1.0/num_rechable_states
+    return 0
+
+def reward_function(cur_state, action, next_state):
+	expected_reward = 0
+	#if player1 wins, 1 for reward
+	#if player2 wins, -1 for reward
+	#if neither, 0 for reward
+	return None
+
+def simulate_transition():
+	""" Simulates a move on the board. """
+	return None
