@@ -1,6 +1,6 @@
 _zip = zip
 
-from Markov import create_states, state_space, action_space, legal_actions, board2state
+from Markov import *
 import random, ast
 
 def mean(s):
@@ -86,10 +86,12 @@ def play(strategy1, strategy2):
     return board
 
 
-def human_player(board):
+def human_player(board, player=1):
     actions = action_space(board)
     curr_state = board2state(board)
     moves = legal_actions(curr_state, actions)
+    states = create_states()
+    state_tree = create_state_tree(states)
     print("The current state of the game is: " + curr_state)
     print("Your available moves are: ")
     print(moves)
@@ -97,5 +99,19 @@ def human_player(board):
     my_move = ast.literal_eval(response)
     while my_move not in moves:
         my_move = ast.literal_eval(input("Please enter a valid move: "))
-    return my_move
+    test_board = board.copy()
+    test_state = board2state(put_piece(test_board, my_move[0], my_move[1], player))
+    probs = []
+    for next_state in state_tree[test_state]:
+        probs.append(transition_prob(next_state, test_state, action, state_tree))
+    print("These are the next possible states: ")
+    print(state_tree[test_state])
+    print("These are the probabilities associated with each state: ")
+    print(probs)
+    print(board)
+    response2 = input("Would you like to change your move? y/n: ")
+    if (response2 == 'n') | (response2 == 'no'):
+        return my_move
+    else:
+        return human_player(board)
 

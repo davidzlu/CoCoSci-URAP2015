@@ -75,19 +75,6 @@ def create_state_tree(states):
 				state_tree[cur_state].append(next_state)
 	return state_tree
 
-# def possible_states(player,curr_state, states):
-# """A function to return all possible states of the game from the current move
-#	onward. Currently does not support the case where curr_state == '0000' and
-#   result includes illegal states. Once working, it'll probably useful for 
-#	calculating transition_probs. Feel free to rewrite entirely."""
-# 	pstates = []
-# 	for item in states:
-# 		for digit in range(len(curr_state)):
-# 			if item[digit] == curr_state[digit] and curr_state[digit] != '0':
-# 				if item not in pstates:
-# 					pstates.append(item)
-# 	pstates.remove(curr_state)
-# 	return pstates
 
 def action_space(board):
     """Returns list of all possible actions for the given board"""
@@ -152,4 +139,7 @@ def reward_function(cur_state, action, next_state):
 
 def simulate_transition():
 	""" Simulates a move on the board. """
+	#draws a sample from next state and returns associated reward
 	return None
+
+	
