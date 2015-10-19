@@ -48,10 +48,24 @@ def put_piece(board, row, column, player):
 
 #cannot find a good way to write so assume the board to be 2*2
 def check_win(board):
-    if board[0][0] == board[0][1] or board[1][0] == board[1][1] or board[0][0] == board[1][0] or board[0][1] == board[1][1]:
-        return True
-    else:
-        return False
+    """ Returns True if a player has won and 1 or 2 depending on which player won. """
+    space0 = board[0][0]
+    space1 = board[0][1]
+    space2 = board[1][0]
+    space3 = board[1][1]
+    if space0 != 0 and space1 != 0:
+        if space0 == space1:
+            return True, space0
+    if space2 != 0 and space3 != 0:
+        if space2 == space3:
+            return True, space2
+    if space0 != 0 and space2 != 0:
+        if space0 == space2:
+            return True, space0
+    if space1 != 0 and space3 != 0:
+        if space1 == space3:
+            return True, space1
+    return False
         
 def check_tie(board):
     if board[0][0] != 0 and board[1][0] != 0 and board[0][1] != 0 and board[1][1] != 0:
@@ -60,6 +74,8 @@ def check_tie(board):
         return False
         
 def random_policy(board):
+    """ Use transition_probability to get next move.
+    Sampled from transition probabilities."""
     board_str = board2state(board)
     actions = action_space(board)
     legal_acts = legal_actions(board_str, actions)
@@ -75,7 +91,7 @@ def other(who):
 def play(strategy1, strategy2):
     who = 1
     board = create_board()
-    while not check_win and not check_tie:# try make a list of tuple for every move and return it with final
+    while not check_win(board) and not check_tie(board):# try make a list of tuple for every move and return it with final
         if who == 1:
             row, column = strategy1(board)[0], strategy1(board)[1]
             board = put_piece(board, row, column, who)

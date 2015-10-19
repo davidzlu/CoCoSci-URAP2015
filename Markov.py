@@ -63,6 +63,7 @@ def state_space():
 		states.remove(item)
 	return states
 
+
 def create_state_tree(states):
 	""" Takes in list of states as base 3 string of digits.
 	Creates dictionary that maps a state to a list of all the ones
@@ -120,19 +121,30 @@ def board2state(board):
 def valid_transition(cur_state, next_state):
 	if cur_state == next_state:
 		return False
+	cur_board = state2board(cur_state)
+	if check_win(cur_board):
+		return False
 	num_differs = 0
 	for i in range(0, len(cur_state)):
 		if cur_state[i] != '0' and next_state[i] != cur_state[i]:
 			return False
 		if cur_state[i] != next_state[i]:
 			num_differs += 1
-	if num_differs == 2:
+	if num_differs <= 2:
 		return True
 	return False
 
+def state2board(state):
+	return [ [int(state[0]), int(state[1])], [int(state[2]), int(state[3])] ]
+
 def transition_prob(next_state, cur_state, action, state_tree):
+	# sample_discrete_distribution module
+	# return index of vector w/ probability greater than some given one
+	# possibly create 3d transition_matrix of cur_state, next_state and action
+	# get action by mapping to and from in some way?
     """ Return probability of transitioning into next_state from
-    cur_state and action. """
+    cur_state and action. Distribution function method. Should get info from
+    policy. """
     if next_state in state_tree[cur_state]:
     	num_rechable_states = 0
     	for state in state_tree[cur_state]:
@@ -144,12 +156,25 @@ def transition_prob(next_state, cur_state, action, state_tree):
     return 0
 
 def reward_function(cur_state, action, next_state):
+	""" Reward every time. """
 	expected_reward = 0
-	#if player1 wins, 1 for reward
-	#if player2 wins, -1 for reward
-	#if neither, 0 for reward
-	return None
+	win, player = check_win(next_state)
+	if win:
+		if player == 1:
+			expected_reward = 1
+		elif player == 2:
+			expected_reward = -1
+	return expected_reward
 
-def simulate_transition():
-	""" Simulates a move on the board. """
-	return None
+
+def simulate_transition(cur_state, action):
+	""" Returns next state and a corresponding reward. """
+	cur_board = state2board(cur_state)
+	next_board = put_piece(cur_board, action[0], action[1], 1)
+	next_state = board2state(next_board)
+	reward = reward_function(cur_state, action, next_state)
+	return next_state, reward
+
+if __name__ == "__main__":
+	states = state_space()
+	state_tree = create_state_tree(states)
