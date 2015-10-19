@@ -1,35 +1,8 @@
 _zip = zip
 
-from Markov import create_states, state_space, action_space, legal_actions, board2state
-import random, ast
+from Markov import *
+import random, ast, randrange
 
-def mean(s):
-    """Return the arithmetic mean of a sequence of numbers s.
-    >>> mean([-1, 3])
-    1.0
-    >>> mean([0, -3, 2, -1])
-    -0.5
-    """
-    assert len(s) > 0, 'cannot find mean of empty sequence'
-    return sum(s) / len(s)
-
-def zip(*sequences):
-    """Returns a list of lists, where the i-th list contains the i-th
-    element from each of the argument sequences.
-    >>> zip(range(0, 3), range(3, 6))
-    [[0, 3], [1, 4], [2, 5]]
-    >>> for a, b in zip([1, 2, 3], [4, 5, 6]):
-    ...     print(a, b)
-    1 4
-    2 5
-    3 6
-    >>> for triple in zip(['a', 'b', 'c'], [1, 2, 3], ['do', 're', 'mi']):
-    ...     print(triple)
-    ['a', 1, 'do']
-    ['b', 2, 're']
-    ['c', 3, 'mi']
-    """
-    return list(map(list, _zip(*sequences)))
 
 def create_board(rows=2, columns=2):
     """ Returns a board with the given dimensions.
@@ -44,7 +17,7 @@ def put_piece(board, row, column, player):
     """ in case rows/columns out of bounds"""
     x = board[:][:]
     x[row][column] = player
-    return board
+    return x
 
 #cannot find a good way to write so assume the board to be 2*2
 def check_win(board):
@@ -65,39 +38,38 @@ def check_win(board):
     if space1 != 0 and space3 != 0:
         if space1 == space3:
             return True, space1
-    return False
-        
+    return False, None
+
 def check_tie(board):
     if board[0][0] != 0 and board[1][0] != 0 and board[0][1] != 0 and board[1][1] != 0:
         return True
     else:
         return False
-        
-def random_policy(board):
-    """ Use transition_probability to get next move.
-    Sampled from transition probabilities."""
-    board_str = board2state(board)
-    actions = action_space(board)
-    legal_acts = legal_actions(board_str, actions)
-    if len(legal_acts) > 0:
-        i = random.randint(0, len(legal_acts) - 1)
-        return legal_acts[i]
-    return None
 
 def other(who):
     return 3 - who
 
 #human-player phase: we print a comment to ask
-def play(strategy1, strategy2):
+def play(strategy1=human_player):
     who = 1
     board = create_board()
     while not check_win(board) and not check_tie(board):# try make a list of tuple for every move and return it with final
         if who == 1:
             row, column = strategy1(board)[0], strategy1(board)[1]
             board = put_piece(board, row, column, who)
+            print("Player's turn end.The current board state is ")
+            print(board)
         if who == 2:
-            row, column = strategy2(board)[0], strategy2(board)[1]
+            actions = action_space(board)
+            curr_state = board2state(board)
+            moves = legal_actions(curr_state, actions)
+            states = create_states()
+            state_tree = create_state_tree(states)
+            random_index = randrange(0, len(moves))
+            row, column = moves[random_index][0], moves[random_index][1]
             board = put_piece(board, row, column, who)
+            print("Computer's turn end.The current board state is ")
+            print(board)
         who = other(who)
     return board
 
@@ -106,6 +78,8 @@ def human_player(board):
     actions = action_space(board)
     curr_state = board2state(board)
     moves = legal_actions(curr_state, actions)
+    states = create_states()
+    state_tree = create_state_tree(states)
     print("The current state of the game is: " + curr_state)
     print("Your available moves are: ")
     print(moves)
@@ -113,5 +87,16 @@ def human_player(board):
     my_move = ast.literal_eval(response)
     while my_move not in moves:
         my_move = ast.literal_eval(input("Please enter a valid move: "))
-    return my_move
-
+    test_state, reward = simulate_transition(curr_state, my_move)
+    probs = []
+    for next_state in state_tree[test_state]:
+        probs.append(transition_prob(next_state, test_state, my_move, state_tree))
+    print("These are the next possible states: ")
+    print(state_tree[test_state])
+    print("These are the probabilities associated with each state: ")
+    print(probs)
+    response2 = input("Would you like to change your move? y/n: ")
+    if (response2 == 'n') | (response2 == 'no'):
+        return my_move
+    else:
+        return human_player(board)
