@@ -1,7 +1,8 @@
 _zip = zip
 
 from Markov import *
-import random, ast, randrange
+import random, ast
+from random import randrange
 
 
 def create_board(rows=2, columns=2):
@@ -49,40 +50,13 @@ def check_tie(board):
 def other(who):
     return 3 - who
 
-<<<<<<< HEAD
-def play(strategy1, strategy2):
-=======
+
 #human-player phase: we print a comment to ask
-def play(strategy1=human_player):
->>>>>>> 90ed0fa70b205a5cccdf6f4dabc05f65d6822bee
-    who = 1
-    board = create_board()
-    while not check_win(board)[0] and not check_tie(board):# try make a list of tuple for every move and return it with final
-        if who == 1:
-            row, column = strategy1(board)[0], strategy1(board)[1]
-            board = put_piece(board, row, column, who)
-            print("Player's turn end.The current board state is ")
-            print(board)
-        if who == 2:
-            actions = action_space(board)
-            curr_state = board2state(board)
-            moves = legal_actions(curr_state, actions)
-            states = create_states()
-            state_tree = create_state_tree(states)
-            random_index = randrange(0, len(moves))
-            row, column = moves[random_index][0], moves[random_index][1]
-            board = put_piece(board, row, column, who)
-            print("Computer's turn end.The current board state is ")
-            print(board)
-        who = other(who)
-    return board
-
-
 def human_player(board):
     actions = action_space(board)
     curr_state = board2state(board)
     moves = legal_actions(curr_state, actions)
-    states = create_states()
+    states = state_space()
     state_tree = create_state_tree(states)
     print("The current state of the game is: " + curr_state)
     print("Your available moves are: ")
@@ -104,3 +78,26 @@ def human_player(board):
         return my_move
     else:
         return human_player(board)
+
+def play(strategy1= human_player):
+    who = 1
+    board = create_board()
+    while not check_win(board)[0] and not check_tie(board):# try make a list of tuple for every move and return it with final
+        if who == 1:
+            row, column = strategy1(board)[0], strategy1(board)[1]
+            board = put_piece(board, row, column, who)
+            print("Player's turn end.The current board state is ")
+            print(board)
+        if who == 2:
+            actions = action_space(board)
+            curr_state = board2state(board)
+            moves = legal_actions(curr_state, actions)
+            states = state_space()
+            state_tree = create_state_tree(states)
+            random_index = randrange(0, len(moves))
+            row, column = moves[random_index][0], moves[random_index][1]
+            board = put_piece(board, row, column, who)
+            print("Computer's turn end.The current board state is ")
+            print(board)
+        who = other(who)
+    return board
