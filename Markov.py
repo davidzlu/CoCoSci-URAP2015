@@ -157,7 +157,7 @@ def next_states(cur_state, action, state_tree):
 def reward_function(cur_state, action, next_state):
 	""" Reward every time. """
 	expected_reward = 0
-	win = check_win(state2board(next_state))[0]
+	win, player = check_win(state2board(next_state))
 	if win:
 		if player == 1:
 			expected_reward = 1
