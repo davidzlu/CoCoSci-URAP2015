@@ -84,7 +84,8 @@ def play(strategy1= human_player):
     board = create_board()
     while not check_win(board)[0] and not check_tie(board):# try make a list of tuple for every move and return it with final
         if who == 1:
-            row, column = strategy1(board)[0], strategy1(board)[1]
+            move = strategy1(board)
+            row, column = move[0], move[1]
             board = put_piece(board, row, column, who)
             print("Player's turn end.The current board state is ")
             print(board)
@@ -100,4 +101,8 @@ def play(strategy1= human_player):
             print("Computer's turn end.The current board state is ")
             print(board)
         who = other(who)
+    if check_win(board)[0]:
+        print('Player ' + str(check_win(board)[1]) + ' has won!')
+    elif check_tie(board):
+        print('The game has ended in a tie.')
     return board
