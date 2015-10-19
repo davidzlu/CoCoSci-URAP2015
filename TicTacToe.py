@@ -49,7 +49,12 @@ def check_tie(board):
 
 def other(who):
     return 3 - who
-
+def moves_made(state):
+    count = 0
+    for i in range(len(state)):
+        if state[i] == '0':
+            count += 1
+    return len(state) - count
 
 #human-player phase: we print a comment to ask
 def human_player(board):
@@ -67,12 +72,17 @@ def human_player(board):
         my_move = ast.literal_eval(input("Please enter a valid move: "))
     test_state, reward = simulate_transition(curr_state, my_move)
     probs = []
+    poss_states = []
     for next_state in state_tree[test_state]:
-        probs.append(transition_prob(next_state, test_state, my_move, state_tree))
+        if moves_made(next_state) == moves_made(test_state)+1:
+            poss_states.append(next_state)
+            probs.append(transition_prob(next_state, test_state, my_move, state_tree)[0])
     print("These are the next possible states: ")
-    print(state_tree[test_state])
+    print(poss_states)
     print("These are the probabilities associated with each state: ")
     print(probs)
+    print("Your expected reward is: ")
+    print(reward)
     response2 = input("Would you like to change your move? y/n: ")
     if (response2 == 'n') | (response2 == 'no'):
         return my_move
