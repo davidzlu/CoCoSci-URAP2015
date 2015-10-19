@@ -99,16 +99,19 @@ def human_player(board, player=1):
     my_move = ast.literal_eval(response)
     while my_move not in moves:
         my_move = ast.literal_eval(input("Please enter a valid move: "))
-    test_board = board.copy()
-    test_state = board2state(put_piece(test_board, my_move[0], my_move[1], player))
-    probs = []
-    for next_state in state_tree[test_state]:
-        probs.append(transition_prob(next_state, test_state, action, state_tree))
-    print("These are the next possible states: ")
-    print(state_tree[test_state])
-    print("These are the probabilities associated with each state: ")
-    print(probs)
-    print(board)
+    orig_board = list(board)
+    #why is this line still modifying the original board instead of test_board
+    test_board = put_piece(board, my_move[0], my_move[1], player)
+    print(orig_board)
+    print(test_board)
+    test_state = board2state(test_board)
+    # probs = []
+    # for next_state in state_tree[test_state]:
+    #     probs.append(transition_prob(next_state, test_state, my_move, state_tree))
+    # print("These are the next possible states: ")
+    # print(state_tree[test_state])
+    # print("These are the probabilities associated with each state: ")
+    # print(probs)
     response2 = input("Would you like to change your move? y/n: ")
     if (response2 == 'n') | (response2 == 'no'):
         return my_move
