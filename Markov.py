@@ -133,14 +133,26 @@ def transition_prob(next_state, cur_state, action, state_tree):
     cur_state and action. Distribution function method. Should get info from
     policy. """
     if next_state in state_tree[cur_state]:
-    	num_rechable_states = 0
-    	for state in state_tree[cur_state]:
-    		space_check = 2*action[0] + action[1]
-    		if state[space_check] == '1':
-    			num_rechable_states += 1
+    	next_level = state_tree[cur_state]
+    	possible_states = next_states(cur_state, action, state_tree)
+    	num_rechable_states = len(possible_states)
+    	vector = [0]*len(next_level)
     	if num_rechable_states > 0:
-    		return 1.0/num_rechable_states
-    return 0
+    		prob =  1.0/num_rechable_states
+    		for i in range(0, len(vector)):
+    			if next_level[i] in possible_states:
+    				vector[i] = prob
+    		return prob, vector
+    return 0, []
+
+def next_states(cur_state, action, state_tree):
+	""" Return list of next possible states given current and action. """
+	states = []
+	for state in state_tree[cur_state]:
+		space_check = 2*action[0] + action[1]
+		if state[space_check] == '1':
+			states.append(state)
+	return states
 
 def reward_function(cur_state, action, next_state):
 	""" Reward every time. """
