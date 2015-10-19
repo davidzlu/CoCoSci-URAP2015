@@ -1,7 +1,7 @@
 _zip = zip
 
 from Markov import create_states, state_space, action_space, legal_actions, board2state
-import random
+import random, ast
 
 def mean(s):
     """Return the arithmetic mean of a sequence of numbers s.
@@ -100,3 +100,18 @@ def play(strategy1, strategy2):
             board = put_piece(board, row, column, who)
         who = other(who)
     return board
+
+
+def human_player(board):
+    actions = action_space(board)
+    curr_state = board2state(board)
+    moves = legal_actions(curr_state, actions)
+    print("The current state of the game is: " + curr_state)
+    print("Your available moves are: ")
+    print(moves)
+    response = input("Enter the move you'd like to make: ")
+    my_move = ast.literal_eval(response)
+    while my_move not in moves:
+        my_move = ast.literal_eval(input("Please enter a valid move: "))
+    return my_move
+
