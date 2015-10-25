@@ -1,6 +1,7 @@
 import string
 from TicTacToe import *
 import random
+import numpy as np
 digs = string.digits
 
 def int2base(x, base):
@@ -144,6 +145,26 @@ def transition_prob(next_state, cur_state, action, state_tree):
     				vector[i] = prob
     		return prob, vector
     return 0, []
+
+def transition_prob_matrix(board):
+	actions = action_space(board)
+	curr_state = board2state(board)
+	moves = legal_actions(curr_state, actions)
+	states = state_space()
+	state_tree = create_state_tree(states)
+	array_list = []
+	for move in moves:
+	    test_state = simulate_transition(curr_state, move)[0]
+	    probs = []
+	    for next_state in state_tree[test_state]:
+	        if moves_made(next_state) == moves_made(test_state)+1:
+	            probs.append(transition_prob(next_state, test_state, move, state_tree)[0])
+	    array_list.append(probs)
+	matrix = np.array(array_list[0])
+	for array in array_list[1:]:
+		matrix = np.dstack(matrix, np.array(array))
+	return matrix
+
 
 def next_states(cur_state, action, state_tree):
 	""" Return list of next possible states given current and action. """
