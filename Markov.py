@@ -125,10 +125,7 @@ def state2board(state):
 	return [ [int(state[0]), int(state[1])], [int(state[2]), int(state[3])] ]
 
 def transition_prob(next_state, cur_state, action, state_tree):
-	# sample_discrete_distribution module
-	# return index of vector w/ probability greater than some given one
-	# possibly create 3d transition_matrix of cur_state, next_state and action
-	# get action by mapping to and from in some way?
+	# giving probability of entire level for some reason
     """ Return probability of transitioning into next_state from
     cur_state and action. Distribution function method. Should get info from
     policy. """
@@ -149,9 +146,14 @@ def next_states(cur_state, action, state_tree):
 	""" Return list of next possible states given current and action. """
 	states = []
 	for state in state_tree[cur_state]:
+		num_differs = 0
 		space_check = 2*action[0] + action[1]
 		if state[space_check] == '1':
-			states.append(state)
+			for i in range(0, len(state)):
+				if cur_state[i] != state[i]:
+					num_differs += 1
+			if num_differs == 2:
+				states.append(state)
 	return states
 
 def reward_function(cur_state, action, next_state):
