@@ -76,7 +76,7 @@ def human_player(board):
     for next_state in state_tree[test_state]:
         if moves_made(next_state) == moves_made(test_state)+1:
             poss_states.append(next_state)
-            probs.append(transition_prob(next_state, test_state, my_move, state_tree)[0])
+            probs.append(transition_prob(next_state, curr_state, my_move, state_tree)[0])
     print("These are the next possible states: ")
     print(poss_states)
     print("These are the probabilities associated with each state: ")
