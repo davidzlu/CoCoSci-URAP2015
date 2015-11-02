@@ -151,12 +151,11 @@ def transition_prob_matrix(board):
 	state_tree = create_state_tree(states)
 	array_list = []
 	for move in moves:
-	    test_state = simulate_transition(curr_state, move)[0]
-	    probs = []
-	    for next_state in state_tree[test_state]:
-	        if moves_made(next_state) == moves_made(test_state)+1:
-	            probs.append(transition_prob(next_state, curr_state, move, state_tree)[0])
-	    array_list.append(probs)
+	     test_state = simulate_transition(curr_state, move)[0]
+	     for next_state in state_tree[test_state]:
+        	if moves_made(next_state) == moves_made(test_state)+1:
+        		array_list.append(transition_prob(next_state, curr_state, move, state_tree)[1])
+        		break
 	matrix = np.array(array_list[0])
 	for array in array_list[1:]:
 		matrix = np.dstack((matrix, np.array(array)))
