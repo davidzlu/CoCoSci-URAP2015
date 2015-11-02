@@ -200,3 +200,19 @@ if __name__ == "__main__":
 	states = state_space()
 	state_tree = create_state_tree(states)
 
+def q(cur_state, action):
+	test_state, reward = simulate_transition(cur_state, action)#first examine if any reward is produced in this action
+	test_board = state2board(test_state)
+	states = create_states()
+    state_tree = create_state_tree(states)#next possible states
+	next_rewards = []
+    for next_state in state_tree[test_state]:
+        trans_prob = transition_prob(next_state, test_state, action, state_tree)
+		next_actions = action_space(state2board(next_state))
+		rewards = []
+		for acts in next_actions:
+			rewards.append(simulate_transition(next_state, act)[1])#append reward of each ection for given possible state
+		max_exp_rewards = trans_prob * max(rewards)
+		next_rewards.append(max_exp_rewards)
+	return reward + sum(next_rewards)#return the reward of this turn and the sum of all possible states according to their transition probability
+
