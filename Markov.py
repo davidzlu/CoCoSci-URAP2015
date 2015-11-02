@@ -155,11 +155,11 @@ def transition_prob_matrix(board):
 	    probs = []
 	    for next_state in state_tree[test_state]:
 	        if moves_made(next_state) == moves_made(test_state)+1:
-	            probs.append(transition_prob(next_state, test_state, move, state_tree)[0])
+	            probs.append(transition_prob(next_state, curr_state, move, state_tree)[0])
 	    array_list.append(probs)
 	matrix = np.array(array_list[0])
 	for array in array_list[1:]:
-		matrix = np.dstack(matrix, np.array(array))
+		matrix = np.dstack((matrix, np.array(array)))
 	return matrix
 
 
