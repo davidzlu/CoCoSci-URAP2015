@@ -139,3 +139,14 @@ def play(strategy1= human_player):
         reward = -100
     return board, reward
 
+def best_policy(board):
+    actions = action_space(board)
+    curr_state = board2state(board)
+    moves = legal_actions(curr_state, actions)
+    possible_actions_q = {}
+    for act in moves:
+        key, value = q(curr_state, act), act
+        possible_actions_q[key] = value
+    best_q = max(possible_actions_q.keys())
+    return possible_actions_q[best_q]
+
