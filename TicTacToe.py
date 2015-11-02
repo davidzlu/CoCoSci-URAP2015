@@ -116,3 +116,14 @@ def play(strategy1= human_player):
     elif check_tie(board):
         print('The game has ended in a tie.')
     return board
+
+def best_policy(board):
+    actions = action_space(board)
+    curr_state = board2state(board)
+    moves = legal_actions(curr_state, actions)
+    possible_actions_q = {}
+    for act in moves:
+        key, value = q(curr_state, act), act
+        possible_actions_q[key] = value
+    best_q = max(possible_actions_q.keys())
+    return possible_actions_q[best_q]
