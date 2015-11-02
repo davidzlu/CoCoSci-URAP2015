@@ -200,3 +200,6 @@ if __name__ == "__main__":
 	states = state_space()
 	state_tree = create_state_tree(states)
 
+def compute_svf(transition_matrix, reward_function):
+	return None
+

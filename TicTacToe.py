@@ -89,14 +89,29 @@ def human_player(board):
     else:
         return human_player(board)
 
+def agent(board, svf):
+    actions = action_space(board)
+    curr_state = board2state(board)
+    moves = legal_actions(curr_state, actions)
+    tpm = transition_prob_matrix(board)
+    values = compute_svf(tpm, reward_function)
+    move = max(values) #this line will change depending on how compute_svf is written
+    return move
+
 def play(strategy1= human_player):
     who = 1
     board = create_board()
     while not check_win(board)[0] and not check_tie(board):# try make a list of tuple for every move and return it with final
         if who == 1:
+            actions = action_space(board)
+            curr_state = board2state(board)
+            moves = legal_actions(curr_state, actions)
             move = strategy1(board)
+            if move not in moves:
+                break
             row, column = move[0], move[1]
             board = put_piece(board, row, column, who)
+            reward = 0
             print("Player's turn end.The current board state is ")
             print(board)
         if who == 2:
@@ -113,6 +128,14 @@ def play(strategy1= human_player):
         who = other(who)
     if check_win(board)[0]:
         print('Player ' + str(check_win(board)[1]) + ' has won!')
+        if str(check_win(board)[1]) == '1':
+            reward = 1
+        else:
+            reward = -1
     elif check_tie(board):
         print('The game has ended in a tie.')
-    return board
+    else:
+        print('An illegal move was made.')
+        reward = -100
+    return board, reward
+
