@@ -217,8 +217,8 @@ def q(cur_state, action):
 		next_actions = action_space(state2board(next_state))
 		next_legal_moves = legal_actions(next_state, next_actions)
 		rewards = []
-		for acts in next_legal_moves:
-			rewards.append(simulate_transition(next_state, act)[1])#append reward of each ection for given possible state
+		for act in next_legal_moves:
+			rewards.append(q(next_state, act))#append reward of each ection for given possible state
 		max_exp_rewards = trans_prob * max(rewards)
 		next_rewards.append(max_exp_rewards)
 	return reward + sum(next_rewards)#return the reward of this turn and the sum of all possible states according to their transition probability
