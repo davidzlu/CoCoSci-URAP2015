@@ -185,11 +185,14 @@ def reward_function(cur_state, action, next_state):
 	""" Reward every time. """
 	expected_reward = 0
 	win, player = check_win(state2board(next_state))
-	if win:
+	actions = action_space(state2board(cur_state))
+	if win and (cur_state != next_state):
 		if player == 1:
 			expected_reward = 1
 		elif player == 2:
 			expected_reward = -1
+	if action not in legal_actions(cur_state, actions):
+		expected_reward = -100
 	return expected_reward
 
 
