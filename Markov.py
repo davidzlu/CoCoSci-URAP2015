@@ -165,7 +165,6 @@ def transition_prob_matrix(board):
 		matrix = np.dstack((matrix, np.array(array)))
 	return matrix
 
-
 def next_states(cur_state, action, state_tree):
 	""" Return list of next possible states given current and action. """
 	states = []
@@ -184,15 +183,19 @@ def next_states(cur_state, action, state_tree):
 def reward_function(cur_state, action, next_state):
 	""" Reward every time. """
 	expected_reward = 0
+	win, player = check_win(state2board(cur_state))
+	if win:
+		return 0
+	next_level = next_states(cur_state, action, create_state_tree(state_space()))
+	if next_level == []:
+		return -100
 	win, player = check_win(state2board(next_state))
-	actions = action_space(state2board(cur_state))
-	if win and (cur_state != next_state):
+
+	if win:
 		if player == 1:
 			expected_reward = 1
 		elif player == 2:
 			expected_reward = -1
-	if action not in legal_actions(cur_state, actions):
-		expected_reward = -100
 	return expected_reward
 
 
@@ -207,6 +210,24 @@ def simulate_transition(cur_state, action):
 if __name__ == "__main__":
 	states = state_space()
 	state_tree = create_state_tree(states)
+	matrix = transition_prob_matrix(create_board())
+
+def opt_svf(cur_state, action, state_tree):
+	if cur_state == '0000':
+		return 1.0/3.0
+	next_level = next_states(cur_state, action, state_tree)
+	if len(next_level) == 1:
+		return reward_function(cur_state, action, next_level[0])
+	if len(next_level) == 0:
+		cur_board = state2board(cur_board)
+		win, player = check_win(cur_board)
+		if win and player == 1:
+			return 1
+		if win and player == 2:
+			return -1
+		return 0
+	if reward_function(cur_state, action, next_level[0]) != 0:
+		return -1.0/2.0 + 0*1.0/2.0
 
 
 def q(cur_state, action):
