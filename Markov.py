@@ -229,10 +229,10 @@ def q(cur_state, action):
 	test_state, reward = simulate_transition(cur_state, action)#first examine if any reward is produced in this action
 	test_board = state2board(test_state)
 	states = create_states()
-    state_tree = create_state_tree(states)#next possible states
+	state_tree = create_state_tree(states)#next possible states
 	next_rewards = []
-    for next_state in state_tree[test_state]:
-        trans_prob = transition_prob(next_state, test_state, action, state_tree)
+	for next_state in state_tree[test_state]:
+		trans_prob = transition_prob(next_state, test_state, action, state_tree)
 		next_actions = action_space(state2board(next_state))
 		next_legal_moves = legal_actions(next_state, next_actions)
 		rewards = []
