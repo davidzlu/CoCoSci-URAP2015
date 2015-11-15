@@ -4,7 +4,6 @@ from Markov import *
 import random, ast
 from random import randrange
 
-
 def create_board(rows=2, columns=2):
     """ Returns a board with the given dimensions.
     >>> create_board(3, 5)
@@ -89,14 +88,6 @@ def human_player(board):
     else:
         return human_player(board)
 
-def agent(board, svf):
-    actions = action_space(board)
-    curr_state = board2state(board)
-    moves = legal_actions(curr_state, actions)
-    tpm = transition_prob_matrix(board)
-    values = compute_svf(tpm, reward_function)
-    move = max(values) #this line will change depending on how compute_svf is written
-    return move
 
 def play(strategy1= human_player):
     who = 1
@@ -142,10 +133,10 @@ def play(strategy1= human_player):
 def best_policy(board):
     actions = action_space(board)
     curr_state = board2state(board)
-    moves = legal_actions(curr_state, actions)
     possible_actions_q = {}
-    for act in moves:
-        key, value = q(curr_state, act), act
+    for act in actions:
+        key = q(curr_state, act)
+        value = act
         possible_actions_q[key] = value
     best_q = max(possible_actions_q.keys())
     return possible_actions_q[best_q]

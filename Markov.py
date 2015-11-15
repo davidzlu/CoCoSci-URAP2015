@@ -227,7 +227,7 @@ def opt_svf(cur_state, action, state_tree):
 
 
 def q(cur_state, action):
-	test_state, reward = simulate_transition(cur_state, action)#first examine if any reward is produced in this action
+	test_state, reward = simulate_transition(cur_state, action) #first examine if any reward is produced in this action
 	test_board = state2board(test_state)
 	states = create_states()
 	state_tree = create_state_tree(states) #next possible states
@@ -237,9 +237,9 @@ def q(cur_state, action):
 		next_actions = action_space(state2board(next_state))
 		rewards = []
 		for act in next_actions:
-			rewards.append(q(next_state, act))#append reward of each ection for given possible state
+			rewards.append(q(next_state, act)) #append reward of each ection for given possible state
 		max_exp_rewards = trans_prob * max(rewards)
 		next_rewards.append(max_exp_rewards)
-	return reward + sum(next_rewards)#return the reward of this turn and the sum of all possible states according to their transition probability
+	return reward + sum(next_rewards) #return the reward of this turn and the sum of all possible states according to their transition probability
 
 
