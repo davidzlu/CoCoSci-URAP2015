@@ -183,19 +183,15 @@ def next_states(cur_state, action, state_tree):
 def reward_function(cur_state, action, next_state):
 	""" Reward every time. """
 	expected_reward = 0
-	win, player = check_win(state2board(cur_state))
-	if win:
-		return 0
-	next_level = next_states(cur_state, action, create_state_tree(state_space()))
-	if next_level == []:
-		return -100
 	win, player = check_win(state2board(next_state))
-
-	if win:
+	actions = action_space(state2board(cur_state))
+	if win and (cur_state != next_state):
 		if player == 1:
 			expected_reward = 1
 		elif player == 2:
 			expected_reward = -1
+	if action not in legal_actions(cur_state, actions):
+		expected_reward = -100
 	return expected_reward
 
 
@@ -237,12 +233,13 @@ def q(cur_state, action):
 	state_tree = create_state_tree(states) #next possible states
 	next_rewards = []
 	for next_state in state_tree[test_state]:
-		trans_prob = transition_prob(next_state, test_state, action, state_tree)
+		trans_prob = transition_prob(next_state, test_state, action, state_tree)[0]
 		next_actions = action_space(state2board(next_state))
-		next_legal_moves = legal_actions(next_state, next_actions)
 		rewards = []
-		for act in next_legal_moves:
+		for act in next_actions:
 			rewards.append(q(next_state, act))#append reward of each ection for given possible state
 		max_exp_rewards = trans_prob * max(rewards)
 		next_rewards.append(max_exp_rewards)
 	return reward + sum(next_rewards)#return the reward of this turn and the sum of all possible states according to their transition probability
+
+
