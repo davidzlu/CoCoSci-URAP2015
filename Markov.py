@@ -142,25 +142,29 @@ def transition_prob(next_state, cur_state, action, state_tree):
     	vector = [0]*len(next_level)
     	if num_rechable_states > 0:
     		prob =  1.0/num_rechable_states
-    		for i in range(0, len(vector)):
+    		for i in range(len(vector)):
     			if next_level[i] in possible_states:
     				vector[i] = prob
     		return prob, vector
-    return 0, []
+    return 0, np.zeros(len(state_tree[cur_state]))
 
 def transition_prob_matrix(board):
 	actions = action_space(board)
 	curr_state = board2state(board)
-	moves = legal_actions(curr_state, actions)
 	states = state_space()
 	state_tree = create_state_tree(states)
 	array_list = []
-	for move in moves:
-	     test_state = simulate_transition(curr_state, move)[0]
-	     for next_state in state_tree[test_state]:
-        	if moves_made(next_state) == moves_made(test_state)+1:
-        		array_list.append(transition_prob(next_state, curr_state, move, state_tree)[1])
-        		break
+	for move in actions:
+		test_state = simulate_transition(curr_state, move)[0]
+		if test_state in state_tree:
+			for next_state in state_tree[test_state]:
+				if moves_made(next_state) == moves_made(test_state)+1:
+					array_list.append(transition_prob(next_state, curr_state, move, state_tree)[1])
+					break
+			if state_tree[test_state] == []:
+				array_list.append(transition_prob(test_state, curr_state, move, state_tree)[1])
+		else:
+			array_list.append(np.zeros(len(state_tree[curr_state])))
 	matrix = np.array(array_list[0])
 	for array in array_list[1:]:
 		matrix = np.dstack((matrix, np.array(array)))
@@ -170,32 +174,29 @@ def next_states(cur_state, action, state_tree):
 	""" Return list of next possible states given current and action. """
 	states = []
 	for state in state_tree[cur_state]:
-		num_differs = 0
 		space_check = 2*action[0] + action[1]
 		if state[space_check] == '1':
-			for i in range(0, len(state)):
-				if cur_state[i] != state[i]:
-					num_differs += 1
-			if num_differs == 2:
+			if simulate_transition(cur_state, action)[0] != cur_state:
+				if moves_made(state) == moves_made(cur_state)+1:
+					if check_win(state2board(state)) == (True, 1):
+						states.append(state)
+						break
+			if moves_made(state) == moves_made(cur_state)+1:
 				states.append(state)
 	return states
 
 def reward_function(cur_state, action, next_state):
 	""" Reward every time. """
 	expected_reward = 0
-	win, player = check_win(state2board(cur_state))
-	if win:
-		return 0
-	next_level = next_states(cur_state, action, create_state_tree(state_space()))
-	if next_level == []:
-		return -100
 	win, player = check_win(state2board(next_state))
-
-	if win:
+	actions = action_space(state2board(cur_state))
+	if win and (cur_state != next_state):
 		if player == 1:
 			expected_reward = 1
 		elif player == 2:
 			expected_reward = -1
+	if action not in legal_actions(cur_state, actions):
+		expected_reward = -100
 	return expected_reward
 
 
@@ -228,18 +229,19 @@ def opt_avf(cur_state, cur_action, state_tree, d, e):
 
 
 def q(cur_state, action):
-	test_state, reward = simulate_transition(cur_state, action)#first examine if any reward is produced in this action
+	test_state, reward = simulate_transition(cur_state, action) #first examine if any reward is produced in this action
 	test_board = state2board(test_state)
 	states = create_states()
-	state_tree = create_state_tree(states)#next possible states
+	state_tree = create_state_tree(states) #next possible states
 	next_rewards = []
 	for next_state in state_tree[test_state]:
-		trans_prob = transition_prob(next_state, test_state, action, state_tree)
+		trans_prob = transition_prob(next_state, test_state, action, state_tree)[0]
 		next_actions = action_space(state2board(next_state))
-		next_legal_moves = legal_actions(next_state, next_actions)
 		rewards = []
-		for acts in next_legal_moves:
-			rewards.append(simulate_transition(next_state, act)[1])#append reward of each ection for given possible state
+		for act in next_actions:
+			rewards.append(q(next_state, act)) #append reward of each ection for given possible state
 		max_exp_rewards = trans_prob * max(rewards)
 		next_rewards.append(max_exp_rewards)
-	return reward + sum(next_rewards)#return the reward of this turn and the sum of all possible states according to their transition probability
+	return reward + sum(next_rewards) #return the reward of this turn and the sum of all possible states according to their transition probability
+
+

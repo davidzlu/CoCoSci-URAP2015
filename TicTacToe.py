@@ -4,7 +4,6 @@ from Markov import *
 import random, ast
 from random import randrange
 
-
 def create_board(rows=2, columns=2):
     """ Returns a board with the given dimensions.
     >>> create_board(3, 5)
@@ -89,18 +88,12 @@ def human_player(board):
     else:
         return human_player(board)
 
-def agent(board, svf):
-    actions = action_space(board)
-    curr_state = board2state(board)
-    moves = legal_actions(curr_state, actions)
-    tpm = transition_prob_matrix(board)
-    values = compute_svf(tpm, reward_function)
-    move = max(values) #this line will change depending on how compute_svf is written
-    return move
 
 def play(strategy1= human_player):
     who = 1
     board = create_board()
+    print("The game has begun. The current board state is ")
+    print(board)
     while not check_win(board)[0] and not check_tie(board):# try make a list of tuple for every move and return it with final
         if who == 1:
             actions = action_space(board)
@@ -142,11 +135,30 @@ def play(strategy1= human_player):
 def best_policy(board):
     actions = action_space(board)
     curr_state = board2state(board)
-    moves = legal_actions(curr_state, actions)
     possible_actions_q = {}
-    for act in moves:
-        key, value = q(curr_state, act), act
-        possible_actions_q[key] = value
+    for act in actions:
+        key = q(curr_state, act)
+        value = key
+        entry = act
+        possible_actions_q[key] = entry
     best_q = max(possible_actions_q.keys())
     return possible_actions_q[best_q]
+
+
+# def policy_improvement(board):
+#     actions = action_space(board)
+#     curr_state = board2state(board)
+#     value = 1
+#     delta = 0.05
+#     while delta > 0.01:
+#         for act in actions:
+#             old_value = value
+#             value = q(curr_state, act)
+#             if value >= old_value:
+#                 policy = act
+#                 delta = abs(old_value - value)
+#                 break
+#     return policy
+# ^ not sure what the right initial value for delta is, also hangs 
+# on some board states such as '1200'
 
