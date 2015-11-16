@@ -92,6 +92,8 @@ def human_player(board):
 def play(strategy1= human_player):
     who = 1
     board = create_board()
+    print("The game has begun. The current board state is ")
+    print(board)
     while not check_win(board)[0] and not check_tie(board):# try make a list of tuple for every move and return it with final
         if who == 1:
             actions = action_space(board)
@@ -136,8 +138,27 @@ def best_policy(board):
     possible_actions_q = {}
     for act in actions:
         key = q(curr_state, act)
-        value = act
-        possible_actions_q[key] = value
+        value = key
+        entry = act
+        possible_actions_q[key] = entry
     best_q = max(possible_actions_q.keys())
     return possible_actions_q[best_q]
+
+
+# def policy_improvement(board):
+#     actions = action_space(board)
+#     curr_state = board2state(board)
+#     value = 1
+#     delta = 0.05
+#     while delta > 0.01:
+#         for act in actions:
+#             old_value = value
+#             value = q(curr_state, act)
+#             if value >= old_value:
+#                 policy = act
+#                 delta = abs(old_value - value)
+#                 break
+#     return policy
+# ^ not sure what the right initial value for delta is, also hangs 
+# on some board states such as '1200'
 
