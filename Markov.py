@@ -122,11 +122,16 @@ def valid_transition(cur_state, next_state):
 		return True
 	return False
 
-def state2board(state):
-	return [ [int(state[0]), int(state[1])], [int(state[2]), int(state[3])] ]
+def state2board(state, rows=2, columns=2):
+	board = []
+	for row in range(rows):
+		board_row = []
+		for col in range(columns):
+			board_row.append(int(state[(row*columns) + col]))
+		board.append(board_row)
+	return board
 
 def transition_prob(next_state, cur_state, action, state_tree):
-	# giving probability of entire level for some reason
     """ Return probability of transitioning into next_state from
     cur_state and action. Distribution function method. Should get info from
     policy. """
@@ -207,22 +212,19 @@ if __name__ == "__main__":
 	state_tree = create_state_tree(states)
 	matrix = transition_prob_matrix(create_board())
 
-def opt_svf(cur_state, action, state_tree):
-	if cur_state == '0000':
-		return 1.0/3.0
-	next_level = next_states(cur_state, action, state_tree)
-	if len(next_level) == 1:
-		return reward_function(cur_state, action, next_level[0])
-	if len(next_level) == 0:
-		cur_board = state2board(cur_board)
-		win, player = check_win(cur_board)
-		if win and player == 1:
-			return 1
-		if win and player == 2:
-			return -1
+def opt_avf(cur_state, cur_action, state_tree, d, e):
+	if state_tree[cur_state] == []:
 		return 0
-	if reward_function(cur_state, action, next_level[0]) != 0:
-		return -1.0/2.0 + 0*1.0/2.0
+	value = 0
+	while d >= e:
+		possible_states = next_states(cur_state, cur_action, state_tree)
+		for next_state in possible_states:
+			for action in action_space([[0,0],[0,0]]):
+				next_value = transition_prob(next_state, cur_state, action, state_tree)[0] * (reward_function(cur_state, action, next_state)
+				 + opt_svf(next_state, action, state_tree, d, e))
+				value = max(value, next_value)
+				d = min(d, abs(value-next_value))
+	return value
 
 
 def q(cur_state, action):
