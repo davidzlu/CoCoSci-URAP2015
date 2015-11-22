@@ -11,13 +11,13 @@ def board2state(board):
 		state += ''.join(map(str, board[row, :]))
 	return state
 
-#def possible_actions(board):
-#	actions = []
-#	for i in range(len(board)):
-#        for j in range(len(board)):
-#			if board[i][j] = 0:
-#				actions.append([i, j, 1])
-#				actions.append([i, j, 2])
-#				actions.append([i, j, 3])
-#				actions.append([i, j, 4])
-#	return actions
+def possible_actions(board):
+	actions = []
+	for i in range(len(board)):
+		for j in range(len(board)):
+			if board[i][j] == 0:
+				actions.append([i, j, 1])
+				actions.append([i, j, 2])
+				actions.append([i, j, 3])
+				actions.append([i, j, 4])
+	return actions
