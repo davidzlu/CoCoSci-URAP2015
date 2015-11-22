@@ -11,7 +11,7 @@ def create_board():
 	return board.astype(int)
 
 def take_action(board, endrow, endcolumn, direction):
-	# 1 = down 2 = right 3 = up 4 = left
+	# 1 = down 2 = left 3 = up 4 = right
 	assert direction == 1 or direction == 2 or direction == 3 or direction == 4
 	x = board[:][:]
 	x[endrow][endcolumn] = 1
