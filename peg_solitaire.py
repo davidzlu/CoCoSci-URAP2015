@@ -37,6 +37,8 @@ def check_win(board):
 		for j in range(len(board)):
 			if board[i][j] == 1:
 				num_pegs += 1
+			if num_pegs > 1:
+				return False
 	if num_pegs == 1:
 		return True
-	return False
+
