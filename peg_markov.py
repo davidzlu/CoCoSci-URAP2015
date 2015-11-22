@@ -11,6 +11,13 @@ def board2state(board):
 		state += ''.join(map(str, board[row, :]))
 	return state
 
+def state2board(state):
+	board = np.zeros(49).astype(int)
+	for i in range(len(state)):
+		board[i] = state[i]
+	return board.reshape((7,7))
+
+
 def possible_actions(board):
 	actions = []
 	for i in range(len(board)):
