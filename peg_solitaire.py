@@ -11,7 +11,9 @@ def create_board():
 	return board.astype(int)
 
 def take_action(board, endrow, endcolumn, direction):
-	# 1 = down 2 = left 3 = up 4 = right
+	"""Takes in the board and the target location, where direction is 
+	the starting location of the peg relative to the target.
+	 1 = down 2 = left 3 = up 4 = right"""
 	assert direction == 1 or direction == 2 or direction == 3 or direction == 4
 	x = board[:][:]
 	x[endrow][endcolumn] = 1
@@ -28,3 +30,13 @@ def take_action(board, endrow, endcolumn, direction):
 		x[endrow][endcolumn + 1] = 0
 		x[endrow][endcolumn + 2] = 0
 	return x
+
+def check_win(board):
+	num_pegs = 0
+	for i in range(len(board)):
+		for j in range(len(board)):
+			if board[i][j] == 1:
+				num_pegs += 1
+	if num_pegs == 1:
+		return True
+	return False
