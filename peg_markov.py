@@ -121,4 +121,5 @@ def reward(state, action, next_state):
 #					if board[acts[0]][acts[1] + 1] = 1 and board[acts[0]][acts[1] + 2] = 1:
 #						legal_acts.append(acts)
 #			except IndexError as error:
+#				pass
 #	return legal_acts
