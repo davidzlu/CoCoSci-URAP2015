@@ -42,3 +42,25 @@ def check_win(board):
 	if num_pegs == 1:
 		return True
 
+def play(strategy):
+	board = create_board()
+	print("The game has begun. The current board state is ")
+	print(board)
+	while not check_win(board):
+		cur_state = board2state(board)
+		moves = legal_actions(board)
+		move = strategy(board)
+		if move not in moves:
+			break
+		row, column, direction = move[0], move[1], move[2]
+		board = take_action(board, row, column, direction)
+		reward = 0
+		print("The turn has ended.The current board state is ")
+		print(board)
+	if check_win(board):
+		print('The player has won the game!')
+		reward = 1
+	else:
+		print('An illegal move was made.')
+		reward = -1
+	return board, reward
