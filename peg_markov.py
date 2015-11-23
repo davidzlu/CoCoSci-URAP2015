@@ -58,16 +58,16 @@ def legal_actions(board):
 		spaces = []
 		if i-2 >= 0: # up
 			if board[(i-2, j)] == 1 and board[(i-1, j)] == 1:
-				spaces.append((i-2, j, 3))
+				spaces.append((i, j, 3))
 		if j-2 >= 0: # left
 			if board[(i, j-2)] == 1 and board[(i, j-1)] == 1:
-				spaces.append((i, j-2, 2))
+				spaces.append((i, j, 2))
 		if i+2 < 7: # down
 			if board[(i+2, j)] == 1 and board[(i+2, j)] == 1:
-				spaces.append((i+2, j, 1))
+				spaces.append((i, j, 1))
 		if j+2 < 7: # right
 			if board[(i, j+2)] == 1 and board[(i, j+2)] == 1:
-				spaces.append((i, j+2, 4))
+				spaces.append((i, j, 4))
 		return spaces
 
 	legal_moves = []
