@@ -1,9 +1,9 @@
-
 import numpy as np
 from peg_solitaire import *
 
-
+lose_state = np.zeros((7,7)).astype(int)
 illegal_spaces = [(0, 0), (1, 0), (5, 0), (6, 0), (0, 1), (1, 1), (5, 1), (6, 1), (0, 5), (0, 6), (1, 5), (1, 6), (5, 5), (5, 6), (6, 5), (6, 6)]
+
 
 def board2state(board):
 	state = ''
@@ -45,3 +45,60 @@ def possible_actions(board):
 				actions.append([i, j, 3])
 				actions.append([i, j, 4])
 	return actions
+
+def legal_actions(board):
+	"""
+	Returns list of legal actions that can be taken in board.
+	"""
+	def space_check((i, j)):
+		"""
+		Helper method for legal_actions. Returns list of legal actions
+		that can be taken using space (i, j) as destination.
+		"""
+		spaces = []
+		if i-2 >= 0: # up
+			if board[(i-2, j)] == 1 and board[(i-1, j)] == 1:
+				spaces.append((i-2, j, 3))
+		if j-2 >= 0: # left
+			if board[(i, j-2)] == 1 and board[(i, j-1)] == 1:
+				spaces.append((i, j-2, 2))
+		if i+2 < 7: # down
+			if board[(i+2, j)] == 1 and board[(i+2, j)] == 1:
+				spaces.append((i+2, j, 1))
+		if j+2 < 7: # right
+			if board[(i, j+2)] == 1 and board[(i, j+2)] == 1:
+				spaces.append((i, j+2, 4))
+		return spaces
+
+	legal_moves = []
+	for i in range(len(board)):
+		for j in range(len(board)):
+			space = (i, j)
+			if space not in illegal_spaces and board[space] == 0:
+				legal_moves += space_check(space)
+	return legal_moves
+
+def state_transition(state, action):
+	""" 
+	Returns state agent would enter if takes action in state.
+	If no legal actions in state, or if action is not legal,
+	return lose state.
+	"""
+	legal_moves = legal_actions(state2board(state))
+	if legal_moves == [] or action not in legal_moves:
+		return lose_state
+	return board2state(take_action(state2board(state), action[0], action[1], action[2]))
+
+def reward(state, action, next_state):
+	"""
+	Returns 1 if taking action in state is legal, state transitions
+	to next_state using action, and next_state is a win state.
+	Returns -100 if taking action in state is not legal, or state
+	does not transition to next_state using action. Return 0 otherwise.
+	"""
+	if state_transition(state, action) == next_state:
+		if check_win(state2board(next_state)):
+			return 1
+		elif next_state != lose_state:
+			return 0
+	return -1
