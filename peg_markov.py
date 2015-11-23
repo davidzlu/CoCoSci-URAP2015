@@ -1,7 +1,6 @@
 import numpy as np
 from peg_solitaire import *
 
-lose_state = np.zeros((7,7)).astype(int)
 illegal_spaces = [(0, 0), (1, 0), (5, 0), (6, 0), (0, 1), (1, 1), (5, 1), (6, 1), (0, 5), (0, 6), (1, 5), (1, 6), (5, 5), (5, 6), (6, 5), (6, 6)]
 
 
@@ -16,6 +15,8 @@ def state2board(state):
 	for i in range(len(state)):
 		board[i] = state[i]
 	return board.reshape((7,7))
+
+lose_state = board2state(np.zeros((7,7)).astype(int))
 
 def next_states(state):
 	states = []
@@ -40,10 +41,10 @@ def possible_actions(board):
 	for i in range(len(board)):
 		for j in range(len(board)):
 			if board[i][j] == 0:
-				actions.append([i, j, 1])
-				actions.append([i, j, 2])
-				actions.append([i, j, 3])
-				actions.append([i, j, 4])
+				actions.append((i, j, 1))
+				actions.append((i, j, 2))
+				actions.append((i, j, 3))
+				actions.append((i, j, 4))
 	return actions
 
 def legal_actions(board):
@@ -90,6 +91,30 @@ def state_transition(state, action):
 	if legal_moves == [] or action not in legal_moves:
 		return lose_state
 	return board2state(take_action(state2board(state), action[0], action[1], action[2]))
+
+def transition_prob(next_state, cur_state, action):
+	moves = legal_actions(state2board(cur_state))
+	if action in moves:
+		if state_transition(cur_state, action) == next_state:
+			return 1
+	return 0
+
+def transition_prob_matrix(board):
+	actions = possible_actions(board)
+	cur_state = board2state(board)
+	states = next_states(cur_state)
+	array_list = []
+	for move in actions:
+		test_state = state_transition(cur_state, move)
+		if test_state in states:
+			array_list.append(transition_prob(test_state, cur_state, move))
+		else:
+			array_list.append(0)
+	matrix = np.array(array_list[0])
+	for array in array_list[1:]:
+		matrix = np.dstack((matrix, np.array(array)))
+	return matrix
+
 
 def reward(state, action, next_state):
 	"""
