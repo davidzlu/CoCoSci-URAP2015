@@ -50,11 +50,13 @@ def legal_actions(board):
 	"""
 	Returns list of legal actions that can be taken in board.
 	"""
-	def space_check((i, j)):
+	def space_check(space):
 		"""
 		Helper method for legal_actions. Returns list of legal actions
 		that can be taken using space (i, j) as destination.
 		"""
+		i = space[0]
+		j = space[1]
 		spaces = []
 		if i-2 >= 0: # up
 			if board[(i-2, j)] == 1 and board[(i-1, j)] == 1:
