@@ -133,7 +133,7 @@ def reward(state, action, next_state):
 #def legal_actions(board, actions):
 #	legal_acts = []
 #	for acts in actions:
-#		if acts[0] * 7 + acts[1] not in illegal_spaces:
+#		if (acts[0], acts[1]) not in illegal_spaces:
 #			try:
 #				if acts[2] == 1:
 #					if board[acts[0] + 1][acts[1]] = 1 and board[acts[0] + 2][acts[1]] = 1:
