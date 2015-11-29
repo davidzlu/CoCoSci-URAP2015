@@ -1,4 +1,5 @@
 import numpy as np
+import ast
 from peg_markov import *
 
 def create_board():
@@ -41,6 +42,29 @@ def check_win(board):
 				return False
 	if num_pegs == 1:
 		return True
+
+def human_player(board):
+    cur_state = board2state(board)
+    moves = legal_actions(board)
+    states = next_states(cur_state)
+    print("Your available moves are: ")
+    print(moves)
+    response = input("Enter the move you'd like to make: ")
+    my_move = ast.literal_eval(response)
+    while my_move not in possible_actions(board):
+        my_move = ast.literal_eval(input("Please enter a valid move: "))
+    next_state = state_transition(cur_state, my_move)
+    expected_reward = reward(cur_state, my_move, next_state)
+    print("The result of that move is: ")
+    print(state2board(next_state))
+    print("Your expected reward for that move is: ")
+    print(expected_reward)
+    response2 = input("Would you like to change your move? y/n: ")
+    if (response2 == 'n') | (response2 == 'no'):
+        return my_move
+    else:
+        return human_player(board)
+
 
 def play(strategy):
 	board = create_board()

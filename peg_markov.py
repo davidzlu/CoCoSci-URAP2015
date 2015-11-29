@@ -66,10 +66,10 @@ def legal_actions(board):
 			if board[(i, j-2)] == 1 and board[(i, j-1)] == 1:
 				spaces.append((i, j, 2))
 		if i+2 < 7: # down
-			if board[(i+2, j)] == 1 and board[(i+2, j)] == 1:
+			if board[(i+2, j)] == 1 and board[(i+1, j)] == 1:
 				spaces.append((i, j, 1))
 		if j+2 < 7: # right
-			if board[(i, j+2)] == 1 and board[(i, j+2)] == 1:
+			if board[(i, j+2)] == 1 and board[(i, j+1)] == 1:
 				spaces.append((i, j, 4))
 		return spaces
 
