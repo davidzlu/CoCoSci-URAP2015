@@ -222,7 +222,7 @@ def opt_avf(cur_state, cur_action, state_tree, d, e):
 		for next_state in possible_states:
 			for action in action_space([[0,0],[0,0]]):
 				next_value = transition_prob(next_state, cur_state, action, state_tree)[0] * (reward_function(cur_state, action, next_state)
-				 + opt_svf(next_state, action, state_tree, d, e))
+				 + opt_avf(next_state, action, state_tree, d, e))
 				value = max(value, next_value)
 				d = min(d, abs(value-next_value))
 	return value

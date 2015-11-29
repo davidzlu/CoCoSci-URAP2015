@@ -145,20 +145,3 @@ def best_policy(board):
     return possible_actions_q[best_q]
 
 
-# def policy_improvement(board):
-#     actions = action_space(board)
-#     curr_state = board2state(board)
-#     value = 1
-#     delta = 0.05
-#     while delta > 0.01:
-#         for act in actions:
-#             old_value = value
-#             value = q(curr_state, act)
-#             if value >= old_value:
-#                 policy = act
-#                 delta = abs(old_value - value)
-#                 break
-#     return policy
-# ^ not sure what the right initial value for delta is, also hangs 
-# on some board states such as '1200'
-
