@@ -88,3 +88,15 @@ def play(strategy):
 		print('An illegal move was made.')
 		reward = -1
 	return board, reward
+	
+#def best_policy(board):
+#    actions = possible_actions(board)
+#    curr_state = board2state(board)
+#    possible_actions_q = {}
+#    for act in actions:
+#        key = opt_avf(curr_state, act, 4, 0.5)
+#        value = key
+#        entry = act
+#        possible_actions_q[key] = entry
+#    best_q = max(possible_actions_q.keys())
+#    return possible_actions_q[best_q]
