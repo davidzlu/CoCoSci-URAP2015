@@ -149,6 +149,12 @@ def transition_prob(next_state, cur_state, action, state_tree):
     return 0, np.zeros(len(state_tree[cur_state]))
 
 def transition_prob_matrix(board):
+	"""
+	Creates a transition probability matrix for the board passed in 
+	for which transition_prob_matrix[i, j, k] refers to 
+	[current state, next state, action].
+
+	"""
 	actions = action_space(board)
 	curr_state = board2state(board)
 	states = state_space()
@@ -186,7 +192,8 @@ def next_states(cur_state, action, state_tree):
 	return states
 
 def reward_function(cur_state, action, next_state):
-	""" Reward every time. """
+	""" Rewards calculated for each move. Returns 1 for a win,
+	-1 for a loss, and -100 for illegal moves. """
 	expected_reward = 0
 	win, player = check_win(state2board(next_state))
 	actions = action_space(state2board(cur_state))

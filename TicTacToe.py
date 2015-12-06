@@ -1,5 +1,3 @@
-_zip = zip
-
 from Markov import *
 import random, ast
 from random import randrange
@@ -48,15 +46,26 @@ def check_tie(board):
 
 def other(who):
     return 3 - who
+
 def moves_made(state):
+    """
+    Takes in a string representation of the current state and counts 
+    the number of moves made up until that state of the game.
+    """
     count = 0
     for i in range(len(state)):
         if state[i] == '0':
             count += 1
     return len(state) - count
 
-#human-player phase: we print a comment to ask
+
 def human_player(board):
+    """
+    A strategy for use with play().
+    When passed into play(), an interactive game of TicTacToe begins
+    against an opponent who choses moves randomly. This function allows
+    users to input moves through the terminal.
+    """
     actions = action_space(board)
     curr_state = board2state(board)
     moves = legal_actions(curr_state, actions)
@@ -90,6 +99,11 @@ def human_player(board):
 
 
 def play(strategy1= human_player):
+    """
+    The main function for running a game of TicTacToe. Default is set to
+    human_player phase but this function also accepts learning algorithms which return moves.
+    Currently acceptable arguments are human_player and best_policy
+    """
     who = 1
     board = create_board()
     print("The game has begun. The current board state is ")
