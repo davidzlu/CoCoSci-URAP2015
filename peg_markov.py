@@ -130,23 +130,15 @@ def reward(state, action, next_state):
 			return 0
 	return -1
 
-#def legal_actions(board, actions):
-#	legal_acts = []
-#	for acts in actions:
-#		if (acts[0], acts[1]) not in illegal_spaces:
-#			try:
-#				if acts[2] == 1:
-#					if board[acts[0] + 1][acts[1]] = 1 and board[acts[0] + 2][acts[1]] = 1:
-#						legal_acts.append(acts)
-#				elif acts[2] == 2:
-#					if board[acts[0]][acts[1] - 1] = 1 and board[acts[0]][acts[1] - 2] = 1:
-#						legal_acts.append(acts)
-#				elif acts[2] == 3:
-#					if board[acts[0] - 1][acts[1]] = 1 and board[acts[0] - 2][acts[1]] = 1:
-#						legal_acts.append(acts)
-#				elif acts[2] == 2:
-#					if board[acts[0]][acts[1] + 1] = 1 and board[acts[0]][acts[1] + 2] = 1:
-#						legal_acts.append(acts)
-#			except IndexError as error:
-#				pass
-#	return legal_acts
+#def opt_avf(cur_state, cur_action, d, e):
+#	value = 0
+#	while d >= e:
+#		possible_states = next_states(cur_state)
+#		for next_state in possible_states:
+#			for action in possible_actions([[0,0],[0,0]]):
+#				next_value = transition_prob(next_state, cur_state, action) * (reward(cur_state, action, next_state)
+#				 + opt_avf(next_state, action, d, e))
+#				value = max(value, next_value)
+#				d = min(d, abs(value-next_value))
+#				print(d)
+#	return value
