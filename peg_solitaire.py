@@ -84,7 +84,7 @@ def play(strategy):
 		row, column, direction = move[0], move[1], move[2]
 		board = take_action(board, row, column, direction)
 		reward = 0
-		print("The turn has ended.The current board state is ")
+		print("The turn has ended. The current board state is ")
 		print(board)
 	if check_win(board):
 		print('The player has won the game!')

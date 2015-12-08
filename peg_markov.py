@@ -130,7 +130,7 @@ def transition_prob_matrix(board):
 	return matrix
 
 
-def reward(state, action, next_state):
+def reward(cur_state, action, next_state):
 	"""
 	Returns 1 if taking action in state is legal, state transitions
 	to next_state using action, and next_state is a win state.
@@ -148,15 +148,72 @@ def reward(state, action, next_state):
 	return -1
 
 
-# def opt_avf(cur_state, d, e):
+#def opt_avf(cur_state, cur_action, d, e):
+#	value = 0
+#	while d >= e:
+#		possible_states = next_states(cur_state)
+#		for next_state in possible_states:
+#			for action in possible_actions([[0,0],[0,0]]):
+#				next_value = transition_prob(next_state, cur_state, action) * (reward(cur_state, action, next_state)
+#				 + opt_avf(next_state, action, d, e))
+#				value = max(value, next_value)
+#				d = min(d, abs(value-next_value))
+#				print(d)
+#	return value
+
+# seen = {}
+# def opt_avf(cur_state, cur_action, d, e):
+# 	"""
+# 	Estimates value of cur_state using optimal policy.
+# 	"""
 # 	value = 0
+# 	if (cur_state, cur_action) in seen:
+# 		return seen[(cur_state, cur_action)]
 # 	while d >= e:
-# 		possible_states = next_states(cur_state)
+# 		following_state = state_transition(cur_state, cur_action)
+# 		possible_states = next_states(following_state)
 # 		for next_state in possible_states:
-# 			for action in possible_actions(state2board(cur_state)):
-# 				next_value = transition_prob(next_state, cur_state, action) * (reward(cur_state, action, next_state)
-# 				 + opt_avf(next_state, d, e))
+# 			for action in legal_actions(state2board(next_state)):
+# 				seen[(next_state, action)] = value
+# 				if (next_state, action) in seen:
+# 					next_value = next_value = transition_prob(following_state, cur_state, action) * (reward(following_state, cur_state, cur_action) \
+# 					+ seen[(next_state, action)])
+# 				else:
+# 					next_value = transition_prob(following_state, cur_state, action) * (reward(following_state, cur_state, cur_action) \
+# 					+ opt_avf(next_state, action, d, e))
 # 				value = max(value, next_value)
-# 				d = min(d, abs(value-next_value))
-# 				print(d)
+# 				seen[(next_state, action)] = value
+# 				d = abs(value-next_value)
+# 		seen[(cur_state, cur_action)] = value
 # 	return value
+
+Q = {}
+def opt_avf(cur_state, cur_action, d, e):
+	following_state = state_transition(cur_state, cur_action)
+	states = allstates(following_state)
+	while d >= e:
+		next_value = 0
+		for next_state in states:
+			for action in legal_actions(state2board(next_state)):
+				if (next_state, action) in Q:
+					next_value = transition_prob(following_state, cur_state, action) * (reward(following_state, cur_state, cur_action) \
+ 					+ Q[(next_state, action)])
+ 				else:
+ 					Q[(next_state, action)] = 0
+ 				Q[(next_state, action)] = max(next_value, Q[(next_state, action)])
+ 				d = abs(Q[(next_state, action)] - next_value)
+ 		Q[(cur_state, cur_action)] = next_value
+	return Q[(cur_state, cur_action)]
+
+def allstates(cur_state):
+	states = next_states(cur_state)
+	for state in states:
+		states += next_states(state)
+	return states
+
+
+if __name__ == '__main__':
+	init_state = board2state(create_board())
+	move = (3, 3, 3)
+	d, e = 2, 0.1
+
