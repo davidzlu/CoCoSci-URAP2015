@@ -44,6 +44,11 @@ def check_win(board):
 		return True
 
 def human_player(board):
+    """
+    A strategy for use with play().
+    When passed into play(), an interactive game of Peg Solitaire begins
+    This function allows players to input moves into the terminal.
+    """
     cur_state = board2state(board)
     moves = legal_actions(board)
     states = next_states(cur_state)
@@ -89,7 +94,7 @@ def play(strategy):
 		reward = -1
 	return board, reward
 	
-#def best_policy(board):
+# def best_policy(board):
 #    actions = possible_actions(board)
 #    curr_state = board2state(board)
 #    possible_actions_q = {}

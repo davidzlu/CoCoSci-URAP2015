@@ -148,15 +148,15 @@ def reward(state, action, next_state):
 	return -1
 
 
-def opt_avf(cur_state, d, e):
-	value = 0
-	while d >= e:
-		possible_states = next_states(cur_state)
-		for next_state in possible_states:
-			for action in possible_actions(state2board(cur_state)):
-				next_value = transition_prob(next_state, cur_state, action) * (reward(cur_state, action, next_state)
-				 + opt_avf(next_state, d, e))
-				value = max(value, next_value)
-				d = min(d, abs(value-next_value))
-				print(d)
-	return value
+# def opt_avf(cur_state, d, e):
+# 	value = 0
+# 	while d >= e:
+# 		possible_states = next_states(cur_state)
+# 		for next_state in possible_states:
+# 			for action in possible_actions(state2board(cur_state)):
+# 				next_value = transition_prob(next_state, cur_state, action) * (reward(cur_state, action, next_state)
+# 				 + opt_avf(next_state, d, e))
+# 				value = max(value, next_value)
+# 				d = min(d, abs(value-next_value))
+# 				print(d)
+# 	return value
