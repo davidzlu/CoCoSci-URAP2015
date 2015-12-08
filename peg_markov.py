@@ -1,16 +1,21 @@
 import numpy as np
 from peg_solitaire import *
 
+#spaces which don't usually exist on a standard English Peg Solitaire board
 illegal_spaces = [(0, 0), (1, 0), (5, 0), (6, 0), (0, 1), (1, 1), (5, 1), (6, 1), (0, 5), (0, 6), (1, 5), (1, 6), (5, 5), (5, 6), (6, 5), (6, 6)]
 
 
 def board2state(board):
+	""" Takes in the board and returns a binary string 
+	where 0 represents a hole and 1 represents a peg"""
 	state = ''
 	for row in range(len(board)):
 		state += ''.join(map(str, board[row, :]))
 	return state
 
 def state2board(state):
+	""" Takes in a binary string state representation
+	and returns the board equivalent """
 	board = np.zeros(49).astype(int)
 	for i in range(len(state)):
 		board[i] = state[i]
@@ -19,6 +24,7 @@ def state2board(state):
 lose_state = board2state(np.zeros((7,7)).astype(int))
 
 def next_states(state):
+	""" Returns the next immediately possible legal states given the current state."""
 	states = []
 	board = state2board(state)
 	for i in range(len(board)):
@@ -28,7 +34,7 @@ def next_states(state):
 					#start checking viable directions
 					if (i-2 >= 0) and (board[(i-2, j)] == 1) and (board[(i-1, j)] == 1): #up
 						states.append(board2state(take_action(board.copy(), i, j, 3)))
-					if (i+2 < 7) and (board[(i+2, j)] == 1) and (board[(i+2, j)] == 1): #down
+					if (i+2 < 7) and (board[(i+2, j)] == 1) and (board[(i+1, j)] == 1): #down
 						states.append(board2state(take_action(board.copy(), i, j, 1)))
 					if (j-2 >=0) and (board[(i, j-2)] ==1) and (board[(i, j-1)] == 1): #left
 						states.append(board2state(take_action(board.copy(), i, j, 2))) 
@@ -93,6 +99,8 @@ def state_transition(state, action):
 	return board2state(take_action(state2board(state), action[0], action[1], action[2]))
 
 def transition_prob(next_state, cur_state, action):
+	""" Return probability of transitioning into next_state from
+    cur_state and action."""
 	moves = legal_actions(state2board(cur_state))
 	if action in moves:
 		if state_transition(cur_state, action) == next_state:
@@ -100,6 +108,12 @@ def transition_prob(next_state, cur_state, action):
 	return 0
 
 def transition_prob_matrix(board):
+	"""
+	Creates a transition probability matrix for the board passed in 
+	for which transition_prob_matrix[i, j, k] refers to 
+	[current state, next state, action].
+
+	"""
 	actions = possible_actions(board)
 	cur_state = board2state(board)
 	states = next_states(cur_state)
@@ -123,22 +137,26 @@ def reward(state, action, next_state):
 	Returns -100 if taking action in state is not legal, or state
 	does not transition to next_state using action. Return 0 otherwise.
 	"""
-	if state_transition(state, action) == next_state:
+	if action in legal_actions(state2board(state)):
 		if check_win(state2board(next_state)):
 			return 1
-		elif next_state != lose_state:
+	# 	elif next_state != lose_state:
+	# 		return 0
+	# return -100
+		else:
 			return 0
 	return -1
 
-#def opt_avf(cur_state, cur_action, d, e):
-#	value = 0
-#	while d >= e:
-#		possible_states = next_states(cur_state)
-#		for next_state in possible_states:
-#			for action in possible_actions([[0,0],[0,0]]):
-#				next_value = transition_prob(next_state, cur_state, action) * (reward(cur_state, action, next_state)
-#				 + opt_avf(next_state, action, d, e))
-#				value = max(value, next_value)
-#				d = min(d, abs(value-next_value))
-#				print(d)
-#	return value
+
+def opt_avf(cur_state, d, e):
+	value = 0
+	while d >= e:
+		possible_states = next_states(cur_state)
+		for next_state in possible_states:
+			for action in possible_actions(state2board(cur_state)):
+				next_value = transition_prob(next_state, cur_state, action) * (reward(cur_state, action, next_state)
+				 + opt_avf(next_state, d, e))
+				value = max(value, next_value)
+				d = min(d, abs(value-next_value))
+				print(d)
+	return value
