@@ -1,10 +1,10 @@
 # Board Games URAP Project :game_die:
-=============================
+
 This repository contains models of board games for an undergraduate research project started in Fall 2015, carried out under the direction and supervision of Falk Lieder and Tom Griffiths of the [Computational Cognitive Science Lab](http://cocosci.berkeley.edu/) at UC Berkeley.
 
 ## Games List
 
-The 10 games selected for analysis based on ratings pulled from this [database](https://github.com/rasmusgreve/BoardGameGeek). The relevant files for each game are also listed.
+The 10 games selected for analysis based on ratings pulled from this [database](https://github.com/rasmusgreve/BoardGameGeek/blob/master/BoardGameGeek/data_w_right_ratings2014-05-02.csv). The relevant files for each game are also listed.
 
 1. Peg Solitaire (`peg_solitaire.py` `peg_markov.py`)
 2. Solitaire/Patience
