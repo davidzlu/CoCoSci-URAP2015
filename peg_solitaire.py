@@ -3,6 +3,10 @@ import ast
 from peg_markov import *
 
 def create_board():
+	"""
+	Initializes the standard English peg solitaire game board with 
+	the center hole vacant.
+	"""
 	board = np.ones((7,7))
 	board[0:2, 0:2] = 0
 	board[0:2, 5:] = 0
@@ -33,6 +37,10 @@ def take_action(board, endrow, endcolumn, direction):
 	return x
 
 def check_win(board):
+	"""
+	Checks if the player has won or not by counting the number of pegs left.
+	Returns True if the game has been won.
+	"""
 	num_pegs = 0
 	for i in range(len(board)):
 		for j in range(len(board)):
@@ -71,7 +79,11 @@ def human_player(board):
         return human_player(board)
 
 
-def play(strategy):
+def play(strategy=human_player):
+	"""
+    The main function for running a game of PegSolitaire. Default is set to
+    human_player phase but this function also accepts any algorithm which returns a move.
+    """
 	board = create_board()
 	print("The game has begun. The current board state is ")
 	print(board)
@@ -95,13 +107,15 @@ def play(strategy):
 	return board, reward
 	
 # def best_policy(board):
-#    actions = possible_actions(board)
+#    actions = legal_actions(board)
 #    curr_state = board2state(board)
 #    possible_actions_q = {}
 #    for act in actions:
-#        key = opt_avf(curr_state, act, 4, 0.5)
+#        key = opt_avf(curr_state, act, 2, 0.5)
 #        value = key
 #        entry = act
 #        possible_actions_q[key] = entry
 #    best_q = max(possible_actions_q.keys())
 #    return possible_actions_q[best_q]
+
+#board state 6 jumps from winning: '0000000001000000100000101000001010000010000000000'
