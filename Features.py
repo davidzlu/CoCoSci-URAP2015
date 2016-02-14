@@ -5,6 +5,8 @@ class Features:
 
 	def entropy(self, prob_matrix):
 		"""
+		Parameters:
+		  prob_matrix: the transition probability matrix for the game
 		Returns entropy of outcome distribution.
 		https://en.wikipedia.org/wiki/Entropy_%28information_theory%29#Definition
 		"""
@@ -12,7 +14,8 @@ class Features:
 
 	def possibleActions(self, actF):
 		"""
-		Takes in a function that returns possible actions.
+		Parameters:
+		  actF: a function that returns possible actions.
 		Returns number of possible actions in game.
 		"""
 		return 0
