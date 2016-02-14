@@ -39,12 +39,14 @@ def check_win(board):
     return False, None
 
 def check_tie(board):
+    """Returns True if there has been a tie, False otherwise."""
     if board[0][0] != 0 and board[1][0] != 0 and board[0][1] != 0 and board[1][1] != 0:
         return True
     else:
         return False
 
 def other(who):
+    """Helper method for play()"""
     return 3 - who
 
 def moves_made(state):
@@ -147,6 +149,10 @@ def play(strategy1= human_player):
     return board, reward
 
 def best_policy(board):
+    """
+    An 'agent' function that looks ahead and calculates future rewards when deciding its
+    next move.
+    """
     actions = action_space(board)
     curr_state = board2state(board)
     possible_actions_q = {}

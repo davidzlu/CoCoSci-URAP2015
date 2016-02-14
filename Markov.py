@@ -107,6 +107,7 @@ def board2state(board):
 	return s
 
 def valid_transition(cur_state, next_state):
+	"""Helper method for create_state_tree"""
 	if cur_state == next_state:
 		return False
 	cur_board = state2board(cur_state)
@@ -123,6 +124,8 @@ def valid_transition(cur_state, next_state):
 	return False
 
 def state2board(state, rows=2, columns=2):
+	""" Takes in a binary string state representation
+	and returns the board equivalent """
 	board = []
 	for row in range(rows):
 		board_row = []
@@ -220,22 +223,24 @@ if __name__ == "__main__":
 	state_tree = create_state_tree(states)
 	matrix = transition_prob_matrix(create_board())
 
-def opt_avf(cur_state, cur_action, state_tree, d, e):
-	if state_tree[cur_state] == []:
-		return 0
-	value = 0
-	while d >= e:
-		possible_states = next_states(cur_state, cur_action, state_tree)
-		for next_state in possible_states:
-			for action in action_space([[0,0],[0,0]]):
-				next_value = transition_prob(next_state, cur_state, action, state_tree)[0] * (reward_function(cur_state, action, next_state)
-				 + opt_avf(next_state, action, state_tree, d, e))
-				value = max(value, next_value)
-				d = min(d, abs(value-next_value))
-	return value
+# def opt_avf(cur_state, cur_action, state_tree, d, e):
+# 	if state_tree[cur_state] == []:
+# 		return 0
+# 	value = 0
+# 	while d >= e:
+# 		possible_states = next_states(cur_state, cur_action, state_tree)
+# 		for next_state in possible_states:
+# 			for action in action_space([[0,0],[0,0]]):
+# 				next_value = transition_prob(next_state, cur_state, action, state_tree)[0] * (reward_function(cur_state, action, next_state)
+# 				 + opt_avf(next_state, action, state_tree, d, e))
+# 				value = max(value, next_value)
+# 				d = min(d, abs(value-next_value))
+# 	return value
 
 
 def q(cur_state, action):
+	""" An implementation of the Bellman optimality equation for TicTacToe.
+	Only works reliably for non-infinite MDPs """
 	test_state, reward = simulate_transition(cur_state, action) #first examine if any reward is produced in this action
 	test_board = state2board(test_state)
 	states = create_states()
