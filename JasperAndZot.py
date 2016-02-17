@@ -1,7 +1,7 @@
 import random
 import numpy as np
 
-"""Key for Tokens:
+"""Token Key:
     0 = empty space
     1 = normal zombie
     2 = flaming zombie
@@ -10,6 +10,7 @@ import numpy as np
     5 = x2 (Multiplier)
     6 = pumpkin
     7 = Jasper
+    8 = zombie + flower bed
     """
 
 def diceRoll():
@@ -28,7 +29,7 @@ def create_board():
 
 def board2state(board):
     """ Takes in the board and returns a binary string 
-    where 0 represents a hole and 1 represents a peg"""
+    where digits represent tokens according to the token key"""
     state = ''
     for row in range(len(board)):
         state += ''.join(map(str, board[row, :]))
@@ -42,15 +43,34 @@ def state2board(state):
         board[i] = state[i]
     return board.reshape((11,6))
 
+def count_pieces(board):
+    state = board2state(board)
+    zombieCount, fZombieCount, bombCount, multCount, pumpCount = 0
+    for token in state:
+        if token == '1':
+            zombieCount += 1
+        elif token == '8':
+            zombieCount += 1
+        elif token == '2':
+            fZombieCount += 1
+        elif token == '4':
+            bombCount += 1
+        elif token == '5':
+            multCount += 1
+        elif token == '6':
+            pumpCount += 1
+    return zombieCount, fZombieCount, bombCount, multCount, pumpCount
+
 class GameState:
 
-    def __init__(self, board, fZombieCount, bombCount, multCountwave=1, zombieCount=24):
+    def __init__(self, board, fZombieCount, bombCount, multCount, pumpCount=6, wave=1, zombieCount=24):
         self.board = board
-        self.wave = wave
-        self.zombieCount = zombieCount
         self.fZombieCount = fZombieCount
         self.bombCount = bombCount
         self.multCount = multCount
+        self.pumpCount = pumpCount
+        self.wave = wave
+        self.zombieCount = zombieCount
 
     def piecesLeft(self, state):
         """Return the number of pieces left in wave.
