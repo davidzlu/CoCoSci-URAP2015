@@ -190,33 +190,33 @@ def reward(cur_state, action, next_state):
 # 		seen[(cur_state, cur_action)] = value
 # 	return value
 
-# Q = {}
-# def opt_avf(cur_state, cur_action, d, e):
-# 	# have to handle the case where next_states(state) = [] and exit the infinite loop
-# 	following_state = state_transition(cur_state, cur_action)
-# 	states = allstates(following_state)
-# 	while d >= e:
-# 		next_value = 0
-# 		for next_state in states:
-# 			for action in legal_actions(state2board(next_state)):
-# 				if (next_state, action) in Q:
-# 					next_value = transition_prob(following_state, cur_state, action) * (reward(following_state, cur_state, cur_action) \
-# 					+ Q[(next_state, action)])
-# 				else:
-# 					Q[(next_state, action)] = 0
-# 				Q[(next_state, action)] = max(next_value, Q[(next_state, action)])
-# 				d = abs(Q[(next_state, action)] - next_value)
-# 		Q[(cur_state, cur_action)] = next_value
-# 	return Q[(cur_state, cur_action)]
+Q = {}
+def opt_avf(cur_state, cur_action, d, e):
+	# have to handle the case where next_states(state) = [] and exit the infinite loop
+	following_state = state_transition(cur_state, cur_action)
+	states = allstates(following_state)
+	while d >= e:
+		next_value = 0
+		for next_state in states:
+			for action in legal_actions(state2board(next_state)):
+				if (next_state, action) in Q:
+					next_value = transition_prob(following_state, cur_state, action) * (reward(following_state, cur_state, cur_action) \
+					+ Q[(next_state, action)])
+				else:
+					Q[(next_state, action)] = 0
+				Q[(next_state, action)] = max(next_value, Q[(next_state, action)])
+				d = abs(Q[(next_state, action)] - next_value)
+		Q[(cur_state, cur_action)] = next_value
+	return Q[(cur_state, cur_action)]
 
-# def allstates(cur_state):
-# 	"""
-# 	Helper method for opt_avf
-# 	"""
-# 	states = next_states(cur_state)
-# 	for state in states:
-# 		states += next_states(state)
-# 	return states
+def allstates(cur_state):
+	"""
+	Helper method for opt_avf
+	"""
+	states = next_states(cur_state)
+	for state in states:
+		states += next_states(state)
+	return states
 
 
 if __name__ == '__main__':
