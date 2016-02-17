@@ -20,11 +20,27 @@ def diceRoll():
     return (roll1, roll2)
 
 def create_board():
+    """Initializes starting game board with 6 pumpkins and Jasper"""
     board = np.zeros((11, 6))
     board[9, :] = 6
     board[10, 3] = 7
     return board.astype(int)
 
+def board2state(board):
+    """ Takes in the board and returns a binary string 
+    where 0 represents a hole and 1 represents a peg"""
+    state = ''
+    for row in range(len(board)):
+        state += ''.join(map(str, board[row, :]))
+    return state
+
+def state2board(state):
+    """ Takes in a binary string state representation
+    and returns the board equivalent """
+    board = np.zeros(66).astype(int)
+    for i in range(len(state)):
+        board[i] = state[i]
+    return board.reshape((11,6))
 
 class GameState:
 
