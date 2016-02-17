@@ -9,7 +9,7 @@ The 10 games selected for analysis based on ratings pulled from this [database](
 1. Peg Solitaire (`peg_solitaire.py` `peg_markov.py`)
 2. Solitaire/Patience
 3. Wolfpack
-4. Jasper and Zot
+4. Jasper and Zot (`JasperAndZot.py` currently in progress)
 5. Legions of Darkness
 6. B-29 Superfortress
 7. Field Commander: Napoleon
