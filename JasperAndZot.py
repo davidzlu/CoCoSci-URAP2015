@@ -63,28 +63,40 @@ def count_pieces(board):
 
 class GameState:
 
-    def __init__(self, board, fZombieCount, bombCount, multCount, pumpCount=6, wave=1, zombieCount=24):
+    def __init__(self, board=create_board(), zombieCount=24, fZombieCount=8, bombCount=4, multCount=3, pumpCount=6, wave=1):
         self.board = board
+        self.zombieCount = zombieCount
         self.fZombieCount = fZombieCount
         self.bombCount = bombCount
         self.multCount = multCount
         self.pumpCount = pumpCount
         self.wave = wave
-        self.zombieCount = zombieCount
-
-    def piecesLeft(self, state):
-        """Return the number of pieces left in wave.
+        
+    def piecesLeft(self):
+        """Return the number of pieces left in wave as a float.
         """
-        return state.zombieCount + state.fZombieCount + state.bombCount + state.multCount
+        return float(self.zombieCount + self.fZombieCount + self.bombCount + self.multCount)
 
-    def pullPiece(self, state):
+    def pullPiece(self):
         """Return the next piece pulled from bag, assuming equal 
         probability of any piece being pulled.
         """
-        totalLeft = self.piecesLeft(state)
-
-        return 0
-
-# Dictionary of game pieces
-# TODO: fill out with number:piece pairing
-gamePieces = {}
+        totalLeft = self.piecesLeft()
+        if totalLeft == 0:
+            return 0
+        zombieRange = self.zombieCount/totalLeft
+        fZombieRange = (self.zombieCount+self.fZombieCount)/totalLeft
+        bombRange = (self.zombieCount+self.fZombieCount+self.bombCount)/totalLeft
+        nextPiece = random.random()
+        if nextPiece < zombieRange:
+            self.zombieCount -= 1
+            return 1
+        elif nextPiece < fZombieRange:
+            self.fZombieCount -= 1
+            return 2
+        elif nextPiece < bombRange:
+            self.bombCount -= 1
+            return 4
+        else:
+            self.multCount -= 1
+            return 5
