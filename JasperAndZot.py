@@ -88,7 +88,17 @@ class GameState:
             if self.board[10, yPos] == 7:
                 y = yPos
         return (10, y)
-        
+
+    def copy(self):
+        """Returns a new state with same instance variables as self.
+        """
+        return GameState(self.board, self.zombieCount, self.fZombieCount, self.bombCount, self.multCount, self.pumpCount, self.wave)
+
+    def enemyDescend(self):
+        """Step 1 of game, all enemy pieces descend board.
+        """
+        return 0
+
     def piecesLeft(self):
         """Return the number of pieces left in wave as a float.
         """
