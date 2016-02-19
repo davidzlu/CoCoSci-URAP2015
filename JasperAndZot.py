@@ -62,6 +62,14 @@ def count_pieces(board):
     return zombieCount, fZombieCount, bombCount, multCount, pumpCount
 
 class GameState:
+    """
+    A GameState specifies the current state of the game in terms of:
+      1) The arrangment of pieces on the board
+      2) The number of each enemy piece left
+      3) The number of pumpkins left
+      4) The current wave
+
+    """
 
     def __init__(self, board=create_board(), zombieCount=24, fZombieCount=8, bombCount=4, multCount=3, pumpCount=6, wave=1):
         self.board = board
@@ -71,6 +79,15 @@ class GameState:
         self.multCount = multCount
         self.pumpCount = pumpCount
         self.wave = wave
+
+    def getJasperPosition(self):
+        """Returns (x, y) coordinate of Jasper.
+        """
+        y = 0
+        for yPos in range(0, 6):
+            if self.board[10, yPos] == 7:
+                y = yPos
+        return (10, y)
         
     def piecesLeft(self):
         """Return the number of pieces left in wave as a float.
@@ -79,7 +96,9 @@ class GameState:
 
     def pullPiece(self):
         """Return the next piece pulled from bag, assuming equal 
-        probability of any piece being pulled.
+        probability of any piece being pulled. Does this by splitting
+        the interval [0.0, 1.0) into 4 based on the probability of drawing
+        a certain piece.
         """
         totalLeft = self.piecesLeft()
         if totalLeft == 0:
@@ -87,7 +106,7 @@ class GameState:
         zombieRange = self.zombieCount/totalLeft
         fZombieRange = (self.zombieCount+self.fZombieCount)/totalLeft
         bombRange = (self.zombieCount+self.fZombieCount+self.bombCount)/totalLeft
-        nextPiece = random.random()
+        nextPiece = random.random() # Random number in [0.0, 1.0)
         if nextPiece < zombieRange:
             self.zombieCount -= 1
             return 1
