@@ -44,23 +44,6 @@ def state2board(state):
         board[i] = state[i]
     return board.reshape((11,6))
 
-def count_pieces(board):
-    state = board2state(board)
-    zombieCount, fZombieCount, bombCount, multCount, pumpCount = 0
-    for token in state:
-        if token == '1':
-            zombieCount += 1
-        elif token == '8':
-            zombieCount += 1
-        elif token == '2':
-            fZombieCount += 1
-        elif token == '4':
-            bombCount += 1
-        elif token == '5':
-            multCount += 1
-        elif token == '6':
-            pumpCount += 1
-    return zombieCount, fZombieCount, bombCount, multCount, pumpCount
 
 class GameState:
     """
@@ -90,6 +73,24 @@ class GameState:
                 y = yPos
         return (10, y)
         
+    def count_pieces(self):
+        state = board2state(self.board)
+        zombieCount, fZombieCount, bombCount, multCount, pumpCount = 0
+        for token in state:
+            if token == '1':
+                zombieCount += 1
+            elif token == '8':
+                zombieCount += 1
+            elif token == '2':
+                fZombieCount += 1
+            elif token == '4':
+                bombCount += 1
+            elif token == '5':
+                multCount += 1
+            elif token == '6':
+                pumpCount += 1
+        return zombieCount, fZombieCount, bombCount, multCount, pumpCount
+
     def piecesLeft(self):
         """Return the number of pieces left in wave as a float.
         """
@@ -120,6 +121,7 @@ class GameState:
         else:
             self.multCount -= 1
             return 5
+
     def put_piece(self, dice1, dice2):
         if self.wave == 1:
             if dice1 == 1:
@@ -308,3 +310,48 @@ class GameState:
                 self.board[0][my_move[2] - 1] = my_move[0]
                 self.board[1][my_move[2]] = my_move[1]
                 self.board[0][my_move[2] + 1] = my_move[2]
+
+    def descend(self):
+        #be careful not to touch pieces that have already been moved
+        for i in range(10):
+            for j in range(6):
+                pass
+
+
+                # if (self.board[i, j] != 0) && (self.board[i, j] != 3) && (self.board[i, j] != 6):
+                #     if j+2 < 10:
+                #         if self.board[i, j] == 1:
+                #             if self.board[i, j+1] == 3:
+                #                 self.board[i, j+1] = 8
+                #                 self.board[i, j]
+                #         elif self.board[i, j] == 2:
+                #             #moves for flaming zombies
+                #         else:
+                #             self.board[i, j+2] = self.board[i, j]
+                #             self.board[i, j] = 0
+                #     else: #tokens reach magical barrier
+                #         if self.board[i, j] == 1:
+                #             #zombie moves left or right
+                #         elif self.board[i, j] == 4:
+                #             #call explode function
+                #         else:
+                #             self.board[i, j] = 0
+
+    def find_adjacent(self, row, column):
+        adjacent = []
+        if row < 10 and column < 6:
+            if column - 1 >= 0 and self.board[row, column - 1] != 0:
+                adjacent.append((row, column - 1, self.board[row, column - 1]))
+            if column + 1 < 6 and self.board[row, column + 1] != 0:
+                adjacent.append((row, column + 1, self.board[row, column + 1]))
+            if row - 1 >= 0 and self.board[row - 1, column] != 0:
+                adjacent.append((row - 1, column, self.board[row - 1, column]))
+            if row + 1 < 10 and self.board[row + 1, column] != 0:
+                adjacent.append((row + 1, column, self.board[row + 1, column]))
+        return adjacent
+
+    def explode(self):
+        pass
+
+
+
