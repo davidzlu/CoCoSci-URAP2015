@@ -72,7 +72,7 @@ class GameState:
 
     """
 
-    def __init__(self, board=create_board(), zombieCount=24, fZombieCount=8, bombCount=4, multCount=3, pumpCount=6, wave=1):
+    def __init__(self, board=create_board(), zombieCount=24, fZombieCount=8, bombCount=4, multCount=3, pumpCount=6, wave=1, phase=2):
         self.board = board
         self.zombieCount = zombieCount
         self.fZombieCount = fZombieCount
@@ -80,6 +80,7 @@ class GameState:
         self.multCount = multCount
         self.pumpCount = pumpCount
         self.wave = wave
+        self.phase = phase
 
     def getJasperPosition(self):
         """Returns (x, y) coordinate of Jasper.
@@ -89,6 +90,12 @@ class GameState:
             if self.board[10, yPos] == 7:
                 y = yPos
         return (10, y)
+
+    def getLegalActions():
+        return None
+
+    def nextStates():
+        return None
         
     def piecesLeft(self):
         """Return the number of pieces left in wave as a float.
@@ -120,6 +127,17 @@ class GameState:
         else:
             self.multCount -= 1
             return 5
+
+    def waveTransition(self):
+        """Manages transitioning between waves.
+        """
+        if self.wave == 1 and self.piecesLeft() == 0:
+            self.wave = 2
+        elif self.wave == 2 and self.piecesLeft() == 0:
+            #Call function for win transition
+        return 0
+
+
     def put_piece(self, dice1, dice2):
         if self.wave == 1:
             if dice1 == 1:
