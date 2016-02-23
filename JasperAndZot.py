@@ -54,6 +54,7 @@ class GameState:
       4) The current wave
 
     """
+    tpm = {} # Maps (curState, action, nextState) to transition probability
 
     def __init__(self, board=create_board(), zombieCount=24, fZombieCount=8, bombCount=4, multCount=3, pumpCount=6, wave=1, phase=2):
         self.board = board
@@ -64,6 +65,12 @@ class GameState:
         self.pumpCount = pumpCount
         self.wave = wave
         self.phase = phase
+
+    def __eq__(self, other):
+        return False
+
+    def __hash__(self):
+        return hash((self.zombieCount,))
 
     def getJasperPosition(self):
         """Returns (x, y) coordinate of Jasper.
@@ -78,13 +85,32 @@ class GameState:
         """Returns a new state with same instance variables as self.
         """
         return GameState(self.board, self.zombieCount, self.fZombieCount, self.bombCount, self.multCount, self.pumpCount, self.wave)
-
-    def getLegalActions():
-        return None
-
-    def nextStates():
-        return None
         
+    def transProbabilityMatrix(self, curState, action, nextState):
+        """Returns transition probability given (s, a, s') if it exists in
+        transProbabilityMatrix. Otherwise calculates the probability, enters it
+        into transProbabilityMatrix and returns the probability.
+        """
+        if (curState, action, nextState) in GameState.tpm:
+            return GameState.tpm[(curState, action, nextState)]
+        else:
+            prob = self.transProbability(curState, action, nextState)
+            GameState.tpm[(curState, action, nextState)] = prob
+            return prob
+
+    def transProbability(self, curState, action, nextState):
+        """Returns probability of transitioning from curState to nextState given action.
+        """
+        # nextPossible = nextStates(curState, action)
+        # if nextState in nextPossible:
+        #     return 1.0/len(nextPossible)
+        return 0.0
+
+    def getMatrixRow(self, curState, action):
+        """Returns row of transition probability matrix, specified by curState and action.
+        """
+        return []
+
     def count_pieces(self):
         state = board2state(self.board)
         zombieCount, fZombieCount, bombCount, multCount, pumpCount = 0
