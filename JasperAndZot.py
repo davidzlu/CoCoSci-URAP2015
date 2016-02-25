@@ -335,8 +335,9 @@ class GameState:
                 self.board[new_row2, col] = token[2]
                 self.board[old_pos] = 0
                 token = (token[0] + 2, token[1], token[2])
-            elif token_one_ahead == 3 and token[2] == 2: #flaming zombies come thru
-                pass
+            elif (token_one_ahead == 3 or token_one_ahead > 7) and token[2] == 2: #flaming zombies come thru
+                self.burn(token)
+                self.move(token)
             elif token_one_ahead == 3 and token[2] != 2: #move into a flower bed
                 self.board[new_row1, col] = token[2] + 7
                 if self.board[old_pos] > 7: #incase last position was in a flower bed
@@ -350,28 +351,21 @@ class GameState:
                 self.board[old_pos] = 3
                 token = (token[0] + 1, token[1], token[2] - 7)
             elif token[2] == 4 and token_one_ahead == 6: #bomb hits pumpkin
-                #bomb explodes
-                self.board[new_row1, col] = 0
-                self.pumpCount -= 1
+                self.explode(token)
             else:
                 self.board[new_row1, col] = token[2]
                 self.board[old_pos] = 0
                 token = (token[0] + 1, token[1], token[2])
         elif (token[0] + 1 == 10): #token reaches magical barrier
             if token[2] == 4:
-                #bomb explodes
-                pass
+                self.explode(token)
             elif token[2] == 5: #multiplier disappears
                 self.board[old_pos] = 0
             else: #zombies move to nearest pumpkin
                 pass
         else:
             self.board[old_pos] = 0
-            #throw an error 
-
-
-
-
+            #throw an error probably
 
 
     # def descend(self):
@@ -399,8 +393,35 @@ class GameState:
                 adjacent.append((row + 1, column, self.board[row + 1, column]))
         return adjacent
 
-    def explode(self):
-        pass
+    def explode(self, token):
+        immediate = self.find_adjacent(token[0], token[1])
+        for item in immediate:
+            self.board[item[0], item[1]] = 0
+            if item[2] == 6:
+                self.pumpCount -= 1
+            if item[2] == 4: #exploding bombs set off other bombs
+                self.explode(item)
+        self.board[token[0], token[1]] = 0
+
+    def burn(self, token):
+        immediate = self.find_adjacent(token[0], token[1])
+        for item in immediate:
+            if item[2] == 3:
+                self.board[item[0], item[1]] = 0
+                self.burn(item)
+            if item[2] > 7: #flower beds get burned, but tokens on top do not disappear
+                self.board[item[0], item[1]] = item[2] - 7
+                self.burn(item)
+
+
+    # This is code that can be used to get rid of chains of things; lightly tested
+    # def destroy_chain(self, token):
+    #     immediate = self.find_adjacent(token[0], token[1])
+    #     for item in immediate:
+    #         self.board[item[0], item[1]] = 0
+    #         self.explode(item)
+            
+
 
 if __name__ == '__main__':
     gs = GameState()
