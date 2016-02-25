@@ -362,12 +362,13 @@ class GameState:
             elif token[2] == 5: #multiplier disappears
                 self.board[old_pos] = 0
             else: #zombies move to nearest pumpkin
+                # TODO: make zombies move to nearest pumpkin
                 pass
         else:
             self.board[old_pos] = 0
-            #throw an error probably
+            #TODO: throw an error probably
 
-
+    #TODO: fix so that it only moves pieces once.
     # def descend(self):
     #     #!!!be careful not to touch pieces that have already been moved!!!
     #     moving_pieces = []
