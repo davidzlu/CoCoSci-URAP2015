@@ -4,14 +4,16 @@ import ast
 
 """Token Key:
     0 = empty space
-    1 = normal zombie
-    2 = flaming zombie
-    3 = flower bed
-    4 = bomb
+    1 = normal zombie 
+    2 = flaming zombie 
+    3 = flower bed 
+    4 = bomb 
     5 = x2 (Multiplier)
     6 = pumpkin
     7 = Jasper
     8 = zombie + flower bed
+    11 = bomb + flower bed
+    12 = multiplier + flower bed
     """
 
 def diceRoll():
@@ -77,15 +79,13 @@ class GameState:
         state = board2state(self.board)
         zombieCount, fZombieCount, bombCount, multCount, pumpCount = 0
         for token in state:
-            if token == '1':
-                zombieCount += 1
-            elif token == '8':
+            if token == '1' or token == '8':
                 zombieCount += 1
             elif token == '2':
                 fZombieCount += 1
-            elif token == '4':
+            elif token == '4' or token == '11':
                 bombCount += 1
-            elif token == '5':
+            elif token == '5' or token == '12':
                 multCount += 1
             elif token == '6':
                 pumpCount += 1
@@ -311,33 +311,82 @@ class GameState:
                 self.board[1][my_move[2]] = my_move[1]
                 self.board[0][my_move[2] + 1] = my_move[2]
 
-    def descend(self):
-        #be careful not to touch pieces that have already been moved
-        for i in range(10):
-            for j in range(6):
+    def move(self, token):
+        old_pos = (token[0], token[1])
+        new_row1 = token[0] + 1
+        new_row2 = token[0] + 2
+        col = token[1]
+        if (new_row2 < 11):
+            token_one_ahead = self.board[token[0] + 1, token[1]]
+            token_two_ahead = self.board[token[0] + 2, token[1]]
+            if (token_one_ahead != 0) and (token_one_ahead != 6) and (token_one_ahead != 3) and (token[0] + 1 != 10):
+                self.move((token[0] + 1, token[1], token_one_ahead))
+                if token_one_ahead > 7:
+                    token_one_ahead = 3
+                else:
+                    token_one_ahead = 0
+            elif (token_one_ahead == 0) and (token_two_ahead != 0) and (token_two_ahead != 6) and (token_two_ahead != 3):
+                self.move((token[0] + 2, token[1], token_two_ahead))
+                if token_two_ahead > 7:
+                    token_two_ahead = 3
+                else:
+                    token_two_ahead = 0
+            if token_one_ahead == 0 and token_two_ahead == 0 and (token[2] < 6 and token[2] != 3): #move two spaces
+                self.board[new_row2, col] = token[2]
+                self.board[old_pos] = 0
+                token = (token[0] + 2, token[1], token[2])
+            elif token_one_ahead == 3 and token[2] == 2: #flaming zombies come thru
                 pass
+            elif token_one_ahead == 3 and token[2] != 2: #move into a flower bed
+                self.board[new_row1, col] = token[2] + 7
+                if self.board[old_pos] > 7: #incase last position was in a flower bed
+                    self.board[old_pos] = 3
+                    self.board[new_row1, col] = token[2]
+                else:
+                    self.board[old_pos] = 0
+                token = (token[0] + 1, token[1], token[2] + 7)
+            elif token_one_ahead == 0 and token[2] > 7: #move out of a flower bed
+                self.board[new_row1, col] = token[2] - 7
+                self.board[old_pos] = 3
+                token = (token[0] + 1, token[1], token[2] - 7)
+            elif token[2] == 4 and token_one_ahead == 6: #bomb hits pumpkin
+                #bomb explodes
+                self.board[new_row1, col] = 0
+                self.pumpCount -= 1
+            else:
+                self.board[new_row1, col] = token[2]
+                self.board[old_pos] = 0
+                token = (token[0] + 1, token[1], token[2])
+        elif (token[0] + 1 == 10): #token reaches magical barrier
+            if token[2] == 4:
+                #bomb explodes
+                pass
+            elif token[2] == 5: #multiplier disappears
+                self.board[old_pos] = 0
+            else: #zombies move to nearest pumpkin
+                pass
+        else:
+            self.board[old_pos] = 0
+            #throw an error 
 
 
-                # if (self.board[i, j] != 0) && (self.board[i, j] != 3) && (self.board[i, j] != 6):
-                #     if j+2 < 10:
-                #         if self.board[i, j] == 1:
-                #             if self.board[i, j+1] == 3:
-                #                 self.board[i, j+1] = 8
-                #                 self.board[i, j]
-                #         elif self.board[i, j] == 2:
-                #             #moves for flaming zombies
-                #         else:
-                #             self.board[i, j+2] = self.board[i, j]
-                #             self.board[i, j] = 0
-                #     else: #tokens reach magical barrier
-                #         if self.board[i, j] == 1:
-                #             #zombie moves left or right
-                #         elif self.board[i, j] == 4:
-                #             #call explode function
-                #         else:
-                #             self.board[i, j] = 0
+
+
+
+
+    # def descend(self):
+    #     #!!!be careful not to touch pieces that have already been moved!!!
+    #     moving_pieces = []
+    #     for j in range(6):
+    #         for i in range(10):
+    #             if (self.board[i, j] != 0) and (self.board[i, j] != 3) and (self.board[i, j] != 6):
+    #                 moving_pieces.append((i, j, self.board[i, j]))
+    #     for token in moving_pieces:
+    #         self.move(token)
+
 
     def find_adjacent(self, row, column):
+        """Takes in position of token and returns a list of all tokens immediately adjacent (row, column, token type)"""
         adjacent = []
         if row < 10 and column < 6:
             if column - 1 >= 0 and self.board[row, column - 1] != 0:
@@ -353,5 +402,12 @@ class GameState:
     def explode(self):
         pass
 
-
+if __name__ == '__main__':
+    gs = GameState()
+    gs.board[0, 0] = 1
+    gs.board[0, 1] = 1
+    gs.board[0, 2] = 1
+    gs.board[2, 0] = 3
+    gs.board[1, 0] = 3
+    gs.board[1, 1] = 3
 
