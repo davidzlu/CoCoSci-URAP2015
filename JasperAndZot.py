@@ -39,8 +39,8 @@ def board2state(board):
     return state
 
 def state2board(state):
-    """ Takes in a binary string state representation
-    and returns the board equivalent """
+    """ Takes in a binary string state representation of
+    the game board and returns the board equivalent """
     board = np.zeros(66).astype(int)
     for i in range(len(state)):
         board[i] = state[i]
@@ -57,7 +57,7 @@ class GameState:
 
     """
 
-    def __init__(self, board=create_board(), zombieCount=24, fZombieCount=8, bombCount=4, multCount=3, pumpCount=6, wave=1):
+    def __init__(self, board=create_board(), zombieCount=24, fZombieCount=8, bombCount=4, multCount=3, pumpCount=6, wave=1, phase=0):
         self.board = board
         self.zombieCount = zombieCount
         self.fZombieCount = fZombieCount
@@ -65,6 +65,7 @@ class GameState:
         self.multCount = multCount
         self.pumpCount = pumpCount
         self.wave = wave
+        self.phase = phase
 
     def getJasperPosition(self):
         """Returns (x, y) coordinate of Jasper.
@@ -458,7 +459,6 @@ class GameState:
         else:
             raise Exception('Whoops, something went wrong.')
 
-
     def descend(self):
         moving_pieces = []
         exclude = []
@@ -476,6 +476,7 @@ class GameState:
                         moving_pieces.append(token)
         for token in moving_pieces:
             self.move(token)
+        self.phase = 2
 
 
     def find_adjacent(self, row, column):
