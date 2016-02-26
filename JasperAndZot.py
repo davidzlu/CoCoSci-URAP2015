@@ -69,10 +69,24 @@ class GameState:
         self.phase = phase
 
     def __eq__(self, other):
-        return False
+        return self.board == other.board \
+               and self.zombieCount == other.zombieCount \
+               and self.fZombieCount == other.fZombieCount \
+               and self.bombCount == other.bombCount \
+               and self.multCount == other.multCount \
+               and self.pumpCount == other.pumpCount \
+               and self.wave == other.wave \
+               and self.phase == other.phase
 
     def __hash__(self):
-        return hash((self.zombieCount,))
+        return hash((self.board, \
+                     self.zombieCount, \
+                     self.fZombieCount, \
+                     self.bombCount, \
+                     self.multCount, \
+                     self.pumpCount, \
+                     self.wave, \
+                     self.phase))
 
     def getJasperPosition(self):
         """Returns (x, y) coordinate of Jasper.
@@ -86,7 +100,7 @@ class GameState:
     def copy(self):
         """Returns a new state with same instance variables as self.
         """
-        return GameState(self.board, self.zombieCount, self.fZombieCount, self.bombCount, self.multCount, self.pumpCount, self.wave)
+        return GameState(self.board, self.zombieCount, self.fZombieCount, self.bombCount, self.multCount, self.pumpCount, self.wave, self.phase)
         
     def transProbabilityMatrix(self, curState, action, nextState):
         """Returns transition probability given (s, a, s') if it exists in
@@ -166,6 +180,7 @@ class GameState:
         if self.wave == 1 and self.piecesLeft() == 0:
             self.wave = 2
         elif self.wave == 2 and self.piecesLeft() == 0:
+            return 0
             #Call function for win transition
         return 0
 
