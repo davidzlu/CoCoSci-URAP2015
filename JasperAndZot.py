@@ -723,6 +723,46 @@ class GameState:
                     token = (row, my_move_3[1], token_type)
                     self.score = self.fire(token)[0] * (2 ** self.fire(token)[1]) + self.score
                     break
+    
+    def smash(self):
+        for row in range(8, 10):
+            for column in range(0, 6):
+                if self.board[row][column] == 1 or self.board[row][column] == 2:
+                    adjacent = self.find_adjacent(row, column)
+                    pump = []
+                    for item in adjacent:
+                        if item[2] = 6:
+                            pump.append(item)
+                    if len(pump) == 1:
+                        self.board[pump[0][0]][pump[0][1]] = 0
+                        self.score = self.score - 10
+                    elif len(pump) == 2:
+                        print("Your choices of pumpkin are:")
+                        print(pump)
+                        pump_chosen = ast.literal_eval(input("Enter the pumpkin to smash: "))
+                        while pump_chosen not in pump:
+                            pump_chosen = ast.literal_eval(input("Please enter an available pumpkin: "))
+                        self.board[pump_chosen[0]][pump_chosen[1]] = 0
+                        self.score = self.score - 10
+                    elif len(pump) == 0:
+                        if row == 9:
+                            if column == 0 or column == 1:
+                                if self.board[row][column + 1] == 0:
+                                    self.board[row][column + 1] = self.board[row][column]
+                                    self.board[row][column] = 0
+                            elif column == 5 or column == 4:
+                                if self.board[row][column - 1] == 0:
+                                    self.board[row][column - 1] = self.board[row][column]
+                                    self.board[row][column] = 0
+                            else:
+                                token = (row, column, self.board[row][column])
+                                direction = self.nearest_pumpkin(token)
+                                if direction == 'left' and self.board[row][column - 1] == 0:
+                                    self.board[row][column - 1] = self.board[row][column]
+                                    self.board[row][column] = 0
+                                elif direction == 'right' and self.board[row][column + 1] == 0:
+                                    self.board[row][column + 1] = self.board[row][column]
+                                    self.board[row][column] = 0
 
 
 if __name__ == '__main__':
