@@ -311,7 +311,8 @@ class GameState:
                 self.board[1][my_move[1]] = my_move[0][1]
                 self.board[0][my_move[1] + 1] = my_move[0][2]
 
-    """Helper method for descend() which takens in a token in the format (row, column, type)"""
+    """Helper method for descend() which takens in a token in the format (row, column, type). Moves only one token,
+    unless there are tokens obstructing its movement, in which case those other tokens move as well."""
     def move(self, token):
         old_pos = (token[0], token[1])
         new_row1 = token[0] + 1
@@ -359,94 +360,122 @@ class GameState:
                 token = (token[0] + 1, token[1], token[2])
             else:
                 pass
-        elif (token[0] + 1 == 10): #token reaches magical barrier
+        elif (new_row1 < 10): #token reaches magical barrier
             if token[2] == 4 or token[2] == 11:
+                token = (new_row1, col, token[2])
+                self.board[old_pos] = 0
                 self.explode(token)
             elif token[2] == 5 or token[2] == 12: #multiplier disappears
                 if token[2] == 12:
                     self.board[old_pos] = 3
                 else:
                     self.board[old_pos] = 0
-            elif token[2] != 3 or token[2] != 6: #zombies move to nearest pumpkin
-                one_left = token[1] - 1
-                two_left = token[1] - 2
-                one_right = token[1] + 1
-                two_right = token[1] + 2
-                old_pos = (token[0], token[1])
-                #First determine which direction the zombie will move
-                direction = self.nearest_pumpkin(token)
-                #Then move
-                if (direction == 'left'):
-                    if self.board[10, one_left] == 3:
-                        if token[2] == 2:
-                            self.burn(token)
-                            self.move(token)
-                        else:
-                            self.board[10, one_left] = 8
-                            if token[2] == 8:
-                                self.board[old_pos] = 3
-                            else:
-                                self.board[old_pos] = 0
-                            token = (10, one_left, 8)
-                    elif token[2] == 8:
-                        if self.board[10, one_left] == 0:
-                            self.board[10, one_left] = 1
-                            self.board[old_pos] = 3
-                            token = (10, one_left, 1)
-                    elif self.board[10, two_left] == 0 and self.board[10, one_left] == 0:
-                        self.board[10, two_left] = token[2]
+            elif token[2] != 3 and self.board[new_row1, col] != 6: 
+                if self.board[new_row1, col] == 3:
+                    if token[2] == 2:
+                        self.burn((new_row1, col, 2))
+                        self.board[new_row1, col] = 2
                         self.board[old_pos] = 0
-                        token = (token, two_left, token[2])
-                    elif self.board[10, one_left] == 0:
-                        self.board[10, one_left] = token[2]
-                        self.board[old_pos] = 0
-                        token = (10, one_left, token[2])
                     else:
-                        pass
-                elif (direction == 'right'):
-                    if self.board[10, one_right] == 3:
-                        if token[2] == 2:
-                            self.burn(token)
-                            self.move(token)
-                        else:
-                            self.board[10, one_right] = 8
-                            if token[2] == 8:
-                                self.board[old_pos] = 3
-                            else:
-                                self.board[old_pos] = 0
-                            token = (10, one_right, 8)
-                    elif token[2] == 8:
-                        if self.board[10, one_right] == 0:
-                            self.board[10, one_right] = 1
+                        self.board[new_row1, col] = 8
+                        if token[2] == 8:
                             self.board[old_pos] = 3
-                            token = (10, one_right, 1)
-                    elif self.board[10, two_right] == 0 and self.board[10, one_right] == 0:
-                        self.board[10, two_right] = token[2]
-                        self.board[old_pos] = 0
-                        token = (token, two_right, token[2])
-                    elif self.board[10, one_right] == 0:
-                        self.board[10, one_right] = token[2]
-                        self.board[old_pos] = 0
-                        token = (10, one_right, token[2])
-                    else: #don't move!
-                        pass
+                        else:
+                            self.board[old_pos] = 0
+                elif token[2] == 8:
+                    self.board[new_row1, col] = 1
+                    self.board[old_pos] = 3
+                else:
+                    self.board[new_row1, col] = token[2]
+                    self.board[old_pos] = 0
+            else: #token is probably a flower bed
+                pass
+        elif (token[0] == 9) and token[2] != 3 and token[2] != 6: #zombies move to nearest pumpkin
+            one_left = token[1] - 1
+            two_left = token[1] - 2
+            one_right = token[1] + 1
+            two_right = token[1] + 2
+            old_pos = (token[0], token[1])
+            #First determine which direction the zombie will move
+            direction = self.nearest_pumpkin(token)
+            #Then move
+            if (direction == 'left'):
+                if self.board[9, one_left] == 3:
+                    if token[2] == 2:
+                        self.burn((token[0], one_left, 2))
+                        self.move(token)
+                    else:
+                        self.board[9, one_left] = 8
+                        if token[2] == 8:
+                            self.board[old_pos] = 3
+                        else:
+                            self.board[old_pos] = 0
+                        token = (9, one_left, 8)
+                elif token[2] == 8:
+                    if self.board[9, one_left] == 0:
+                        self.board[9, one_left] = 1
+                        self.board[old_pos] = 3
+                        token = (9, one_left, 1)
+                elif self.board[9, two_left] == 0 and self.board[9, one_left] == 0:
+                    self.board[9, two_left] = token[2]
+                    self.board[old_pos] = 0
+                    token = (token, two_left, token[2])
+                elif self.board[9, one_left] == 0:
+                    self.board[9, one_left] = token[2]
+                    self.board[old_pos] = 0
+                    token = (9, one_left, token[2])
+                else:
+                    pass
+            elif (direction == 'right'):
+                if self.board[9, one_right] == 3:
+                    if token[2] == 2:
+                        self.burn((token[0], one_right, 2))
+                        self.move(token)
+                    else:
+                        self.board[9, one_right] = 8
+                        if token[2] == 8:
+                            self.board[old_pos] = 3
+                        else:
+                            self.board[old_pos] = 0
+                        token = (9, one_right, 8)
+                elif token[2] == 8:
+                    if self.board[9, one_right] == 0:
+                        self.board[9, one_right] = 1
+                        self.board[old_pos] = 3
+                        token = (9, one_right, 1)
+                elif self.board[9, two_right] == 0 and self.board[9, one_right] == 0:
+                    self.board[9, two_right] = token[2]
+                    self.board[old_pos] = 0
+                    token = (token, two_right, token[2])
+                elif self.board[9, one_right] == 0:
+                    self.board[9, one_right] = token[2]
+                    self.board[old_pos] = 0
+                    token = (9, one_right, token[2])
                 else: #don't move!
                     pass
-            else: #token is probably a flower bed
+            else: #don't move!
                 pass
         else:
             raise Exception('Whoops, something went wrong.')
 
-    #TODO: fix so that it only moves pieces once.
-    # def descend(self):
-    #     #!!!be careful not to touch pieces that have already been moved!!!
-    #     moving_pieces = []
-    #     for j in range(6):
-    #         for i in range(10):
-    #             if (self.board[i, j] != 0) and (self.board[i, j] != 3) and (self.board[i, j] != 6):
-    #                 moving_pieces.append((i, j, self.board[i, j]))
-    #     for token in moving_pieces:
-    #         self.move(token)
+
+    def descend(self):
+        moving_pieces = []
+        exclude = []
+        for j in range(6):
+            for i in range(10):
+                if (self.board[i, j] != 0) and (self.board[i, j] != 3) and (self.board[i, j] != 6):
+                    if (i + 1 < 10):
+                        if self.board[i + 1, j] != 0 and self.board[i + 1, j] != 3 and self.board[i + 1, j] != 6:
+                            exclude.append((i + 1, j, self.board[i + 1, j]))
+                    if (i + 2 < 10):
+                        if self.board[i + 2, j] != 0 and self.board[i + 2, j] != 3 and self.board[i + 2, j] != 6:
+                            exclude.append((i + 2, j, self.board[i + 2, j]))
+                    token = (i, j, self.board[i, j])
+                    if token not in exclude:
+                        moving_pieces.append(token)
+        for token in moving_pieces:
+            self.move(token)
 
 
     def find_adjacent(self, row, column):
@@ -494,24 +523,24 @@ class GameState:
         elif token[1] == 5:
             direction = 'left'
         elif token[1] == 1:
-            if self.board[10, one_left] != 6:
+            if self.board[9, one_left] != 6:
                 direction = 'right'
             else:
                 direction = 'stop'
         elif token[1] == 4:
-            if self.board[10, one_right] != 6:
+            if self.board[9, one_right] != 6:
                 direction = 'left'
             else:
                 direction = 'stop'
-        elif self.board[10, two_left] == 6 and self.board[10, two_right] == 6:
+        elif self.board[9, two_left] == 6 and self.board[9, two_right] == 6:
             direction = random.choice(['left', 'right'])
-        elif self.board[10, two_right] == 6 and self.board[10, one_left] != 6:
+        elif self.board[9, two_right] == 6 and self.board[9, one_left] != 6:
             direction = 'right'
-            if self.board[10, one_right] != 0 or self.board[10, one_right] != 3:
+            if self.board[9, one_right] != 0 and self.board[9, one_right] != 3:
                 direction = 'stop'
-        elif self.board[10, two_left] == 6 and self.board[10, one_right] != 6:
+        elif self.board[9, two_left] == 6 and self.board[9, one_right] != 6:
             direction = 'left'
-            if self.board[10, one_left] != 0 or self.board[10, one_left] != 3:
+            if self.board[9, one_left] != 0 and self.board[9, one_left] != 3:
                 direction = 'stop'
         else: #two spaces on either side show no signs of pumpkins
             if token[1] == 2:
@@ -532,10 +561,5 @@ class GameState:
 
 if __name__ == '__main__':
     gs = GameState()
-    gs.board[0, 0] = 1
-    gs.board[0, 1] = 1
-    gs.board[0, 2] = 1
-    gs.board[2, 0] = 3
-    gs.board[1, 0] = 3
-    gs.board[1, 1] = 3
+
 
