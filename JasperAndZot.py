@@ -92,11 +92,11 @@ class GameState:
     def getJasperPosition(self):
         """Returns (x, y) coordinate of Jasper.
         """
-        y = 0
-        for yPos in range(0, 6):
-            if self.board[10, yPos] == 7:
-                y = yPos
-        return (10, y)
+        x = 0
+        for xPos in range(0, 6):
+            if self.board[10, xPos] == 7:
+                x = xPos
+        return (x, 10)
 
     def copy(self):
         """Returns a new state with same instance variables as self.
