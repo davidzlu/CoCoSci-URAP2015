@@ -57,6 +57,7 @@ class GameState:
       4) The current wave
 
     """
+    tpm = {} # Maps (curState, action, nextState) to transition probability
 
     def __init__(self, board=create_board(), zombieCount=24, fZombieCount=8, bombCount=4, multCount=3, pumpCount=6, wave=1, phase=0):
         self.board = board
@@ -68,6 +69,26 @@ class GameState:
         self.wave = wave
         self.phase = phase
 
+    def __eq__(self, other):
+        return self.board == other.board \
+               and self.zombieCount == other.zombieCount \
+               and self.fZombieCount == other.fZombieCount \
+               and self.bombCount == other.bombCount \
+               and self.multCount == other.multCount \
+               and self.pumpCount == other.pumpCount \
+               and self.wave == other.wave \
+               and self.phase == other.phase
+
+    def __hash__(self):
+        return hash((self.board, \
+                     self.zombieCount, \
+                     self.fZombieCount, \
+                     self.bombCount, \
+                     self.multCount, \
+                     self.pumpCount, \
+                     self.wave, \
+                     self.phase))
+
     def getJasperPosition(self):
         """Returns (x, y) coordinate of Jasper.
         """
@@ -77,12 +98,36 @@ class GameState:
                 y = yPos
         return (10, y)
 
-    def getLegalActions():
-        return None
-
-    def nextStates():
-        return None
+    def copy(self):
+        """Returns a new state with same instance variables as self.
+        """
+        return GameState(self.board, self.zombieCount, self.fZombieCount, self.bombCount, self.multCount, self.pumpCount, self.wave, self.phase)
         
+    def transProbabilityMatrix(self, curState, action, nextState):
+        """Returns transition probability given (s, a, s') if it exists in
+        transProbabilityMatrix. Otherwise calculates the probability, enters it
+        into transProbabilityMatrix and returns the probability.
+        """
+        if (curState, action, nextState) in GameState.tpm:
+            return GameState.tpm[(curState, action, nextState)]
+        else:
+            prob = self.transProbability(curState, action, nextState)
+            GameState.tpm[(curState, action, nextState)] = prob
+            return prob
+
+    def transProbability(self, curState, action, nextState):
+        """Returns probability of transitioning from curState to nextState given action.
+        """
+        # nextPossible = nextStates(curState, action)
+        # if nextState in nextPossible:
+        #     return 1.0/len(nextPossible)
+        return 0.0
+
+    def getMatrixRow(self, curState, action):
+        """Returns row of transition probability matrix, specified by curState and action.
+        """
+        return []
+
     def count_pieces(self):
         state = board2state(self.board)
         zombieCount, fZombieCount, bombCount, multCount, pumpCount = 0
@@ -112,7 +157,7 @@ class GameState:
         """
         totalLeft = self.piecesLeft()
         if totalLeft == 0:
-            return 0
+            return self.waveTransition()
         zombieRange = self.zombieCount/totalLeft
         fZombieRange = (self.zombieCount+self.fZombieCount)/totalLeft
         bombRange = (self.zombieCount+self.fZombieCount+self.bombCount)/totalLeft
@@ -135,8 +180,12 @@ class GameState:
         """
         if self.wave == 1 and self.piecesLeft() == 0:
             self.wave = 2
+            # count number of enemy pieces on board, replace
+            return 
         elif self.wave == 2 and self.piecesLeft() == 0:
             #Call function for win transition
+            return 1
+            
         return 0
 
     def put_piece(self, dice1, dice2):
