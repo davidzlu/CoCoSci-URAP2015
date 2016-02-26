@@ -156,7 +156,7 @@ class GameState:
         """
         totalLeft = self.piecesLeft()
         if totalLeft == 0:
-            return 0
+            return self.waveTransition()
         zombieRange = self.zombieCount/totalLeft
         fZombieRange = (self.zombieCount+self.fZombieCount)/totalLeft
         bombRange = (self.zombieCount+self.fZombieCount+self.bombCount)/totalLeft
@@ -179,9 +179,12 @@ class GameState:
         """
         if self.wave == 1 and self.piecesLeft() == 0:
             self.wave = 2
+            # count number of enemy pieces on board, replace
+            return 
         elif self.wave == 2 and self.piecesLeft() == 0:
-            return 0
             #Call function for win transition
+            return 1
+            
         return 0
 
     def put_piece(self, dice1, dice2):
