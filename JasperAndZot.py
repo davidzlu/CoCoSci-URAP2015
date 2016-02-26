@@ -193,7 +193,7 @@ class GameState:
                 piece1 = self.pullPiece()
                 piece2 = self.pullPiece()
                 piece3 = self.pullPiece()
-                iif dice2 != 1 and dice2 != 6:
+                if dice2 != 1 and dice2 != 6:
                     moves = [[[piece1, piece2, piece3], dice2 - 1], [[piece1, piece3, piece2], dice2 - 1], [[piece2, piece1, piece3], dice2 - 1], [[piece2, piece3, piece1], dice2 - 1], [[piece3, piece1, piece2], dice2 - 1], [[piece3, piece2, piece1], dice2 - 1], [[piece1, piece2, piece3], dice2], [[piece1, piece3, piece2], dice2], [[piece2, piece1, piece3], dice2], [[piece2, piece3, piece1], dice2], [[piece3, piece1, piece2], dice2], [[piece3, piece2, piece1], dice2]]
                 elif dice2 == 1:
                     moves = [[[piece1, piece2, piece3], 1], [[piece1, piece3, piece2], 1], [[piece2, piece1, piece3], 1], [[piece2, piece3, piece1], 1], [[piece3, piece1, piece2], 1], [[piece3, piece2, piece1], 1]]
@@ -248,7 +248,7 @@ class GameState:
                 elif dice2 == 1:
                     moves = [[[piece1, piece2], 1], [[piece2, piece1], 1]]
                 else:
-                    moves = [[[piece1, piece2], 5], [[piece2, piece]1, 5]]
+                    moves = [[[piece1, piece2], 5], [[piece2, piece1], 5]]
                 print("Your available moves are: ")
                 print(moves)
                 my_move = ast.literal_eval(input("Enter the move you'd like to make: "))
@@ -311,12 +311,13 @@ class GameState:
                 self.board[1][my_move[1]] = my_move[0][1]
                 self.board[0][my_move[1] + 1] = my_move[0][2]
 
+    """Helper method for descend() which takens in a token in the format (row, column, type)"""
     def move(self, token):
         old_pos = (token[0], token[1])
         new_row1 = token[0] + 1
         new_row2 = token[0] + 2
         col = token[1]
-        if (new_row2 < 11):
+        if (new_row2 < 10):
             token_one_ahead = self.board[token[0] + 1, token[1]]
             token_two_ahead = self.board[token[0] + 2, token[1]]
             if (token_one_ahead != 0) and (token_one_ahead != 6) and (token_one_ahead != 3) and (token[0] + 1 != 10):
@@ -352,21 +353,89 @@ class GameState:
                 token = (token[0] + 1, token[1], token[2] - 7)
             elif token[2] == 4 and token_one_ahead == 6: #bomb hits pumpkin
                 self.explode(token)
-            else:
+            elif token_one_ahead == 0: #move forward one space
                 self.board[new_row1, col] = token[2]
                 self.board[old_pos] = 0
                 token = (token[0] + 1, token[1], token[2])
+            else:
+                pass
         elif (token[0] + 1 == 10): #token reaches magical barrier
-            if token[2] == 4:
+            if token[2] == 4 or token[2] == 11:
                 self.explode(token)
-            elif token[2] == 5: #multiplier disappears
-                self.board[old_pos] = 0
-            else: #zombies move to nearest pumpkin
-                # TODO: make zombies move to nearest pumpkin
+            elif token[2] == 5 or token[2] == 12: #multiplier disappears
+                if token[2] == 12:
+                    self.board[old_pos] = 3
+                else:
+                    self.board[old_pos] = 0
+            elif token[2] != 3 or token[2] != 6: #zombies move to nearest pumpkin
+                one_left = token[1] - 1
+                two_left = token[1] - 2
+                one_right = token[1] + 1
+                two_right = token[1] + 2
+                old_pos = (token[0], token[1])
+                #First determine which direction the zombie will move
+                direction = self.nearest_pumpkin(token)
+                #Then move
+                if (direction == 'left'):
+                    if self.board[10, one_left] == 3:
+                        if token[2] == 2:
+                            self.burn(token)
+                            self.move(token)
+                        else:
+                            self.board[10, one_left] = 8
+                            if token[2] == 8:
+                                self.board[old_pos] = 3
+                            else:
+                                self.board[old_pos] = 0
+                            token = (10, one_left, 8)
+                    elif token[2] == 8:
+                        if self.board[10, one_left] == 0:
+                            self.board[10, one_left] = 1
+                            self.board[old_pos] = 3
+                            token = (10, one_left, 1)
+                    elif self.board[10, two_left] == 0 and self.board[10, one_left] == 0:
+                        self.board[10, two_left] = token[2]
+                        self.board[old_pos] = 0
+                        token = (token, two_left, token[2])
+                    elif self.board[10, one_left] == 0:
+                        self.board[10, one_left] = token[2]
+                        self.board[old_pos] = 0
+                        token = (10, one_left, token[2])
+                    else:
+                        pass
+                elif (direction == 'right'):
+                    if self.board[10, one_right] == 3:
+                        if token[2] == 2:
+                            self.burn(token)
+                            self.move(token)
+                        else:
+                            self.board[10, one_right] = 8
+                            if token[2] == 8:
+                                self.board[old_pos] = 3
+                            else:
+                                self.board[old_pos] = 0
+                            token = (10, one_right, 8)
+                    elif token[2] == 8:
+                        if self.board[10, one_right] == 0:
+                            self.board[10, one_right] = 1
+                            self.board[old_pos] = 3
+                            token = (10, one_right, 1)
+                    elif self.board[10, two_right] == 0 and self.board[10, one_right] == 0:
+                        self.board[10, two_right] = token[2]
+                        self.board[old_pos] = 0
+                        token = (token, two_right, token[2])
+                    elif self.board[10, one_right] == 0:
+                        self.board[10, one_right] = token[2]
+                        self.board[old_pos] = 0
+                        token = (10, one_right, token[2])
+                    else: #don't move!
+                        pass
+                else: #don't move!
+                    pass
+            else: #token is probably a flower bed
                 pass
         else:
-            self.board[old_pos] = 0
-            #TODO: throw an error probably
+            raise Exception('Whoops, something went wrong.')
 
     #TODO: fix so that it only moves pieces once.
     # def descend(self):
@@ -413,6 +482,43 @@ class GameState:
             if item[2] > 7: #flower beds get burned, but tokens on top do not disappear
                 self.board[item[0], item[1]] = item[2] - 7
                 self.burn(item)
+
+    def nearest_pumpkin(self, token):
+        one_left = token[1] - 1
+        two_left = token[1] - 2
+        one_right = token[1] + 1
+        two_right = token[1] + 2
+        direction = 'stop'
+        if token[1] == 0:
+            direction = 'right'
+        elif token[1] == 5:
+            direction = 'left'
+        elif token[1] == 1:
+            if self.board[10, one_left] != 6:
+                direction = 'right'
+            else:
+                direction = 'stop'
+        elif token[1] == 4:
+            if self.board[10, one_right] != 6:
+                direction = 'left'
+            else:
+                direction = 'stop'
+        elif self.board[10, two_left] == 6 and self.board[10, two_right] == 6:
+            direction = random.choice(['left', 'right'])
+        elif self.board[10, two_right] == 6 and self.board[10, one_left] != 6:
+            direction = 'right'
+            if self.board[10, one_right] != 0 or self.board[10, one_right] != 3:
+                direction = 'stop'
+        elif self.board[10, two_left] == 6 and self.board[10, one_right] != 6:
+            direction = 'left'
+            if self.board[10, one_left] != 0 or self.board[10, one_left] != 3:
+                direction = 'stop'
+        else: #two spaces on either side show no signs of pumpkins
+            if token[1] == 2:
+                direction = 'right'
+            else:
+                direction = 'left'
+        return direction
 
 
     # This is code that can be used to get rid of chains of things; lightly tested
