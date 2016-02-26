@@ -1,6 +1,7 @@
 import random
 import numpy as np
 import ast
+from copy import deepcopy
 
 """Token Key:
     0 = empty space
@@ -39,8 +40,8 @@ def board2state(board):
     return state
 
 def state2board(state):
-    """ Takes in a binary string state representation
-    and returns the board equivalent """
+    """ Takes in a binary string state representation of
+    the game board and returns the board equivalent """
     board = np.zeros(66).astype(int)
     for i in range(len(state)):
         board[i] = state[i]
@@ -57,7 +58,7 @@ class GameState:
 
     """
 
-    def __init__(self, board=create_board(), zombieCount=24, fZombieCount=8, bombCount=4, multCount=3, pumpCount=6, wave=1, phase=2):
+    def __init__(self, board=create_board(), zombieCount=24, fZombieCount=8, bombCount=4, multCount=3, pumpCount=6, wave=1, phase=0):
         self.board = board
         self.zombieCount = zombieCount
         self.fZombieCount = fZombieCount
@@ -474,7 +475,6 @@ class GameState:
         else:
             raise Exception('Whoops, something went wrong.')
 
-
     def descend(self):
         moving_pieces = []
         exclude = []
@@ -492,6 +492,7 @@ class GameState:
                         moving_pieces.append(token)
         for token in moving_pieces:
             self.move(token)
+        self.phase = 2
 
 
     def find_adjacent(self, row, column):
@@ -564,6 +565,20 @@ class GameState:
             else:
                 direction = 'left'
         return direction
+
+    def next_states(self):
+        states = []
+        next_state = deepcopy(self)
+        if self.phase == 1:
+            states.append[next_state.descend()]
+        elif self.phase == 0 or self.phase == 2:
+            pass
+        elif self.phase == 3:
+            pass
+        elif self.phase == 4:
+            pass
+        return states
+
 
 
     # This is code that can be used to get rid of chains of things; lightly tested
