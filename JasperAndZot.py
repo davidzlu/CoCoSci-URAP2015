@@ -92,11 +92,11 @@ class GameState:
     def getJasperPosition(self):
         """Returns (x, y) coordinate of Jasper.
         """
-        y = 0
-        for yPos in range(0, 6):
-            if self.board[10, yPos] == 7:
-                y = yPos
-        return (10, y)
+        x = 0
+        for xPos in range(0, 6):
+            if self.board[10, xPos] == 7:
+                x = xPos
+        return (x, 10)
 
     def copy(self):
         """Returns a new state with same instance variables as self.
@@ -115,7 +115,20 @@ class GameState:
             GameState.tpm[(curState, action, nextState)] = prob
             return prob
 
-    def transProbability(self, curState, action, nextState):
+    def nextStates(self, action):
+        states = []
+        next_state = deepcopy(self)
+        if self.phase == 1: #states after descend
+            states.append(next_state.descend())
+        elif self.phase == 0 or self.phase == 2: #states after placing
+            pass
+        elif self.phase == 3: #states after moving and spellcasting
+            states.append(next_state.move_and_shoot(action))
+        elif self.phase == 4: #states after smash
+        #   states.append(next_state.smash(action))
+        return states
+
+    def transProbability(self, curState, action, nextState): #are self and curState not the same thing?? -Priyam
         """Returns probability of transitioning from curState to nextState given action.
         """
         # nextPossible = nextStates(curState, action)
@@ -567,6 +580,7 @@ class GameState:
         else:
             raise Exception('Whoops, something went wrong.')
 
+    """Phase 1 of the game"""
     def descend(self):
         moving_pieces = []
         exclude = []
@@ -601,6 +615,7 @@ class GameState:
                 adjacent.append((row + 1, column, self.board[row + 1, column]))
         return adjacent
 
+    """Action for bombs"""
     def explode(self, token):
         immediate = self.find_adjacent(token[0], token[1])
         for item in immediate:
@@ -611,6 +626,7 @@ class GameState:
                 self.explode(item)
         self.board[token[0], token[1]] = 0
 
+    """Action for the flaming zombie"""
     def burn(self, token):
         immediate = self.find_adjacent(token[0], token[1])
         for item in immediate:
@@ -621,6 +637,7 @@ class GameState:
                 self.board[item[0], item[1]] = item[2] - 7
                 self.burn(item)
 
+    """Helper method for move; sets direction for zombies to move when in pumpkin patch"""
     def nearest_pumpkin(self, token):
         one_left = token[1] - 1
         two_left = token[1] - 2
@@ -658,20 +675,6 @@ class GameState:
                 direction = 'left'
         return direction
 
-    def next_states(self):
-        states = []
-        next_state = deepcopy(self)
-        if self.phase == 1:
-            states.append[next_state.descend()]
-        elif self.phase == 0 or self.phase == 2:
-            pass
-        elif self.phase == 3:
-            pass
-        elif self.phase == 4:
-            pass
-        return states
-
-
 
     # This is code that can be used to get rid of chains of things; lightly tested
     # def destroy_chain(self, token):
@@ -679,7 +682,7 @@ class GameState:
     #     for item in immediate:
     #         self.board[item[0], item[1]] = 0
     #         self.explode(item)
-    move_3 = []
+    
     def flower(self, token):
         immediate = self.find_adjacent(token[0], token[1])
         if token[2] == 1 or token[2] == 2 or token[2] == 5 or token[2] == 8 or token[2] == 12:
@@ -735,17 +738,18 @@ class GameState:
         return (score, multiplier)
 
 
-
-    def move_and_shoot(self):
-        jasper_x = self.getJasperPosition();
+    move_3 = []
+    def move_and_shoot(self, my_move_3):
+        jasper_x = self.getJasperPosition()[1]
         for spell in range(0, 3): #1.flower 2.fire 3.do nothing
             for column in range(max(0, jasper_x - 3), min(jasper_x + 3, 5)):
-                move_3.append([spell, column])
-        print("Your available moves are:")
-        print(move_3)
-        my_move_3 = ast.literal_eval(input("Enter the move you'd like to make: "))
-        while my_move not in moves:
-            my_move_3 = ast.literal_eval(input("Please enter a valid move: "))
+                GameState.move_3.append([spell, column])
+        #I think the code below belongs in a play function instead of in a phase function. - Priyam
+        # print("Your available moves are:")
+        # print(move_3)
+        # my_move_3 = ast.literal_eval(input("Enter the move you'd like to make: "))
+        # while my_move not in moves:
+        #     my_move_3 = ast.literal_eval(input("Please enter a valid move: "))
         if my_move_3[0] == 0:#flower power
             for index in range(0, 4):
                 row = 9 - index
@@ -762,6 +766,46 @@ class GameState:
                     token = (row, my_move_3[1], token_type)
                     self.score = self.fire(token)[0] * (2 ** self.fire(token)[1]) + self.score
                     break
+    
+    def smash(self):
+        for row in range(8, 10):
+            for column in range(0, 6):
+                if self.board[row][column] == 1 or self.board[row][column] == 2:
+                    adjacent = self.find_adjacent(row, column)
+                    pump = []
+                    for item in adjacent:
+                        if item[2] = 6:
+                            pump.append(item)
+                    if len(pump) == 1:
+                        self.board[pump[0][0]][pump[0][1]] = 0
+                        self.score = self.score - 10
+                    elif len(pump) == 2:
+                        print("Your choices of pumpkin are:")
+                        print(pump)
+                        pump_chosen = ast.literal_eval(input("Enter the pumpkin to smash: "))
+                        while pump_chosen not in pump:
+                            pump_chosen = ast.literal_eval(input("Please enter an available pumpkin: "))
+                        self.board[pump_chosen[0]][pump_chosen[1]] = 0
+                        self.score = self.score - 10
+                    elif len(pump) == 0:
+                        if row == 9:
+                            if column == 0 or column == 1:
+                                if self.board[row][column + 1] == 0:
+                                    self.board[row][column + 1] = self.board[row][column]
+                                    self.board[row][column] = 0
+                            elif column == 5 or column == 4:
+                                if self.board[row][column - 1] == 0:
+                                    self.board[row][column - 1] = self.board[row][column]
+                                    self.board[row][column] = 0
+                            else:
+                                token = (row, column, self.board[row][column])
+                                direction = self.nearest_pumpkin(token)
+                                if direction == 'left' and self.board[row][column - 1] == 0:
+                                    self.board[row][column - 1] = self.board[row][column]
+                                    self.board[row][column] = 0
+                                elif direction == 'right' and self.board[row][column + 1] == 0:
+                                    self.board[row][column + 1] = self.board[row][column]
+                                    self.board[row][column] = 0
 
 
 if __name__ == '__main__':
