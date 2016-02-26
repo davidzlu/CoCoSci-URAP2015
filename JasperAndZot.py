@@ -641,7 +641,89 @@ class GameState:
     #     for item in immediate:
     #         self.board[item[0], item[1]] = 0
     #         self.explode(item)
-            
+    move_3 = []
+    def flower(self, token):
+        immediate = self.find_adjacent(token[0], token[1])
+        if token[2] == 1 or token[2] == 2 or token[2] == 5 or token[2] == 8 or token[2] == 12:
+            self.board[token[0]][token[1]] = 3
+            for item in immediate:
+                if item[2] == 1 or item[2] == 2 or item[2] == 5 or item[2] == 8 or item[2] == 12 or token[2] == 4 or token[2] = 11:
+                    self.flower(item)
+        elif token[2] == 4 or token[2] = 11:
+            self.explode(token)
+
+    def fire(self, token):
+        immediate = self.find_adjacent(token[0], token[1])
+        score = 0
+        multiplier = 0
+        if token[2] == 1 or token[2] == 2:
+            self.board[token[0]][token[1]] = 0
+            score = score + 2
+            for item in immediate:
+                if item[2] == 1 or item[2] == 2 or item[2] == 3 or item[2] == 5 or item[2] == 8 or item[2] == 12 or token[2] == 4 or token[2] = 11:
+                    score = score + self.fire(item)[0]
+                    multiplier = multiplier + self.fire(item)[1]
+        elif token[2] == 8:
+            self.board[token[0]][token[1]] = 0
+            score = score + 3
+            for item in immediate:
+                if item[2] == 1 or item[2] == 2 or item[2] == 3 or item[2] == 5 or item[2] == 8 or item[2] == 12 or token[2] == 4 or token[2] = 11:
+                    score = score + self.fire(item)[0]
+                    multiplier = multiplier + self.fire(item)[1]
+        elif token[2] == 3:
+            self.board[token[0]][token[1]] = 0
+            score = score + 1
+            for item in immediate:
+                if item[2] == 1 or item[2] == 2 or item[2] == 3 or item[2] == 5 or item[2] == 8 or item[2] == 12 or token[2] == 4 or token[2] = 11:
+                    score = score + self.fire(item)[0]
+                    multiplier = multiplier + self.fire(item)[1]
+        elif token[2] == 4 or token[2] == 11:
+            self.explode(token)
+        elif token[2] == 5:
+            self.board[token[0]][token[1]] = 0
+            multiplier = multiplier + 1
+            for item in immediate:
+                if item[2] == 1 or item[2] == 2 or item[2] == 3 or item[2] == 5 or item[2] == 8 or item[2] == 12 or token[2] == 4 or token[2] = 11:
+                    score = score + self.fire(item)[0]
+                    multiplier = multiplier + self.fire(item)[1]
+        elif token[2] == 12:
+            self.board[token[0]][token[1]] = 0
+            score = score + 1
+            multiplier = multiplier + 1
+            for item in immediate:
+                if item[2] == 1 or item[2] == 2 or item[2] == 3 or item[2] == 5 or item[2] == 8 or item[2] == 12 or token[2] == 4 or token[2] = 11:
+                    score = score + self.fire(item)[0]
+                    multiplier = multiplier + self.fire(item)[1]
+        return (score, multiplier)
+
+
+
+    def move_and_shoot(self):
+        jasper_x = self.getJasperPosition();
+        for spell in range(0, 3): #1.flower 2.fire 3.do nothing
+            for column in range(max(0, jasper_x - 3), min(jasper_x + 3, 5)):
+                move_3.append([spell, column])
+        print("Your available moves are:")
+        print(move_3)
+        my_move_3 = ast.literal_eval(input("Enter the move you'd like to make: "))
+        while my_move not in moves:
+            my_move_3 = ast.literal_eval(input("Please enter a valid move: "))
+        if my_move_3[0] == 0:#flower power
+            for index in range(0, 4):
+                row = 9 - index
+                token_type = self.board[row][my_move_3[1]]
+                if token_type == 1 or token_type == 2 or token_type == 4 or token_type == 5 or token_type == 8 or token_type == 11 or token_type == 12:
+                    token = (row, my_move_3[1], token_type)
+                    self.flower(token)
+                    break
+        elif my_move_3[0] == 1:
+            for index in range(0, 4):
+                row = 9 - index
+                token_type = self.board[row][my_move_3[1]]
+                if token_type == 3 or token_type == 8 or token_type == 11 or token_type == 12:
+                    token = (row, my_move_3[1], token_type)
+                    self.score = self.fire(token)[0] * (2 ** self.fire(token)[1]) + self.score
+                    break
 
 
 if __name__ == '__main__':
