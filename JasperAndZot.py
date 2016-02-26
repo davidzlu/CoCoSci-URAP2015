@@ -59,7 +59,7 @@ class GameState:
     """
     tpm = {} # Maps (curState, action, nextState) to transition probability
 
-    def __init__(self, board=create_board(), zombieCount=24, fZombieCount=8, bombCount=4, multCount=3, pumpCount=6, wave=1, phase=0):
+    def __init__(self, board=create_board(), zombieCount=24, fZombieCount=8, bombCount=4, multCount=3, pumpCount=6, wave=1, phase=0, score=0):
         self.board = board
         self.zombieCount = zombieCount
         self.fZombieCount = fZombieCount
@@ -68,6 +68,7 @@ class GameState:
         self.pumpCount = pumpCount
         self.wave = wave
         self.phase = phase
+        self.score = score
 
     def __eq__(self, other):
         return self.board == other.board \
