@@ -126,7 +126,14 @@ class GameState:
     def getMatrixRow(self, curState, action):
         """Returns row of transition probability matrix, specified by curState and action.
         """
-        return []
+        matrixRow = []
+        # nextPossible = nextStates(curState, action)
+        # for nextState in nextPossible:
+        #   index = (curState, action, nextState)
+        #   if index not in GameState.tmp:
+        #        GameState.tmp[index] = self.transProbability(curState, action, nextState)
+        #        matrixRow.append(GameState.tmp[index])
+        return matrixRow
 
     def count_pieces(self):
         state = board2state(self.board)
@@ -153,7 +160,7 @@ class GameState:
         """Return the next piece pulled from bag, assuming equal 
         probability of any piece being pulled. Does this by splitting
         the interval [0.0, 1.0) into 4 based on the probability of drawing
-        a certain piece.
+        a certain piece. Also accounts for wave transition when out of pieces.
         """
         totalLeft = self.piecesLeft()
         if totalLeft == 0:
@@ -180,39 +187,61 @@ class GameState:
         """
         if self.wave == 1 and self.piecesLeft() == 0:
             zCount, fzCount, bCount, mCount, pCount = self.count_pieces()
-            nextState = GameState(self.board, 24-zCount, 8-fzCount, 4-bCount, 4-mCount, 6-pCount, 2, self.phase)
-            # count number of enemy pieces on board, replace
-            return nextState
-        if self.wave == 1 and self.piecesLeft() > 0:
-            nextState = self.copy()
-            nextState.wave = 2
-            return nextState
+            self.zombieCount = 24-zCount
+            self.fZombieCount = 8-fzCount
+            self.bombCount = 4-bCount
+            self.multCount = 4-mCount
+            self.pumpCount = 6-pCount
+            self.wave = 2
+            return self.pullPiece()
+        elif self.wave == 1 and self.piecesLeft() > 0:
+            self.wave = 2
         elif self.wave == 2 and self.piecesLeft() == 0:
-            #Call function for win transition
+            if self.checkWin():
+                # Take care of win transition
+                return 0
+            elif self.checkLose():
+                # Take care of lose transition
+                return 0
             return 1
-            
         return 0
+
+    def checkWin(self):
+        """Checks if current state is a win state.
+        """
+        def enemyOnBoard(self):
+            zCount, fZCount, bCount, mCount, pCount = self.count_pieces()
+            return zCount > 0 or fZCount > 0 or bCount > 0 or mCount > 0
+        return self.wave == 2 and self.pumpCount > 0 and self.piecesLeft == 0 and self.enemyOnBoard()
+
+    def checkLose(self):
+        return self.pumpCount == 0
 
     def put_piece(self, dice1, dice2):
         if self.wave == 1:
             if dice1 == 1:
                 self.board[0][dice2 - 1] = self.pullPiece()
+
             elif dice1 == 2:
                 piece1 = self.pullPiece()
                 piece2 = self.pullPiece()
+
                 if dice2 != 1 and dice2 != 6:
                     moves = [[[piece1, piece2], dice2 - 1], [[piece2, piece1], dice2 - 1], [[piece1, piece2], dice2], [[piece2, piece1], dice2]]
                 elif dice2 == 1:
                     moves = [[[piece1, piece2], 1], [[piece2, piece1], 1]]
                 else:
                     moves[[[piece1, piece2], 5], [[piece2, piece1], 5]]
+
                 print("Your available moves are: ")
                 print(moves)
                 my_move = ast.literal_eval(input("Enter the move you'd like to make: "))
                 while my_move not in moves:
                     my_move = ast.literal_eval(input("Please enter a valid move: "))
+
                 self.board[0][my_move[1] - 1] = my_move[0][0]
                 self.board[0][my_move[1]] = my_move[0][1]
+
             elif dice1 == 3:
                 piece1 = self.pullPiece()
                 piece2 = self.pullPiece()
@@ -224,6 +253,7 @@ class GameState:
                     my_move = ast.literal_eval(input("Please enter a valid move: "))
                 self.board[0][my_move[1] - 1] = my_move[0][0]
                 self.board[1][my_move[1] - 1] = my_move[0][1]
+
             elif dice1 == 4:
                 piece1 = self.pullPiece()
                 piece2 = self.pullPiece()
@@ -242,6 +272,7 @@ class GameState:
                 self.board[0][my_move[1] - 1] = my_move[0][0]
                 self.board[0][my_move[1]] = my_move[0][1]
                 self.board[1][my_move[1] - 1] = my_move[0][2]
+
             elif dice1 == 5:
                 piece1 = self.pullPiece()
                 piece2 = self.pullPiece()
@@ -260,6 +291,7 @@ class GameState:
                 self.board[0][my_move[1] - 1] = my_move[0][0]
                 self.board[0][my_move[1]] = my_move[0][1]
                 self.board[1][my_move[1]] = my_move[0][2]
+
             elif dice1 == 6:
                 piece1 = self.pullPiece()
                 piece2 = self.pullPiece()
@@ -278,6 +310,7 @@ class GameState:
                 self.board[0][my_move[1] - 1] = my_move[0][0]
                 self.board[0][my_move[1]] = my_move[0][1]
                 self.board[0][my_move[1] + 1] = my_move[0][2]
+
         elif self.wave == 2:
             if dice1 == 1:
                 piece1 = self.pullPiece()
@@ -295,6 +328,7 @@ class GameState:
                     my_move = ast.literal_eval(input("Please enter a valid move: "))
                 self.board[0][my_move[1] - 1] = my_move[0][0]
                 self.board[1][my_move[1]] = my_move[0][1]
+
             elif dice1 == 2:
                 piece1 = self.pullPiece()
                 piece2 = self.pullPiece()
@@ -311,6 +345,7 @@ class GameState:
                     my_move = ast.literal_eval(input("Please enter a valid move: "))
                 self.board[0][my_move[1] - 1] = my_move[0][0]
                 self.board[0][my_move[1] + 1] = my_move[0][1]
+
             elif dice1 == 3:
                 piece1 = self.pullPiece()
                 piece2 = self.pullPiece()
@@ -327,6 +362,7 @@ class GameState:
                     my_move = ast.literal_eval(input("Please enter a valid move: "))
                 self.board[1][my_move[1] - 1] = my_move[0][0]
                 self.board[0][my_move[1]] = my_move[0][1]
+
             elif dice1 == 4:
                 piece1 = self.pullPiece()
                 piece2 = self.pullPiece()
@@ -345,6 +381,7 @@ class GameState:
                 self.board[0][my_move[1] - 1] = my_move[0][0]
                 self.board[1][my_move[1] - 1] = my_move[0][1]
                 self.board[0][my_move[1] + 1] = my_move[0][2]
+
             elif dice1 == 5:
                 piece1 = self.pullPiece()
                 piece2 = self.pullPiece()
@@ -363,6 +400,7 @@ class GameState:
                 self.board[0][my_move[1] - 1] = my_move[0][0]
                 self.board[0][my_move[1] + 1] = my_move[0][1]
                 self.board[1][my_move[1] + 1] = my_move[0][2]
+
             elif dice1 == 6:
                 piece1 = self.pullPiece()
                 piece2 = self.pullPiece()
@@ -647,9 +685,9 @@ class GameState:
         if token[2] == 1 or token[2] == 2 or token[2] == 5 or token[2] == 8 or token[2] == 12:
             self.board[token[0]][token[1]] = 3
             for item in immediate:
-                if item[2] == 1 or item[2] == 2 or item[2] == 5 or item[2] == 8 or item[2] == 12 or token[2] == 4 or token[2] = 11:
+                if item[2] == 1 or item[2] == 2 or item[2] == 5 or item[2] == 8 or item[2] == 12 or token[2] == 4 or token[2] == 11:
                     self.flower(item)
-        elif token[2] == 4 or token[2] = 11:
+        elif token[2] == 4 or token[2] == 11:
             self.explode(token)
 
     def fire(self, token):
@@ -660,7 +698,7 @@ class GameState:
             self.board[token[0]][token[1]] = 0
             score = score + 2
             for item in immediate:
-                if item[2] == 1 or item[2] == 2 or item[2] == 3 or item[2] == 5 or item[2] == 8 or item[2] == 12 or token[2] == 4 or token[2] = 11:
+                if item[2] == 1 or item[2] == 2 or item[2] == 3 or item[2] == 5 or item[2] == 8 or item[2] == 12 or token[2] == 4 or token[2] == 11:
                     score = score + self.fire(item)[0]
                     multiplier = multiplier + self.fire(item)[1]
         elif token[2] == 8:
