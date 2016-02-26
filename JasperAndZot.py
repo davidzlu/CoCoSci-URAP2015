@@ -1,6 +1,7 @@
 import random
 import numpy as np
 import ast
+from copy import deepcopy
 
 """Token Key:
     0 = empty space
@@ -549,6 +550,20 @@ class GameState:
             else:
                 direction = 'left'
         return direction
+
+    def next_states(self):
+        states = []
+        next_state = deepcopy(self)
+        if self.phase == 1:
+            states.append[next_state.descend()]
+        elif self.phase == 0 or self.phase == 2:
+            pass
+        elif self.phase == 3:
+            pass
+        elif self.phase == 4:
+            pass
+        return states
+
 
 
     # This is code that can be used to get rid of chains of things; lightly tested
