@@ -123,13 +123,7 @@ class GameState:
         elif self.phase == 0 or self.phase == 2: #states after placing
             pass
         elif self.phase == 3: #states after moving and spellcasting
-            jasper_y = self.getJasperPosition()[1]
-            for i in range(max(0, jasper_y - 3), min(jasper_y + 3, 5)):
-                states.append(next_state.move_and_shoot([0, i]))
-                next_state = deepcopy(self) 
-                states.append(next_state.move_and_shoot([1, i]))
-                next_state = deepcopy(self)
-                states.append(next_state.move_and_shoot([2, i]))
+            states.append(next_state.move_and_shoot(action))
         elif self.phase == 4: #states after smash
         #   states.append(next_state.smash(action))
         return states
