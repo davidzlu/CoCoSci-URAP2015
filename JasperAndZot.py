@@ -179,9 +179,14 @@ class GameState:
         """Manages transitioning between waves.
         """
         if self.wave == 1 and self.piecesLeft() == 0:
-            self.wave = 2
+            zCount, fzCount, bCount, mCount, pCount = self.count_pieces()
+            nextState = GameState(self.board, 24-zCount, 8-fzCount, 4-bCount, 4-mCount, 6-pCount, 2, self.phase)
             # count number of enemy pieces on board, replace
-            return 
+            return nextState
+        if self.wave == 1 and self.piecesLeft() > 0:
+            nextState = self.copy()
+            nextState.wave = 2
+            return nextState
         elif self.wave == 2 and self.piecesLeft() == 0:
             #Call function for win transition
             return 1
