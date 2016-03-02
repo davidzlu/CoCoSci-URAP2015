@@ -121,12 +121,15 @@ class GameState:
         next_state = deepcopy(self)
         if self.phase == 1: #states after descend
             states.append(next_state.descend())
-        elif self.phase == 0 or self.phase == 2: #states after placing
-            pass
+        elif self.phase == 0 or self.phase == 2: #states after rolling and placing
+            for i in range(1, 7):
+                for j in range(1, 7): #all possible combinations of dicerolls
+                    next_state = deepcopy(self)
+                    states.append(next_state.phase_two(i, j, action))
         elif self.phase == 3: #states after moving and spellcasting
             states.append(next_state.move_and_shoot(action))
         elif self.phase == 4: #states after smash
-        #   states.append(next_state.smash(action))
+           states.append(next_state.phase_four(action))
         return states
 
     def transProbability(self, curState, action, nextState): #are self and curState not the same thing?? -Priyam
@@ -231,7 +234,55 @@ class GameState:
     def checkLose(self):
         return self.pumpCount == 0
 
-    def put_piece(self, dice1, dice2):
+    def phase_two(self, dice1, dice2, my_move):
+        if self.wave == 1:
+            if dice1 == 1:
+                self.board[0][my_move[1]] = my_move[0][0] #needs to be specified so that next_states works properly
+            elif dice1 == 2:
+                self.board[0][my_move[1] - 1] = my_move[0][0]
+                self.board[0][my_move[1]] = my_move[0][1]
+            elif dice1 == 3:
+                self.board[0][my_move[1] - 1] = my_move[0][0]
+                self.board[1][my_move[1] - 1] = my_move[0][1]
+            elif dice1 == 4:
+                self.board[0][my_move[1] - 1] = my_move[0][0]
+                self.board[0][my_move[1]] = my_move[0][1]
+                self.board[1][my_move[1] - 1] = my_move[0][2]
+            elif dice1 == 5:
+                self.board[0][my_move[1] - 1] = my_move[0][0]
+                self.board[0][my_move[1]] = my_move[0][1]
+                self.board[1][my_move[1]] = my_move[0][2]
+            elif dice1 == 6:
+                self.board[0][my_move[1] - 1] = my_move[0][0]
+                self.board[0][my_move[1]] = my_move[0][1]
+                self.board[0][my_move[1] + 1] = my_move[0][2]
+        elif self.wave == 2:
+            if dice1 == 1:
+                self.board[0][my_move[1] - 1] = my_move[0][0]
+                self.board[1][my_move[1]] = my_move[0][1]
+            elif dice1 == 2:
+                self.board[0][my_move[1] - 1] = my_move[0][0]
+                self.board[0][my_move[1] + 1] = my_move[0][1]
+            elif dice1 == 3:
+                self.board[1][my_move[1] - 1] = my_move[0][0]
+                self.board[0][my_move[1]] = my_move[0][1]
+            elif dice1 == 4:
+                self.board[0][my_move[1] - 1] = my_move[0][0]
+                self.board[1][my_move[1] - 1] = my_move[0][1]
+                self.board[0][my_move[1] + 1] = my_move[0][2]
+            elif dice1 == 5:
+                self.board[0][my_move[1] - 1] = my_move[0][0]
+                self.board[0][my_move[1] + 1] = my_move[0][1]
+                self.board[1][my_move[1] + 1] = my_move[0][2]
+            elif dice1 == 6:
+                self.board[0][my_move[1] - 1] = my_move[0][0]
+                self.board[1][my_move[1]] = my_move[0][1]
+                self.board[0][my_move[1] + 1] = my_move[0][2]
+
+
+
+
+    def human_put_piece(self, dice1, dice2):
         if self.wave == 1:
             if dice1 == 1:
                 self.board[0][dice2 - 1] = self.pullPiece()
@@ -709,14 +760,14 @@ class GameState:
             self.board[token[0]][token[1]] = 0
             score = score + 3
             for item in immediate:
-                if item[2] == 1 or item[2] == 2 or item[2] == 3 or item[2] == 5 or item[2] == 8 or item[2] == 12 or token[2] == 4 or token[2] = 11:
+                if item[2] == 1 or item[2] == 2 or item[2] == 3 or item[2] == 5 or item[2] == 8 or item[2] == 12 or token[2] == 4 or token[2] == 11:
                     score = score + self.fire(item)[0]
                     multiplier = multiplier + self.fire(item)[1]
         elif token[2] == 3:
             self.board[token[0]][token[1]] = 0
             score = score + 1
             for item in immediate:
-                if item[2] == 1 or item[2] == 2 or item[2] == 3 or item[2] == 5 or item[2] == 8 or item[2] == 12 or token[2] == 4 or token[2] = 11:
+                if item[2] == 1 or item[2] == 2 or item[2] == 3 or item[2] == 5 or item[2] == 8 or item[2] == 12 or token[2] == 4 or token[2] == 11:
                     score = score + self.fire(item)[0]
                     multiplier = multiplier + self.fire(item)[1]
         elif token[2] == 4 or token[2] == 11:
@@ -725,7 +776,7 @@ class GameState:
             self.board[token[0]][token[1]] = 0
             multiplier = multiplier + 1
             for item in immediate:
-                if item[2] == 1 or item[2] == 2 or item[2] == 3 or item[2] == 5 or item[2] == 8 or item[2] == 12 or token[2] == 4 or token[2] = 11:
+                if item[2] == 1 or item[2] == 2 or item[2] == 3 or item[2] == 5 or item[2] == 8 or item[2] == 12 or token[2] == 4 or token[2] == 11:
                     score = score + self.fire(item)[0]
                     multiplier = multiplier + self.fire(item)[1]
         elif token[2] == 12:
@@ -733,7 +784,7 @@ class GameState:
             score = score + 1
             multiplier = multiplier + 1
             for item in immediate:
-                if item[2] == 1 or item[2] == 2 or item[2] == 3 or item[2] == 5 or item[2] == 8 or item[2] == 12 or token[2] == 4 or token[2] = 11:
+                if item[2] == 1 or item[2] == 2 or item[2] == 3 or item[2] == 5 or item[2] == 8 or item[2] == 12 or token[2] == 4 or token[2] == 11:
                     score = score + self.fire(item)[0]
                     multiplier = multiplier + self.fire(item)[1]
         return (score, multiplier)
@@ -767,7 +818,25 @@ class GameState:
                     token = (row, my_move_3[1], token_type)
                     self.score = self.fire(token)[0] * (2 ** self.fire(token)[1]) + self.score
                     break
-    
+
+
+    def phase_four(self, pump_chosen):
+        for row in range(8, 10):
+            for column in range(0, 6):
+                if self.board[row][column] == 1 or self.board[row][column] == 2:
+                    adjacent = self.find_adjacent(row, column)
+                    pump = []
+                    for item in adjacent:
+                        if item[2] == 6:
+                            pump.append(item)
+                    if len(pump) == 1:
+                        self.board[pump[0][0]][pump[0][1]] = 0
+                        self.score = self.score - 10
+                    elif len(pump) == 2:
+                        self.board[pump_chosen[0]][pump_chosen[1]] = 0
+                        self.score = self.score - 10
+
+
     def smash(self):
         for row in range(8, 10):
             for column in range(0, 6):
@@ -775,7 +844,7 @@ class GameState:
                     adjacent = self.find_adjacent(row, column)
                     pump = []
                     for item in adjacent:
-                        if item[2] = 6:
+                        if item[2] == 6:
                             pump.append(item)
                     if len(pump) == 1:
                         self.board[pump[0][0]][pump[0][1]] = 0
@@ -788,25 +857,26 @@ class GameState:
                             pump_chosen = ast.literal_eval(input("Please enter an available pumpkin: "))
                         self.board[pump_chosen[0]][pump_chosen[1]] = 0
                         self.score = self.score - 10
-                    elif len(pump) == 0:
-                        if row == 9:
-                            if column == 0 or column == 1:
-                                if self.board[row][column + 1] == 0:
-                                    self.board[row][column + 1] = self.board[row][column]
-                                    self.board[row][column] = 0
-                            elif column == 5 or column == 4:
-                                if self.board[row][column - 1] == 0:
-                                    self.board[row][column - 1] = self.board[row][column]
-                                    self.board[row][column] = 0
-                            else:
-                                token = (row, column, self.board[row][column])
-                                direction = self.nearest_pumpkin(token)
-                                if direction == 'left' and self.board[row][column - 1] == 0:
-                                    self.board[row][column - 1] = self.board[row][column]
-                                    self.board[row][column] = 0
-                                elif direction == 'right' and self.board[row][column + 1] == 0:
-                                    self.board[row][column + 1] = self.board[row][column]
-                                    self.board[row][column] = 0
+                    #Code below may be unnecessary as it should be handled in descend function. Tokens don't move during smash anyway
+                    # elif len(pump) == 0:
+                    #     if row == 9:
+                    #         if column == 0 or column == 1:
+                    #             if self.board[row][column + 1] == 0:
+                    #                 self.board[row][column + 1] = self.board[row][column]
+                    #                 self.board[row][column] = 0
+                    #         elif column == 5 or column == 4:
+                    #             if self.board[row][column - 1] == 0:
+                    #                 self.board[row][column - 1] = self.board[row][column]
+                    #                 self.board[row][column] = 0
+                    #         else:
+                    #             token = (row, column, self.board[row][column])
+                    #             direction = self.nearest_pumpkin(token)
+                    #             if direction == 'left' and self.board[row][column - 1] == 0:
+                    #                 self.board[row][column - 1] = self.board[row][column]
+                    #                 self.board[row][column] = 0
+                    #             elif direction == 'right' and self.board[row][column + 1] == 0:
+                    #                 self.board[row][column + 1] = self.board[row][column]
+                    #                 self.board[row][column] = 0
 
 
 if __name__ == '__main__':
