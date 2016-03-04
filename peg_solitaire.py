@@ -106,16 +106,16 @@ def play(strategy=human_player):
 		reward = -1
 	return board, reward
 	
-# def best_policy(board):
-#    actions = legal_actions(board)
-#    curr_state = board2state(board)
-#    possible_actions_q = {}
-#    for act in actions:
-#        key = opt_avf(curr_state, act, 2, 0.5)
-#        value = key
-#        entry = act
-#        possible_actions_q[key] = entry
-#    best_q = max(possible_actions_q.keys())
-#    return possible_actions_q[best_q]
+def best_policy(board):
+   actions = legal_actions(board)
+   curr_state = board2state(board)
+   possible_actions_q = {}
+   for act in actions:
+       key = opt_avf(curr_state, act, 2, 0.5)
+       value = key
+       entry = act
+       possible_actions_q[key] = entry
+   best_q = max(possible_actions_q.keys())
+   return possible_actions_q[best_q]
 
 #board state 6 jumps from winning: '0000000001000000100000101000001010000010000000000'
