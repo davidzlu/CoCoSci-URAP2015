@@ -43,6 +43,13 @@ class Features:
 		return 0
 
 	def generateGame(self, game, policy):
+		"""
+		Takes in a game's initial state and a policy, then simulates actions and state
+		transitions until terminal state reached. Returns tuple of 3 elements
+		  0) List of states visited
+		  1) List of actions taken
+          2) List of rewards received
+		"""
 		return 0
 
 	"Takes in the current game state and returns a randomly selected move"

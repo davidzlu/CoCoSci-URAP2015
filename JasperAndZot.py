@@ -70,34 +70,25 @@ class GameState:
         self.phase = phase
         self.score = score
 
-    def __eq__(self, other):
-        return self.board == other.board \
-               and self.zombieCount == other.zombieCount \
-               and self.fZombieCount == other.fZombieCount \
-               and self.bombCount == other.bombCount \
-               and self.multCount == other.multCount \
-               and self.pumpCount == other.pumpCount \
-               and self.wave == other.wave \
-               and self.phase == other.phase
-
-    def __hash__(self):
-        return hash((self.board, \
-                     self.zombieCount, \
-                     self.fZombieCount, \
-                     self.bombCount, \
-                     self.multCount, \
-                     self.pumpCount, \
-                     self.wave, \
-                     self.phase))
-
     def getJasperPosition(self):
-        """Returns (x, y) coordinate of Jasper.
+        """Returns (row, column) coordinate of Jasper.
         """
-        x = 0
-        for xPos in range(0, 6):
-            if self.board[10, xPos] == 7:
-                x = xPos
-        return (x, 10)
+        column = 0
+        for i in range(0, 6):
+            if self.board[10, i] == 7:
+                column = i
+        return (10, column)
+
+    def reward(self, action, nextState):
+        """Return reward for transition from taking action in current state and moving
+        to nextState.
+        """
+        nextPossible = self.nextStates(action)
+        if nextState in nextPossible:
+            if nextState.checkWin():
+                self.score += 100 # Reward for winning game
+                return 100
+        return 0 # No reward for losing
 
     def copy(self):
         """Returns a new state with same instance variables as self.
@@ -132,24 +123,24 @@ class GameState:
            states.append(next_state.phase_four(action))
         return states
 
-    def transProbability(self, curState, action, nextState): #are self and curState not the same thing?? -Priyam
+    def transProbability(self, action, nextState): #are self and curState not the same thing?? -Priyam
         """Returns probability of transitioning from curState to nextState given action.
         """
-        # nextPossible = nextStates(curState, action)
-        # if nextState in nextPossible:
-        #     return 1.0/len(nextPossible)
+        nextPossible = self.nextStates(action)
+        if nextState in nextPossible:
+            return 1.0/len(nextPossible)
         return 0.0
 
     def getMatrixRow(self, curState, action):
         """Returns row of transition probability matrix, specified by curState and action.
         """
         matrixRow = []
-        # nextPossible = nextStates(curState, action)
-        # for nextState in nextPossible:
-        #   index = (curState, action, nextState)
-        #   if index not in GameState.tmp:
-        #        GameState.tmp[index] = self.transProbability(curState, action, nextState)
-        #        matrixRow.append(GameState.tmp[index])
+        nextPossible = self.nextStates(action)
+        for nextState in nextPossible:
+          index = (curState, action, nextState)
+          if index not in GameState.tmp:
+               GameState.tmp[index] = self.transProbability(curState, action, nextState)
+               matrixRow.append(GameState.tmp[index])
         return matrixRow
 
     def count_pieces(self):
@@ -889,7 +880,7 @@ class GameState:
                     elif dice2 == 1:
                         moves = [[[piece1, piece2], 1], [[piece2, piece1], 1]]
                     else:
-                        moves[[[piece1, piece2], 5], [[piece2, piece1], 5]]
+                        moves = [[[piece1, piece2], 5], [[piece2, piece1], 5]]
                 elif dice1 == 3:
                     piece1 = self.pullPiece()
                     piece2 = self.pullPiece()
@@ -1004,6 +995,29 @@ class GameState:
                             pump.append(item)
         return pump
 
+    ##################
+    # Helper methods #
+    ##################
+
+    def __eq__(self, other):
+        return self.board == other.board \
+               and self.zombieCount == other.zombieCount \
+               and self.fZombieCount == other.fZombieCount \
+               and self.bombCount == other.bombCount \
+               and self.multCount == other.multCount \
+               and self.pumpCount == other.pumpCount \
+               and self.wave == other.wave \
+               and self.phase == other.phase
+
+    def __hash__(self):
+        return hash((self.board, \
+                     self.zombieCount, \
+                     self.fZombieCount, \
+                     self.bombCount, \
+                     self.multCount, \
+                     self.pumpCount, \
+                     self.wave, \
+                     self.phase))
 
 if __name__ == '__main__':
     gs = GameState()
