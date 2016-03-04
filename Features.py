@@ -16,7 +16,7 @@ class Features:
 		"""
 		Parameters:
 		  actF: a function that returns possible actions.
-		Returns number of possible actions in game.
+		Returns number of possible actions in game. 
 		"""
 		return 0
 
@@ -36,4 +36,7 @@ class Features:
 		"""
 		Returns average number of moves before reaching a final state.
 		"""
+		return 0
+
+	def generateGame(self, game, policy):
 		return 0
