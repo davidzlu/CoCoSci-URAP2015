@@ -225,6 +225,13 @@ class GameState:
     def checkLose(self):
         return self.pumpCount == 0
 
+    def phaseTwoLegalActions(self, dice1, dice2):
+        """Generates all legal actions for phase 2, given dice outcomes.
+        """
+        actions = []
+
+        return actions
+
     def phase_two(self, dice1, dice2, my_move):
         if self.wave == 1:
             if dice1 == 1:
