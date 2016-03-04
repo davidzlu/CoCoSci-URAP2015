@@ -1,3 +1,7 @@
+from peg_markov import state2board, possibleActions
+from JasperAndZot import *
+import random
+
 class Features:
 
 	def __init__(self, game):
@@ -37,3 +41,24 @@ class Features:
 		Returns average number of moves before reaching a final state.
 		"""
 		return 0
+
+	"Takes in the current game state and returns a randomly selected move"
+	def random_policy(self, gamestate):
+		game = self.game
+		if game == 'Peg Solitaire': #not sure about what type 'game' is so need to double check
+			board = peg_markov.state2board(gamestate)
+			actions = peg_markov.possibleActions(board)
+		elif game == 'Jasper and Zot':
+			if gamestate.phase == 2:
+				roll = JasperAndZot.diceRoll()
+				dice1 = roll[0]
+				dice2 = roll[1]
+				actions = JasperAndZot.possible_moves_2(gamestate, dice1, dice2)
+			elif gamestate.phase == 3:
+				actions = JasperAndZot.possible_moves_3(gamestate)
+			elif gamestate.phase == 4:
+				actions = JasperAndZot.possible_moves_4(gamestate)
+		return random.choice(actions)
+
+
+
