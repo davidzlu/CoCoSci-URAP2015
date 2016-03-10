@@ -17,12 +17,7 @@ from copy import deepcopy
     12 = multiplier + flower bed
     """
 
-def diceRoll():
-    """Returns a tuple of random integers between 1 and 6 inclusive.
-    """
-    roll1 = random.randint(1, 6)
-    roll2 = random.randint(1, 6)
-    return (roll1, roll2)
+
 
 def create_board():
     """Initializes starting game board with 6 pumpkins and Jasper"""
@@ -69,6 +64,17 @@ class GameState:
         self.wave = wave
         self.phase = phase
         self.score = score
+        self.dice1 = 0
+        self.dice2 = 0
+
+    def diceRoll(self):
+    """Returns a tuple of random integers between 1 and 6 inclusive.
+    """
+    roll1 = random.randint(1, 6)
+    roll2 = random.randint(1, 6)
+    self.dice1 = roll1
+    self.dice2 = roll2
+    return (roll1, roll2)
 
     def getJasperPosition(self):
         """Returns (row, column) coordinate of Jasper.
@@ -226,7 +232,18 @@ class GameState:
     def checkLose(self):
         return self.pumpCount == 0
 
+<<<<<<< HEAD
     def phase_two(self, dice1, dice2, my_move):
+=======
+    def phaseTwoLegalActions(self, dice1, dice2):
+        """Generates all legal actions for phase 2, given dice outcomes.
+        """
+        actions = []
+
+        return actions
+
+    def phase_two(self, dice1, my_move):
+>>>>>>> b181a358a61237463e3153782d36d818d3efb663
         if self.wave == 1:
             if dice1 == 1:
                 self.board[0][my_move[1]] = my_move[0][0] #needs to be specified so that nextStates works properly
