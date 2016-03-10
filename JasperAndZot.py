@@ -89,7 +89,7 @@ class GameState:
         """Return reward for transition from taking action in current state and moving
         to nextState.
         """
-        nextPossible = self.nextStates(action)
+        nextPossible = self.next_states(action)
         if nextState in nextPossible:
             if nextState.checkWin():
                 self.score += 100 # Reward for winning game
@@ -101,19 +101,19 @@ class GameState:
         """
         return GameState(self.board, self.zombieCount, self.fZombieCount, self.bombCount, self.multCount, self.pumpCount, self.wave, self.phase)
         
-    def transProbabilityMatrix(self, curState, action, nextState):
+    def transition_prob_matrix(self, curState, action, nextState):
         """Returns transition probability given (s, a, s') if it exists in
-        transProbabilityMatrix. Otherwise calculates the probability, enters it
-        into transProbabilityMatrix and returns the probability.
+        transition_prob_matrix. Otherwise calculates the probability, enters it
+        into transition_prob_matrix and returns the probability.
         """
         if (curState, action, nextState) in GameState.tpm:
             return GameState.tpm[(curState, action, nextState)]
         else:
-            prob = self.transProbability(curState, action, nextState)
+            prob = self.transition_prob(curState, action, nextState)
             GameState.tpm[(curState, action, nextState)] = prob
             return prob
 
-    def nextStates(self, action):
+    def next_states(self, action):
         states = []
         next_state = deepcopy(self)
         if self.phase == 1: #states after descend
@@ -129,23 +129,23 @@ class GameState:
            states.append(next_state.phase_four(action))
         return states
 
-    def transProbability(self, action, nextState): #are self and curState not the same thing?? -Priyam
+    def transition_prob(self, action, nextState): #are self and curState not the same thing?? -Priyam
         """Returns probability of transitioning from curState to nextState given action.
         """
-        nextPossible = self.nextStates(action)
+        nextPossible = self.next_states(action)
         if nextState in nextPossible:
             return 1.0/len(nextPossible)
         return 0.0
 
-    def getMatrixRow(self, curState, action):
+    def getMatrixRow(self, action):
         """Returns row of transition probability matrix, specified by curState and action.
         """
         matrixRow = []
-        nextPossible = self.nextStates(action)
+        nextPossible = self.next_states(action)
         for nextState in nextPossible:
           index = (curState, action, nextState)
           if index not in GameState.tmp:
-               GameState.tmp[index] = self.transProbability(curState, action, nextState)
+               GameState.tmp[index] = self.transition_prob(action, nextState)
                matrixRow.append(GameState.tmp[index])
         return matrixRow
 
@@ -241,7 +241,7 @@ class GameState:
     def phase_two(self, dice1, my_move):
         if self.wave == 1:
             if dice1 == 1:
-                self.board[0][my_move[1]] = my_move[0][0] #needs to be specified so that nextStates works properly
+                self.board[0][my_move[1]] = my_move[0][0] #needs to be specified so that next_states works properly
             elif dice1 == 2:
                 self.board[0][my_move[1] - 1] = my_move[0][0]
                 self.board[0][my_move[1]] = my_move[0][1]
@@ -878,6 +878,16 @@ class GameState:
                     #             elif direction == 'right' and self.board[row][column + 1] == 0:
                     #                 self.board[row][column + 1] = self.board[row][column]
                     #                 self.board[row][column] = 0
+
+    def possible_actions(self):
+        if self.phase == 2:
+            return possible_moves_2(self, self.dice1, self.dice2)
+        elif self.phase == 3:
+            return possible_moves_3(self)
+        elif self.phase == 4:
+            return possible_moves_4(self)
+        else:
+            return []
 
     """Returns possible moves for phase 2 depending on dice rolls"""
     def possible_moves_2(self, dice1, dice2):
