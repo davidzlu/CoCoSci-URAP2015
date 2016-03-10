@@ -86,6 +86,7 @@ class GameState:
         nextPossible = self.nextStates(action)
         if nextState in nextPossible:
             if nextState.checkWin():
+                #add reward for destroying tokens
                 self.score += 100 # Reward for winning game
                 return 100
         return 0 # No reward for losing
@@ -225,13 +226,6 @@ class GameState:
     def checkLose(self):
         return self.pumpCount == 0
 
-    def phaseTwoLegalActions(self, dice1, dice2):
-        """Generates all legal actions for phase 2, given dice outcomes.
-        """
-        actions = []
-
-        return actions
-
     def phase_two(self, dice1, dice2, my_move):
         if self.wave == 1:
             if dice1 == 1:
@@ -289,7 +283,7 @@ class GameState:
                 if dice2 != 1 and dice2 != 6:
                     moves = [[[piece1, piece2], dice2 - 1], [[piece2, piece1], dice2 - 1], [[piece1, piece2], dice2], [[piece2, piece1], dice2]]
                 elif dice2 == 1:
-                    moves = [[[piece1, piece2], 1], [[piece2, piece1], 1]]
+                    moves = [[ [piece1, piece2], 1], [[piece2, piece1], 1]]
                 else:
                     moves[[[piece1, piece2], 5], [[piece2, piece1], 5]]
 
@@ -1002,9 +996,9 @@ class GameState:
                             pump.append(item)
         return pump
 
-    ##################
-    # Helper methods #
-    ##################
+    ########################################
+    # Helper methods for transition matrix #
+    ########################################
 
     def __eq__(self, other):
         return self.board == other.board \
