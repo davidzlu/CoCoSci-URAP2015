@@ -109,8 +109,8 @@ class GameState:
     
 
     def diceRoll(self):
-    """Returns a tuple of random integers between 1 and 6 inclusive.
-    """
+        """Returns a tuple of random integers between 1 and 6 inclusive.
+        """
         roll1 = random.randint(1, 6)
         roll2 = random.randint(1, 6)
         self.dice1 = roll1
@@ -133,7 +133,7 @@ class GameState:
         nextPossible = self.next_states(action)
         if nextState in nextPossible:
             if nextState.checkWin():
-                #add reward for destroying tokens
+                #add reward for destroying tokens?
                 self.score += 100 # Reward for winning game
                 return 100
         return 0 # No reward for losing
@@ -927,112 +927,112 @@ class GameState:
             return []
 
     def possible_moves_2(self, dice1, dice2):
-    """takes in state and two dices, return all possible moves"""
-    if self.wave == 1:
-        if dice1 == 1:
-            return [[self.pullPiece()], dice2 - 1]
-        elif dice1 == 2:
-            piece1 = self.pullPiece()
-            piece2 = self.pullPiece()
+        """takes in state and two dices, return all possible moves"""
+        if self.wave == 1:
+            if dice1 == 1:
+                return [[self.pullPiece()], dice2 - 1]
+            elif dice1 == 2:
+                piece1 = self.pullPiece()
+                piece2 = self.pullPiece()
 
-            if dice2 != 1 and dice2 != 6:
-                return [[[piece1, piece2], dice2 - 1], [[piece2, piece1], dice2 - 1], [[piece1, piece2], dice2], [[piece2, piece1], dice2]]
-            elif dice2 == 1:
-                return [[[piece1, piece2], 1], [[piece2, piece1], 1]]
-            else:
-                return [[[piece1, piece2], 5], [[piece2, piece1], 5]]
-        elif dice1 == 3:
-            piece1 = self.pullPiece()
-            piece2 = self.pullPiece()
-            return [[[piece1, piece2], dice2], [[piece2, piece1], dice2]]
-        elif dice1 == 4:
-            piece1 = self.pullPiece()
-            piece2 = self.pullPiece()
-            piece3 = self.pullPiece()
-            if dice2 != 1 and dice2 != 6:
-                return [[[piece1, piece2, piece3], dice2 - 1], [[piece1, piece3, piece2], dice2 - 1], [[piece2, piece1, piece3], dice2 - 1], [[piece2, piece3, piece1], dice2 - 1], [[piece3, piece1, piece2], dice2 - 1], [[piece3, piece2, piece1], dice2 - 1], [[piece1, piece2, piece3], dice2], [[piece1, piece3, piece2], dice2], [[piece2, piece1, piece3], dice2], [[piece2, piece3, piece1], dice2], [[piece3, piece1, piece2], dice2], [[piece3, piece2, piece1], dice2]]
-            elif dice2 == 1:
-                return [[[piece1, piece2, piece3], 1], [[piece1, piece3, piece2], 1], [[piece2, piece1, piece3], 1], [[piece2, piece3, piece1], 1], [[piece3, piece1, piece2], 1], [[piece3, piece2, piece1], 1]]
-            else:
-                return [[[piece1, piece2, piece3], 5], [[piece1, piece3, piece2], 5], [[piece2, piece1, piece3], 5], [[piece2, piece3, piece1], 5], [[piece3, piece1, piece2], 5], [[piece3, piece2, piece1], 5]]
-        elif dice1 == 5:
-            piece1 = self.pullPiece()
-            piece2 = self.pullPiece()
-            piece3 = self.pullPiece()
-            if dice2 != 1 and dice2 != 6:
-                return [[[piece1, piece2, piece3], dice2 - 1], [[piece1, piece3, piece2], dice2 - 1], [[piece2, piece1, piece3], dice2 - 1], [[piece2, piece3, piece1], dice2 - 1], [[piece3, piece1, piece2], dice2 - 1], [[piece3, piece2, piece1], dice2 - 1], [[piece1, piece2, piece3], dice2], [[piece1, piece3, piece2], dice2], [[piece2, piece1, piece3], dice2], [[piece2, piece3, piece1], dice2], [[piece3, piece1, piece2], dice2], [[piece3, piece2, piece1], dice2]]
-            elif dice2 == 1:
-                return [[[piece1, piece2, piece3], 1], [[piece1, piece3, piece2], 1], [[piece2, piece1, piece3], 1], [[piece2, piece3, piece1], 1], [[piece3, piece1, piece2], 1], [[piece3, piece2, piece1], 1]]
-            else:
-                return [[[piece1, piece2, piece3], 5], [[piece1, piece3, piece2], 5], [[piece2, piece1, piece3], 5], [[piece2, piece3, piece1], 5], [[piece3, piece1, piece2], 5], [[piece3, piece2, piece1], 5]]
-        elif dice1 == 6:
-            piece1 = self.pullPiece()
-            piece2 = self.pullPiece()
-            piece3 = self.pullPiece()
-            if dice2 != 1 and dice2 != 6:
-                return [[[piece1, piece2, piece3], dice2 - 1], [[piece1, piece3, piece2], dice2 - 1], [[piece2, piece1, piece3], dice2 - 1], [[piece2, piece3, piece1], dice2 - 1], [[piece3, piece1, piece2], dice2 - 1], [[piece3, piece2, piece1], dice2 - 1], [[piece1, piece2, piece3], dice2], [[piece1, piece3, piece2], dice2], [[piece2, piece1, piece3], dice2], [[piece2, piece3, piece1], dice2], [[piece3, piece1, piece2], dice2], [[piece3, piece2, piece1], dice2]]
-            elif dice2 == 1:
-                return [[[piece1, piece2, piece3], 1], [[piece1, piece3, piece2], 1], [[piece2, piece1, piece3], 1], [[piece2, piece3, piece1], 1], [[piece3, piece1, piece2], 1], [[piece3, piece2, piece1], 1]]
-            else:
-                return [[[piece1, piece2, piece3], 5], [[piece1, piece3, piece2], 5], [[piece2, piece1, piece3], 5], [[piece2, piece3, piece1], 5], [[piece3, piece1, piece2], 5], [[piece3, piece2, piece1], 5]]
-    elif self.wave == 2:
-        if dice1 == 1:
-            piece1 = self.pullPiece()
-            piece2 = self.pullPiece()
-            if dice2 != 1 and dice2 != 6:
-                return [[[piece1, piece2], dice2 - 1], [[piece2, piece1], dice2 - 1], [[piece1, piece2], dice2], [[piece2, piece1], dice2]]
-            elif dice2 == 1:
-                return [[[piece1, piece2], 1], [[piece2, piece1], 1]]
-            else:
-                return [[[piece1, piece2], 5], [[piece2, piece1], 5]]
-        elif dice1 == 2:
-            piece1 = self.pullPiece()
-            piece2 = self.pullPiece()
-            if dice2 != 1 and dice2 != 6:
-                return [[[piece1, piece2], dice2 - 1], [[piece2, piece1], dice2 - 1]]
-            elif dice2 == 1:
-                return [[[piece1, piece2], 1], [[piece2, piece1], 1]]
-            else:
-                return [[[piece1, piece2], 5], [[piece2, piece1], 5]]
-        elif dice1 == 3:
-            piece1 = self.pullPiece()
-            piece2 = self.pullPiece()
-            if dice2 != 1 and dice2 != 6:
-                return [[[piece1, piece2], dice2 - 1], [[piece2, piece1], dice2 - 1], [[piece1, piece2], dice2], [[piece2, piece1], dice2]]
-            elif dice2 == 1:
-                return [[[piece1, piece2], 1], [[piece2, piece1], 1]]
-            else:
-                return [[[piece1, piece2], 5], [[piece2, piece1], 5]]
-        elif dice1 == 4:
-            piece1 = self.pullPiece()
-            piece2 = self.pullPiece()
-            piece3 = self.pullPiece()
-            if dice2 != 1 and dice2 != 6:
-                return [[[piece1, piece2, piece3], dice2 - 1], [[piece1, piece3, piece2], dice2 - 1], [[piece2, piece1, piece3], dice2 - 1], [[piece2, piece3, piece1], dice2 - 1], [[piece3, piece1, piece2], dice2 - 1], [[piece3, piece2, piece1], dice2 - 1], [[piece1, piece2, piece3], dice2], [[piece1, piece3, piece2], dice2], [[piece2, piece1, piece3], dice2], [[piece2, piece3, piece1], dice2], [[piece3, piece1, piece2], dice2], [[piece3, piece2, piece1], dice2]]
-            elif dice2 == 1:
-                return [[[piece1, piece2, piece3], 1], [[piece1, piece3, piece2], 1], [[piece2, piece1, piece3], 1], [[piece2, piece3, piece1], 1], [[piece3, piece1, piece2], 1], [[piece3, piece2, piece1], 1]]
-            else:
-                return [[[piece1, piece2, piece3], 5], [[piece1, piece3, piece2], 5], [[piece2, piece1, piece3], 5], [[piece2, piece3, piece1], 5], [[piece3, piece1, piece2], 5], [[piece3, piece2, piece1], 5]]
-        elif dice1 == 5:
-            piece1 = self.pullPiece()
-            piece2 = self.pullPiece()
-            piece3 = self.pullPiece()
-            if dice2 != 1 and dice2 != 6:
-                return [[[piece1, piece2, piece3], dice2 - 1], [[piece1, piece3, piece2], dice2 - 1], [[piece2, piece1, piece3], dice2 - 1], [[piece2, piece3, piece1], dice2 - 1], [[piece3, piece1, piece2], dice2 - 1], [[piece3, piece2, piece1], dice2 - 1], [[piece1, piece2, piece3], dice2], [[piece1, piece3, piece2], dice2], [[piece2, piece1, piece3], dice2], [[piece2, piece3, piece1], dice2], [[piece3, piece1, piece2], dice2], [[piece3, piece2, piece1], dice2]]
-            elif dice2 == 1:
-                return [[[piece1, piece2, piece3], 1], [[piece1, piece3, piece2], 1], [[piece2, piece1, piece3], 1], [[piece2, piece3, piece1], 1], [[piece3, piece1, piece2], 1], [[piece3, piece2, piece1], 1]]
-            else:
-                return [[[piece1, piece2, piece3], 5], [[piece1, piece3, piece2], 5], [[piece2, piece1, piece3], 5], [[piece2, piece3, piece1], 5], [[piece3, piece1, piece2], 5], [[piece3, piece2, piece1], 5]]
-        elif dice1 == 6:
-            piece1 = self.pullPiece()
-            piece2 = self.pullPiece()
-            piece3 = self.pullPiece()
-            if dice2 != 1 and dice2 != 6:
-                return [[[piece1, piece2, piece3], dice2 - 1], [[piece1, piece3, piece2], dice2 - 1], [[piece2, piece1, piece3], dice2 - 1], [[piece2, piece3, piece1], dice2 - 1], [[piece3, piece1, piece2], dice2 - 1], [[piece3, piece2, piece1], dice2 - 1], [[piece1, piece2, piece3], dice2], [[piece1, piece3, piece2], dice2], [[piece2, piece1, piece3], dice2], [[piece2, piece3, piece1], dice2], [[piece3, piece1, piece2], dice2], [[piece3, piece2, piece1], dice2]]
-            elif dice2 == 1:
-                return [[[piece1, piece2, piece3], 1], [[piece1, piece3, piece2], 1], [[piece2, piece1, piece3], 1], [[piece2, piece3, piece1], 1], [[piece3, piece1, piece2], 1], [[piece3, piece2, piece1], 1]]
-            else:
-                return [[[piece1, piece2, piece3], 5], [[piece1, piece3, piece2], 5], [[piece2, piece1, piece3], 5], [[piece2, piece3, piece1], 5], [[piece3, piece1, piece2], 5], [[piece3, piece2, piece1], 5]]
+                if dice2 != 1 and dice2 != 6:
+                    return [[[piece1, piece2], dice2 - 1], [[piece2, piece1], dice2 - 1], [[piece1, piece2], dice2], [[piece2, piece1], dice2]]
+                elif dice2 == 1:
+                    return [[[piece1, piece2], 1], [[piece2, piece1], 1]]
+                else:
+                    return [[[piece1, piece2], 5], [[piece2, piece1], 5]]
+            elif dice1 == 3:
+                piece1 = self.pullPiece()
+                piece2 = self.pullPiece()
+                return [[[piece1, piece2], dice2], [[piece2, piece1], dice2]]
+            elif dice1 == 4:
+                piece1 = self.pullPiece()
+                piece2 = self.pullPiece()
+                piece3 = self.pullPiece()
+                if dice2 != 1 and dice2 != 6:
+                    return [[[piece1, piece2, piece3], dice2 - 1], [[piece1, piece3, piece2], dice2 - 1], [[piece2, piece1, piece3], dice2 - 1], [[piece2, piece3, piece1], dice2 - 1], [[piece3, piece1, piece2], dice2 - 1], [[piece3, piece2, piece1], dice2 - 1], [[piece1, piece2, piece3], dice2], [[piece1, piece3, piece2], dice2], [[piece2, piece1, piece3], dice2], [[piece2, piece3, piece1], dice2], [[piece3, piece1, piece2], dice2], [[piece3, piece2, piece1], dice2]]
+                elif dice2 == 1:
+                    return [[[piece1, piece2, piece3], 1], [[piece1, piece3, piece2], 1], [[piece2, piece1, piece3], 1], [[piece2, piece3, piece1], 1], [[piece3, piece1, piece2], 1], [[piece3, piece2, piece1], 1]]
+                else:
+                    return [[[piece1, piece2, piece3], 5], [[piece1, piece3, piece2], 5], [[piece2, piece1, piece3], 5], [[piece2, piece3, piece1], 5], [[piece3, piece1, piece2], 5], [[piece3, piece2, piece1], 5]]
+            elif dice1 == 5:
+                piece1 = self.pullPiece()
+                piece2 = self.pullPiece()
+                piece3 = self.pullPiece()
+                if dice2 != 1 and dice2 != 6:
+                    return [[[piece1, piece2, piece3], dice2 - 1], [[piece1, piece3, piece2], dice2 - 1], [[piece2, piece1, piece3], dice2 - 1], [[piece2, piece3, piece1], dice2 - 1], [[piece3, piece1, piece2], dice2 - 1], [[piece3, piece2, piece1], dice2 - 1], [[piece1, piece2, piece3], dice2], [[piece1, piece3, piece2], dice2], [[piece2, piece1, piece3], dice2], [[piece2, piece3, piece1], dice2], [[piece3, piece1, piece2], dice2], [[piece3, piece2, piece1], dice2]]
+                elif dice2 == 1:
+                    return [[[piece1, piece2, piece3], 1], [[piece1, piece3, piece2], 1], [[piece2, piece1, piece3], 1], [[piece2, piece3, piece1], 1], [[piece3, piece1, piece2], 1], [[piece3, piece2, piece1], 1]]
+                else:
+                    return [[[piece1, piece2, piece3], 5], [[piece1, piece3, piece2], 5], [[piece2, piece1, piece3], 5], [[piece2, piece3, piece1], 5], [[piece3, piece1, piece2], 5], [[piece3, piece2, piece1], 5]]
+            elif dice1 == 6:
+                piece1 = self.pullPiece()
+                piece2 = self.pullPiece()
+                piece3 = self.pullPiece()
+                if dice2 != 1 and dice2 != 6:
+                    return [[[piece1, piece2, piece3], dice2 - 1], [[piece1, piece3, piece2], dice2 - 1], [[piece2, piece1, piece3], dice2 - 1], [[piece2, piece3, piece1], dice2 - 1], [[piece3, piece1, piece2], dice2 - 1], [[piece3, piece2, piece1], dice2 - 1], [[piece1, piece2, piece3], dice2], [[piece1, piece3, piece2], dice2], [[piece2, piece1, piece3], dice2], [[piece2, piece3, piece1], dice2], [[piece3, piece1, piece2], dice2], [[piece3, piece2, piece1], dice2]]
+                elif dice2 == 1:
+                    return [[[piece1, piece2, piece3], 1], [[piece1, piece3, piece2], 1], [[piece2, piece1, piece3], 1], [[piece2, piece3, piece1], 1], [[piece3, piece1, piece2], 1], [[piece3, piece2, piece1], 1]]
+                else:
+                    return [[[piece1, piece2, piece3], 5], [[piece1, piece3, piece2], 5], [[piece2, piece1, piece3], 5], [[piece2, piece3, piece1], 5], [[piece3, piece1, piece2], 5], [[piece3, piece2, piece1], 5]]
+        elif self.wave == 2:
+            if dice1 == 1:
+                piece1 = self.pullPiece()
+                piece2 = self.pullPiece()
+                if dice2 != 1 and dice2 != 6:
+                    return [[[piece1, piece2], dice2 - 1], [[piece2, piece1], dice2 - 1], [[piece1, piece2], dice2], [[piece2, piece1], dice2]]
+                elif dice2 == 1:
+                    return [[[piece1, piece2], 1], [[piece2, piece1], 1]]
+                else:
+                    return [[[piece1, piece2], 5], [[piece2, piece1], 5]]
+            elif dice1 == 2:
+                piece1 = self.pullPiece()
+                piece2 = self.pullPiece()
+                if dice2 != 1 and dice2 != 6:
+                    return [[[piece1, piece2], dice2 - 1], [[piece2, piece1], dice2 - 1]]
+                elif dice2 == 1:
+                    return [[[piece1, piece2], 1], [[piece2, piece1], 1]]
+                else:
+                    return [[[piece1, piece2], 5], [[piece2, piece1], 5]]
+            elif dice1 == 3:
+                piece1 = self.pullPiece()
+                piece2 = self.pullPiece()
+                if dice2 != 1 and dice2 != 6:
+                    return [[[piece1, piece2], dice2 - 1], [[piece2, piece1], dice2 - 1], [[piece1, piece2], dice2], [[piece2, piece1], dice2]]
+                elif dice2 == 1:
+                    return [[[piece1, piece2], 1], [[piece2, piece1], 1]]
+                else:
+                    return [[[piece1, piece2], 5], [[piece2, piece1], 5]]
+            elif dice1 == 4:
+                piece1 = self.pullPiece()
+                piece2 = self.pullPiece()
+                piece3 = self.pullPiece()
+                if dice2 != 1 and dice2 != 6:
+                    return [[[piece1, piece2, piece3], dice2 - 1], [[piece1, piece3, piece2], dice2 - 1], [[piece2, piece1, piece3], dice2 - 1], [[piece2, piece3, piece1], dice2 - 1], [[piece3, piece1, piece2], dice2 - 1], [[piece3, piece2, piece1], dice2 - 1], [[piece1, piece2, piece3], dice2], [[piece1, piece3, piece2], dice2], [[piece2, piece1, piece3], dice2], [[piece2, piece3, piece1], dice2], [[piece3, piece1, piece2], dice2], [[piece3, piece2, piece1], dice2]]
+                elif dice2 == 1:
+                    return [[[piece1, piece2, piece3], 1], [[piece1, piece3, piece2], 1], [[piece2, piece1, piece3], 1], [[piece2, piece3, piece1], 1], [[piece3, piece1, piece2], 1], [[piece3, piece2, piece1], 1]]
+                else:
+                    return [[[piece1, piece2, piece3], 5], [[piece1, piece3, piece2], 5], [[piece2, piece1, piece3], 5], [[piece2, piece3, piece1], 5], [[piece3, piece1, piece2], 5], [[piece3, piece2, piece1], 5]]
+            elif dice1 == 5:
+                piece1 = self.pullPiece()
+                piece2 = self.pullPiece()
+                piece3 = self.pullPiece()
+                if dice2 != 1 and dice2 != 6:
+                    return [[[piece1, piece2, piece3], dice2 - 1], [[piece1, piece3, piece2], dice2 - 1], [[piece2, piece1, piece3], dice2 - 1], [[piece2, piece3, piece1], dice2 - 1], [[piece3, piece1, piece2], dice2 - 1], [[piece3, piece2, piece1], dice2 - 1], [[piece1, piece2, piece3], dice2], [[piece1, piece3, piece2], dice2], [[piece2, piece1, piece3], dice2], [[piece2, piece3, piece1], dice2], [[piece3, piece1, piece2], dice2], [[piece3, piece2, piece1], dice2]]
+                elif dice2 == 1:
+                    return [[[piece1, piece2, piece3], 1], [[piece1, piece3, piece2], 1], [[piece2, piece1, piece3], 1], [[piece2, piece3, piece1], 1], [[piece3, piece1, piece2], 1], [[piece3, piece2, piece1], 1]]
+                else:
+                    return [[[piece1, piece2, piece3], 5], [[piece1, piece3, piece2], 5], [[piece2, piece1, piece3], 5], [[piece2, piece3, piece1], 5], [[piece3, piece1, piece2], 5], [[piece3, piece2, piece1], 5]]
+            elif dice1 == 6:
+                piece1 = self.pullPiece()
+                piece2 = self.pullPiece()
+                piece3 = self.pullPiece()
+                if dice2 != 1 and dice2 != 6:
+                    return [[[piece1, piece2, piece3], dice2 - 1], [[piece1, piece3, piece2], dice2 - 1], [[piece2, piece1, piece3], dice2 - 1], [[piece2, piece3, piece1], dice2 - 1], [[piece3, piece1, piece2], dice2 - 1], [[piece3, piece2, piece1], dice2 - 1], [[piece1, piece2, piece3], dice2], [[piece1, piece3, piece2], dice2], [[piece2, piece1, piece3], dice2], [[piece2, piece3, piece1], dice2], [[piece3, piece1, piece2], dice2], [[piece3, piece2, piece1], dice2]]
+                elif dice2 == 1:
+                    return [[[piece1, piece2, piece3], 1], [[piece1, piece3, piece2], 1], [[piece2, piece1, piece3], 1], [[piece2, piece3, piece1], 1], [[piece3, piece1, piece2], 1], [[piece3, piece2, piece1], 1]]
+                else:
+                    return [[[piece1, piece2, piece3], 5], [[piece1, piece3, piece2], 5], [[piece2, piece1, piece3], 5], [[piece2, piece3, piece1], 5], [[piece3, piece1, piece2], 5], [[piece3, piece2, piece1], 5]]
 
     def possible_moves_3(self):
         moves = []
