@@ -66,39 +66,41 @@ class GameState:
         self.score = score
         self.dice1 = 0
         self.dice2 = 0
+
     def play(self, strategy):
         """the functon that runs the process of playing the game."""
-        data = [[], [], []] # generate lists that consists of all states, actions taken, and scores overtime.
-        while not self.checkWin() and not self.checkLose():
+        statesVisited = [] # Sequence of states visited during a game
+        actionsTaken = [] # Sequential actions taken during a game
+        rewardsGained = [] # Sequence of rewards obtained during a game
+        while not self.checkWin() or not self.checkLose():
             if self.phase == 1:
                 self.descend() # phase 1
                 self.waveTransition() #transition of phase
-                data[0].append(self.board)
             elif self.phase == 2:
                 self.diceRoll() # roll dice for phase 2
                 moves2 = self.possible_moves_2(self.dice1, self.dice2) #create possible moves
                 mymove2 = strategy(moves2) #select move in possible moves
                 self.phase_two(self.dice1, mymove2)
                 self.waveTransition()
-                data[0].append(self.board)
-                data[1].append(mymove2)
+                actionsTaken.append(mymove2)
             elif self.phase == 3:
                 moves3 = self.possible_moves_3() # generate possible moves for phase3
                 mymove3 = strategy(moves3) #select move for phase 3
+                prevScore = self.score
                 self.move_and_shoot(mymove3) #execute phase 3
                 self.waveTransition()
-                data[0].append(self.board)
-                data[1].append(mymove3)
-                data[2].append(self.score)
+                actionsTaken.append(mymove3)
+                rewardsGained.append(self.score - prevScore)
             elif self.phase == 4:
                 moves4 = self.possible_moves_4()
                 mymove4 = strategy(moves4)
+                prevScore = self.score
                 self.phase_four(mymove4)
                 self.waveTransition()
-                data[0].append(self.board)
-                data[1].append(mymove4)
-                data[2].append(self.score)
-        return data
+                actionsTaken.append(mymove4)
+                rewardsGained.append(self.score - prevScore)
+            statesVisited.append(self.copy())
+        return (statesVisited, actionsTaken, rewardsGained)
 
 
 
@@ -271,11 +273,7 @@ class GameState:
     def checkLose(self):
         return self.pumpCount == 0
 
-<<<<<<< HEAD
-    def phase_two(self, dice1, dice2, my_move):
-=======
     def phase_two(self, dice1, my_move):
->>>>>>> f93f9182005dd8e7eb9ba74a031cdce69dbfd68d
         if self.wave == 1:
             if dice1 == 1:
                 self.board[0][my_move[1]] = my_move[0][0] #needs to be specified so that next_states works properly
