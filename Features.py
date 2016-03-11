@@ -52,6 +52,9 @@ class Features:
 		"""
 		return 0
 
+	def generateGames(self, iterations):
+		
+
 	"Takes in the current game state and returns a randomly selected move"
 	def random_policy(self, gamestate):
 		game = self.game
