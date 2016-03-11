@@ -54,7 +54,7 @@ class Features:
         """
         results = []
         for i in xrange(n):
-        	results.append(game.policy)
+        	results.append(game.play(policy))
         return results
 
     "Takes in the current game state and returns a randomly selected move"
