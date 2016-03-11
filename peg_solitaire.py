@@ -1,6 +1,13 @@
+import abc
+import Game
 import numpy as np
 import ast
 from peg_markov import *
+
+class PegSolitaire:
+
+	def __init__(self, board=create_board()):
+		self.board = board
 
 def create_board():
 	"""

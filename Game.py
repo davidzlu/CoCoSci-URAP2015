@@ -19,10 +19,10 @@ class Game(object):
 	def transition_prob_matrix(self):
 		"""Returns probability of transitioning from curState to nextState given action.
         """
-    @abc.abstractmethod
-    def isWinState(self):
+    # @abc.abstractmethod
+    # def isWinState(self):
 
-    @abc.abstractmethod
-    def isLoseState(self):
+    # @abc.abstractmethod
+    # def isLoseState(self):
 
     
