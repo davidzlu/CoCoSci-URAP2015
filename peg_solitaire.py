@@ -88,18 +88,24 @@ def play(strategy=human_player):
     The main function for running a game of PegSolitaire. Default is set to
     human_player phase but this function also accepts any algorithm which returns a move.
     """
+    statesVisited = [] # Sequence of states visited during a game
+    actionsTaken = [] # Sequential actions taken during a game
+    rewardsGained = [] # Sequence of rewards obtained during a game
 	board = create_board()
 	print("The game has begun. The current board state is ")
 	print(board)
 	while not check_win(board):
 		cur_state = board2state(board)
+		statesVisited.append(cur_state)
 		moves = legal_actions(board)
 		move = strategy(board)
+		actionsTaken.append(move)
 		if move not in moves:
 			break
 		row, column, direction = move[0], move[1], move[2]
 		board = take_action(board, row, column, direction)
 		reward = 0
+		rewardsGained.append(reward)
 		print("The turn has ended. The current board state is ")
 		print(board)
 	if check_win(board):
@@ -108,7 +114,8 @@ def play(strategy=human_player):
 	else:
 		print('An illegal move was made. The player has lost the game.')
 		reward = -1
-	return board, reward
+	rewardsGained.append(reward)
+	return (statesVisited, actionsTaken, rewardsGained)
 	
 def best_policy(board):
    actions = legal_actions(board)
