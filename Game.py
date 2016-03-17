@@ -1,21 +1,22 @@
-import abc
+from abc import ABCMeta, abstractmethod
+from peg_solitaire import *
+# from peg_markov import *
 
-class Game(object):
-	__metaclass__ = abc.ABCMeta
+class Game(metaclass=ABCMeta):
 
-	@abc.abstractmethod
+	@abstractmethod
 	def play(self, strategy):
 		"""Runs game with given strategy"""
 
-	@abc.abstractmethod
-	def possible_moves(self):
+	@abstractmethod
+	def possible_actions(self):
 		"""Returns the set of all possible moves given the current game state."""
 
-	@abc.abstractmethod
+	@abstractmethod
 	def next_states(self):
 		"""Returns the immediate states reachable from the current state"""
 
-	@abc.abstractmethod
+	@abstractmethod
 	def transition_prob_matrix(self):
 		"""Returns probability of transitioning from curState to nextState given action.
         """
@@ -24,5 +25,5 @@ class Game(object):
 
     # @abc.abstractmethod
     # def isLoseState(self):
+Game.register(PegSolitaire)
 
-    

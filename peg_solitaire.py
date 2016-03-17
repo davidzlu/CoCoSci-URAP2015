@@ -1,13 +1,10 @@
 import abc
-import Game
+from Game import *
 import numpy as np
 import ast
+import random
 from peg_markov import *
 
-class PegSolitaire:
-
-	def __init__(self, board=create_board()):
-		self.board = board
 
 def create_board():
 	"""
@@ -109,7 +106,7 @@ def play(strategy=human_player):
 		print('The player has won the game!')
 		reward = 1
 	else:
-		print('An illegal move was made.')
+		print('An illegal move was made. The player has lost the game.')
 		reward = -1
 	return board, reward
 	
@@ -126,3 +123,30 @@ def best_policy(board):
    return possible_actions_q[best_q]
 
 #board state 6 jumps from winning: '0000000001000000100000101000001010000010000000000'
+
+def random_policy(board):
+    actions = legal_actions(board)
+    if len(actions) == 0:
+    	return random.choice(possible_actions(board))
+    return random.choice(actions)
+
+class PegSolitaire:
+
+	def __init__(self, board=create_board()):
+		self.board = board
+
+	def possible_actions(self, board):
+		return possible_actions(board)
+
+	def transition_prob_matrix(self, board):
+		return transition_prob_matrix(board)
+
+	def next_states(self, board):
+		state = board2state(board)
+		return next_states(state)
+
+	def play(self, strategy):
+		return play(strategy)
+
+# if __name__ == '__main__':
+# 	print('Subclass:', issubclass(PegSolitaire, Game))
