@@ -1,6 +1,6 @@
 from abc import ABCMeta, abstractmethod
 from peg_solitaire import *
-# from peg_markov import *
+from peg_markov import *
 
 class Game(metaclass=ABCMeta):
 
@@ -25,5 +25,6 @@ class Game(metaclass=ABCMeta):
 
     # @abc.abstractmethod
     # def isLoseState(self):
-Game.register(PegSolitaire)
+
+#Game.register(PegSolitaire)
 
