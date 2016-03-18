@@ -55,7 +55,7 @@ class GameState(Game):
     """
     tpm = {} # Maps (curState, action, nextState) to transition probability
 
-    def __init__(self, board=create_board(), zombieCount=24, fZombieCount=8, bombCount=4, multCount=3, pumpCount=6, wave=1, phase=0, score=0):
+    def __init__(self, board=create_board(), zombieCount=24, fZombieCount=8, bombCount=4, multCount=3, pumpCount=6, wave=1, phase=2, score=0):
         self.board = board
         self.zombieCount = zombieCount
         self.fZombieCount = fZombieCount
@@ -68,25 +68,29 @@ class GameState(Game):
         self.dice1 = 0
         self.dice2 = 0
 
+    def random_policy(self):
+        actions = self.possible_actions()
+        return random.choice(actions)
+
     def play(self, strategy):
         """the functon that runs the process of playing the game."""
         statesVisited = [] # Sequence of states visited during a game
         actionsTaken = [] # Sequential actions taken during a game
         rewardsGained = [] # Sequence of rewards obtained during a game
-        while not self.checkWin() or not self.checkLose():
+        while not self.checkWin() and not self.checkLose():
             if self.phase == 1:
                 self.descend() # phase 1
                 self.waveTransition() #transition of phase
             elif self.phase == 2:
                 self.diceRoll() # roll dice for phase 2
                 moves2 = self.possible_moves_2(self.dice1, self.dice2) #create possible moves
-                mymove2 = strategy(moves2) #select move in possible moves
+                mymove2 = strategy() #select move in possible moves
                 self.phase_two(self.dice1, mymove2)
                 self.waveTransition()
                 actionsTaken.append(mymove2)
             elif self.phase == 3:
                 moves3 = self.possible_moves_3() # generate possible moves for phase3
-                mymove3 = strategy(moves3) #select move for phase 3
+                mymove3 = strategy() #select move for phase 3
                 prevScore = self.score
                 self.move_and_shoot(mymove3) #execute phase 3
                 self.waveTransition()
@@ -94,20 +98,17 @@ class GameState(Game):
                 rewardsGained.append(self.score - prevScore)
             elif self.phase == 4:
                 moves4 = self.possible_moves_4()
-                mymove4 = strategy(moves4)
+                mymove4 = strategy()
                 prevScore = self.score
                 self.phase_four(mymove4)
                 self.waveTransition()
                 actionsTaken.append(mymove4)
                 rewardsGained.append(self.score - prevScore)
+            print("The current state is:")
+            print(self.board)
             statesVisited.append(self.copy())
+            self.phase = (self.phase % 4) + 1
         return (statesVisited, actionsTaken, rewardsGained)
-
-
-
-
-
-    
 
     def diceRoll(self):
         """Returns a tuple of random integers between 1 and 6 inclusive.
@@ -192,21 +193,6 @@ class GameState(Game):
                matrixRow.append(GameState.tmp[index])
         return matrixRow
 
-    def count_pieces(self):
-        state = board2state(self.board)
-        zombieCount, fZombieCount, bombCount, multCount, pumpCount = 0
-        for token in state:
-            if token == '1' or token == '8':
-                zombieCount += 1
-            elif token == '2':
-                fZombieCount += 1
-            elif token == '4' or token == '11':
-                bombCount += 1
-            elif token == '5' or token == '12':
-                multCount += 1
-            elif token == '6':
-                pumpCount += 1
-        return zombieCount, fZombieCount, bombCount, multCount, pumpCount
 
     def piecesLeft(self):
         """Return the number of pieces left in wave as a float.
@@ -314,209 +300,6 @@ class GameState(Game):
                 self.board[0][my_move[1] + 1] = my_move[0][1]
                 self.board[1][my_move[1] + 1] = my_move[0][2]
             elif dice1 == 6:
-                self.board[0][my_move[1] - 1] = my_move[0][0]
-                self.board[1][my_move[1]] = my_move[0][1]
-                self.board[0][my_move[1] + 1] = my_move[0][2]
-
-    def human_put_piece(self, dice1, dice2):
-        if self.wave == 1:
-            if dice1 == 1:
-                self.board[0][dice2 - 1] = self.pullPiece()
-
-            elif dice1 == 2:
-                piece1 = self.pullPiece()
-                piece2 = self.pullPiece()
-
-                if dice2 != 1 and dice2 != 6:
-                    moves = [[[piece1, piece2], dice2 - 1], [[piece2, piece1], dice2 - 1], [[piece1, piece2], dice2], [[piece2, piece1], dice2]]
-                elif dice2 == 1:
-                    moves = [[ [piece1, piece2], 1], [[piece2, piece1], 1]]
-                else:
-                    moves[[[piece1, piece2], 5], [[piece2, piece1], 5]]
-
-                print("Your available moves are: ")
-                print(moves)
-                my_move = ast.literal_eval(input("Enter the move you'd like to make: "))
-                while my_move not in moves:
-                    my_move = ast.literal_eval(input("Please enter a valid move: "))
-
-                self.board[0][my_move[1] - 1] = my_move[0][0]
-                self.board[0][my_move[1]] = my_move[0][1]
-
-            elif dice1 == 3:
-                piece1 = self.pullPiece()
-                piece2 = self.pullPiece()
-                moves = [[[piece1, piece2], dice2], [[piece2, piece1], dice2]]
-                print("Your available moves are: ")
-                print(moves)
-                my_move = ast.literal_eval(input("Enter the move you'd like to make: "))
-                while my_move not in moves:
-                    my_move = ast.literal_eval(input("Please enter a valid move: "))
-                self.board[0][my_move[1] - 1] = my_move[0][0]
-                self.board[1][my_move[1] - 1] = my_move[0][1]
-
-            elif dice1 == 4:
-                piece1 = self.pullPiece()
-                piece2 = self.pullPiece()
-                piece3 = self.pullPiece()
-                if dice2 != 1 and dice2 != 6:
-                    moves = [[[piece1, piece2, piece3], dice2 - 1], [[piece1, piece3, piece2], dice2 - 1], [[piece2, piece1, piece3], dice2 - 1], [[piece2, piece3, piece1], dice2 - 1], [[piece3, piece1, piece2], dice2 - 1], [[piece3, piece2, piece1], dice2 - 1], [[piece1, piece2, piece3], dice2], [[piece1, piece3, piece2], dice2], [[piece2, piece1, piece3], dice2], [[piece2, piece3, piece1], dice2], [[piece3, piece1, piece2], dice2], [[piece3, piece2, piece1], dice2]]
-                elif dice2 == 1:
-                    moves = [[[piece1, piece2, piece3], 1], [[piece1, piece3, piece2], 1], [[piece2, piece1, piece3], 1], [[piece2, piece3, piece1], 1], [[piece3, piece1, piece2], 1], [[piece3, piece2, piece1], 1]]
-                else:
-                    moves = [[[piece1, piece2, piece3], 5], [[piece1, piece3, piece2], 5], [[piece2, piece1, piece3], 5], [[piece2, piece3, piece1], 5], [[piece3, piece1, piece2], 5], [[piece3, piece2, piece1], 5]]
-                print("Your available moves are: ")
-                print(moves)
-                my_move = ast.literal_eval(input("Enter the move you'd like to make: "))
-                while my_move not in moves:
-                    my_move = ast.literal_eval(input("Please enter a valid move: "))
-                self.board[0][my_move[1] - 1] = my_move[0][0]
-                self.board[0][my_move[1]] = my_move[0][1]
-                self.board[1][my_move[1] - 1] = my_move[0][2]
-
-            elif dice1 == 5:
-                piece1 = self.pullPiece()
-                piece2 = self.pullPiece()
-                piece3 = self.pullPiece()
-                if dice2 != 1 and dice2 != 6:
-                    moves = [[[piece1, piece2, piece3], dice2 - 1], [[piece1, piece3, piece2], dice2 - 1], [[piece2, piece1, piece3], dice2 - 1], [[piece2, piece3, piece1], dice2 - 1], [[piece3, piece1, piece2], dice2 - 1], [[piece3, piece2, piece1], dice2 - 1], [[piece1, piece2, piece3], dice2], [[piece1, piece3, piece2], dice2], [[piece2, piece1, piece3], dice2], [[piece2, piece3, piece1], dice2], [[piece3, piece1, piece2], dice2], [[piece3, piece2, piece1], dice2]]
-                elif dice2 == 1:
-                    moves = [[[piece1, piece2, piece3], 1], [[piece1, piece3, piece2], 1], [[piece2, piece1, piece3], 1], [[piece2, piece3, piece1], 1], [[piece3, piece1, piece2], 1], [[piece3, piece2, piece1], 1]]
-                else:
-                    moves = [[[piece1, piece2, piece3], 5], [[piece1, piece3, piece2], 5], [[piece2, piece1, piece3], 5], [[piece2, piece3, piece1], 5], [[piece3, piece1, piece2], 5], [[piece3, piece2, piece1], 5]]
-                print("Your available moves are: ")
-                print(moves)
-                my_move = ast.literal_eval(input("Enter the move you'd like to make: "))
-                while my_move not in moves:
-                    my_move = ast.literal_eval(input("Please enter a valid move: "))
-                self.board[0][my_move[1] - 1] = my_move[0][0]
-                self.board[0][my_move[1]] = my_move[0][1]
-                self.board[1][my_move[1]] = my_move[0][2]
-
-            elif dice1 == 6:
-                piece1 = self.pullPiece()
-                piece2 = self.pullPiece()
-                piece3 = self.pullPiece()
-                if dice2 != 1 and dice2 != 6:
-                    moves = [[[piece1, piece2, piece3], dice2 - 1], [[piece1, piece3, piece2], dice2 - 1], [[piece2, piece1, piece3], dice2 - 1], [[piece2, piece3, piece1], dice2 - 1], [[piece3, piece1, piece2], dice2 - 1], [[piece3, piece2, piece1], dice2 - 1], [[piece1, piece2, piece3], dice2], [[piece1, piece3, piece2], dice2], [[piece2, piece1, piece3], dice2], [[piece2, piece3, piece1], dice2], [[piece3, piece1, piece2], dice2], [[piece3, piece2, piece1], dice2]]
-                elif dice2 == 1:
-                    moves = [[[piece1, piece2, piece3], 1], [[piece1, piece3, piece2], 1], [[piece2, piece1, piece3], 1], [[piece2, piece3, piece1], 1], [[piece3, piece1, piece2], 1], [[piece3, piece2, piece1], 1]]
-                else:
-                    moves = [[[piece1, piece2, piece3], 5], [[piece1, piece3, piece2], 5], [[piece2, piece1, piece3], 5], [[piece2, piece3, piece1], 5], [[piece3, piece1, piece2], 5], [[piece3, piece2, piece1], 5]]
-                print("Your available moves are: ")
-                print(moves)
-                my_move = ast.literal_eval(input("Enter the move you'd like to make: "))
-                while my_move not in moves:
-                    my_move = ast.literal_eval(input("Please enter a valid move: "))
-                self.board[0][my_move[1] - 1] = my_move[0][0]
-                self.board[0][my_move[1]] = my_move[0][1]
-                self.board[0][my_move[1] + 1] = my_move[0][2]
-
-        elif self.wave == 2:
-            if dice1 == 1:
-                piece1 = self.pullPiece()
-                piece2 = self.pullPiece()
-                if dice2 != 1 and dice2 != 6:
-                    moves = [[[piece1, piece2], dice2 - 1], [[piece2, piece1], dice2 - 1], [[piece1, piece2], dice2], [[piece2, piece1], dice2]]
-                elif dice2 == 1:
-                    moves = [[[piece1, piece2], 1], [[piece2, piece1], 1]]
-                else:
-                    moves = [[[piece1, piece2], 5], [[piece2, piece1], 5]]
-                print("Your available moves are: ")
-                print(moves)
-                my_move = ast.literal_eval(input("Enter the move you'd like to make: "))
-                while my_move not in moves:
-                    my_move = ast.literal_eval(input("Please enter a valid move: "))
-                self.board[0][my_move[1] - 1] = my_move[0][0]
-                self.board[1][my_move[1]] = my_move[0][1]
-
-            elif dice1 == 2:
-                piece1 = self.pullPiece()
-                piece2 = self.pullPiece()
-                if dice2 != 1 and dice2 != 6:
-                    moves = [[[piece1, piece2], dice2 - 1], [[piece2, piece1], dice2 - 1]]
-                elif dice2 == 1:
-                    moves = [[[piece1, piece2], 1], [[piece2, piece1], 1]]
-                else:
-                    moves[[[piece1, piece2], 5], [[piece2, piece1], 5]]
-                print("Your available moves are: ")
-                print(moves)
-                my_move = ast.literal_eval(input("Enter the move you'd like to make: "))
-                while my_move not in moves:
-                    my_move = ast.literal_eval(input("Please enter a valid move: "))
-                self.board[0][my_move[1] - 1] = my_move[0][0]
-                self.board[0][my_move[1] + 1] = my_move[0][1]
-
-            elif dice1 == 3:
-                piece1 = self.pullPiece()
-                piece2 = self.pullPiece()
-                if dice2 != 1 and dice2 != 6:
-                    moves = [[[piece1, piece2], dice2 - 1], [[piece2, piece1], dice2 - 1], [[piece1, piece2], dice2], [[piece2, piece1], dice2]]
-                elif dice2 == 1:
-                    moves = [[[piece1, piece2], 1], [[piece2, piece1], 1]]
-                else:
-                    moves = [[[piece1, piece2], 5], [[piece2, piece1], 5]]
-                print("Your available moves are: ")
-                print(moves)
-                my_move = ast.literal_eval(input("Enter the move you'd like to make: "))
-                while my_move not in moves:
-                    my_move = ast.literal_eval(input("Please enter a valid move: "))
-                self.board[1][my_move[1] - 1] = my_move[0][0]
-                self.board[0][my_move[1]] = my_move[0][1]
-
-            elif dice1 == 4:
-                piece1 = self.pullPiece()
-                piece2 = self.pullPiece()
-                piece3 = self.pullPiece()
-                if dice2 != 1 and dice2 != 6:
-                    moves = [[[piece1, piece2, piece3], dice2 - 1], [[piece1, piece3, piece2], dice2 - 1], [[piece2, piece1, piece3], dice2 - 1], [[piece2, piece3, piece1], dice2 - 1], [[piece3, piece1, piece2], dice2 - 1], [[piece3, piece2, piece1], dice2 - 1], [[piece1, piece2, piece3], dice2], [[piece1, piece3, piece2], dice2], [[piece2, piece1, piece3], dice2], [[piece2, piece3, piece1], dice2], [[piece3, piece1, piece2], dice2], [[piece3, piece2, piece1], dice2]]
-                elif dice2 == 1:
-                    moves = [[[piece1, piece2, piece3], 1], [[piece1, piece3, piece2], 1], [[piece2, piece1, piece3], 1], [[piece2, piece3, piece1], 1], [[piece3, piece1, piece2], 1], [[piece3, piece2, piece1], 1]]
-                else:
-                    moves = [[[piece1, piece2, piece3], 5], [[piece1, piece3, piece2], 5], [[piece2, piece1, piece3], 5], [[piece2, piece3, piece1], 5], [[piece3, piece1, piece2], 5], [[piece3, piece2, piece1], 5]]
-                print("Your available moves are: ")
-                print(moves)
-                my_move = ast.literal_eval(input("Enter the move you'd like to make: "))
-                while my_move not in moves:
-                    my_move = ast.literal_eval(input("Please enter a valid move: "))
-                self.board[0][my_move[1] - 1] = my_move[0][0]
-                self.board[1][my_move[1] - 1] = my_move[0][1]
-                self.board[0][my_move[1] + 1] = my_move[0][2]
-
-            elif dice1 == 5:
-                piece1 = self.pullPiece()
-                piece2 = self.pullPiece()
-                piece3 = self.pullPiece()
-                if dice2 != 1 and dice2 != 6:
-                    moves = [[[piece1, piece2, piece3], dice2 - 1], [[piece1, piece3, piece2], dice2 - 1], [[piece2, piece1, piece3], dice2 - 1], [[piece2, piece3, piece1], dice2 - 1], [[piece3, piece1, piece2], dice2 - 1], [[piece3, piece2, piece1], dice2 - 1], [[piece1, piece2, piece3], dice2], [[piece1, piece3, piece2], dice2], [[piece2, piece1, piece3], dice2], [[piece2, piece3, piece1], dice2], [[piece3, piece1, piece2], dice2], [[piece3, piece2, piece1], dice2]]
-                elif dice2 == 1:
-                    moves = [[[piece1, piece2, piece3], 1], [[piece1, piece3, piece2], 1], [[piece2, piece1, piece3], 1], [[piece2, piece3, piece1], 1], [[piece3, piece1, piece2], 1], [[piece3, piece2, piece1], 1]]
-                else:
-                    moves = [[[piece1, piece2, piece3], 5], [[piece1, piece3, piece2], 5], [[piece2, piece1, piece3], 5], [[piece2, piece3, piece1], 5], [[piece3, piece1, piece2], 5], [[piece3, piece2, piece1], 5]]
-                print("Your available moves are: ")
-                print(moves)
-                my_move = ast.literal_eval(input("Enter the move you'd like to make: "))
-                while my_move not in moves:
-                    my_move = ast.literal_eval(input("Please enter a valid move: "))
-                self.board[0][my_move[1] - 1] = my_move[0][0]
-                self.board[0][my_move[1] + 1] = my_move[0][1]
-                self.board[1][my_move[1] + 1] = my_move[0][2]
-
-            elif dice1 == 6:
-                piece1 = self.pullPiece()
-                piece2 = self.pullPiece()
-                piece3 = self.pullPiece()
-                if dice2 != 1 and dice2 != 6:
-                    moves = [[[piece1, piece2, piece3], dice2 - 1], [[piece1, piece3, piece2], dice2 - 1], [[piece2, piece1, piece3], dice2 - 1], [[piece2, piece3, piece1], dice2 - 1], [[piece3, piece1, piece2], dice2 - 1], [[piece3, piece2, piece1], dice2 - 1], [[piece1, piece2, piece3], dice2], [[piece1, piece3, piece2], dice2], [[piece2, piece1, piece3], dice2], [[piece2, piece3, piece1], dice2], [[piece3, piece1, piece2], dice2], [[piece3, piece2, piece1], dice2]]
-                elif dice2 == 1:
-                    moves = [[[piece1, piece2, piece3], 1], [[piece1, piece3, piece2], 1], [[piece2, piece1, piece3], 1], [[piece2, piece3, piece1], 1], [[piece3, piece1, piece2], 1], [[piece3, piece2, piece1], 1]]
-                else:
-                    moves = [[[piece1, piece2, piece3], 5], [[piece1, piece3, piece2], 5], [[piece2, piece1, piece3], 5], [[piece2, piece3, piece1], 5], [[piece3, piece1, piece2], 5], [[piece3, piece2, piece1], 5]]
-                print("Your available moves are: ")
-                print(moves)
-                my_move = ast.literal_eval(input("Enter the move you'd like to make: "))
-                while my_move not in moves:
-                    my_move = ast.literal_eval(input("Please enter a valid move: "))
                 self.board[0][my_move[1] - 1] = my_move[0][0]
                 self.board[1][my_move[1]] = my_move[0][1]
                 self.board[0][my_move[1] + 1] = my_move[0][2]
@@ -763,13 +546,6 @@ class GameState(Game):
                 direction = 'left'
         return direction
 
-
-    # This is code that can be used to get rid of chains of things; lightly tested
-    # def destroy_chain(self, token):
-    #     immediate = self.find_adjacent(token[0], token[1])
-    #     for item in immediate:
-    #         self.board[item[0], item[1]] = 0
-    #         self.explode(item)
     
     def flower(self, token):
         immediate = self.find_adjacent(token[0], token[1])
@@ -868,8 +644,11 @@ class GameState(Game):
                         if item[2] == 6:
                             pump.append(item)
                     if len(pump) == 1:
-                        self.board[pump[0][0]][pump[0][1]] = 0
-                        self.score = self.score - 10
+                        if pump[0] is "nothing":
+                            break
+                        else:
+                            self.board[pump[0][0]][pump[0][1]] = 0
+                            self.score = self.score - 10
                     elif len(pump) == 2:
                         self.board[pump_chosen[0]][pump_chosen[1]] = 0
                         self.score = self.score - 10
@@ -916,15 +695,6 @@ class GameState(Game):
                     #                 self.board[row][column + 1] = self.board[row][column]
                     #                 self.board[row][column] = 0
 
-    def possible_actions(self):
-        if self.phase == 2:
-            return possible_moves_2(self, self.dice1, self.dice2)
-        elif self.phase == 3:
-            return possible_moves_3(self)
-        elif self.phase == 4:
-            return possible_moves_4(self)
-        else:
-            return []
 
     def possible_moves_2(self, dice1, dice2):
         """takes in state and two dices, return all possible moves"""
@@ -1051,7 +821,21 @@ class GameState(Game):
                     for item in adjacent:
                         if item[2] == 6:
                             pump.append(item)
+        if len(pump) == 0:
+            pump.append("nothing")
         return pump
+
+    def possible_actions(self):
+        if self.phase == 2:
+            return possible_moves_2(self, self.dice1, self.dice2)
+        elif self.phase == 3:
+            return possible_moves_3(self)
+        elif self.phase == 4:
+            return possible_moves_4(self)
+        else:
+            return []
+
+
 
     ########################################
     # Helper methods for transition matrix #
@@ -1076,8 +860,5 @@ class GameState(Game):
                      self.pumpCount, \
                      self.wave, \
                      self.phase))
-
-if __name__ == '__main__':
-    gs = GameState()
 
 
