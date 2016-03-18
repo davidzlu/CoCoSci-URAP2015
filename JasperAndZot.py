@@ -2,6 +2,7 @@ import random
 import numpy as np
 import ast
 from copy import deepcopy
+from Game import Game
 
 """Token Key:
     0 = empty space
@@ -43,7 +44,7 @@ def state2board(state):
     return board.reshape((11,6))
 
 
-class GameState:
+class GameState(Game):
     """
     A GameState specifies the current state of the game in terms of:
       1) The arrangment of pieces on the board
@@ -250,16 +251,15 @@ class GameState:
             self.pumpCount = 6-pCount
             self.wave = 2
             return self.pullPiece()
-        elif self.wave == 1 and self.piecesLeft() > 0:
+        elif self.wave == 1 and self.piecesLeft() > 0 and self.pumpCount < 6:
             self.wave = 2
         elif self.wave == 2 and self.piecesLeft() == 0:
             if self.checkWin():
-                # Take care of win transition
+                self.reward
                 return 0
             elif self.checkLose():
                 # Take care of lose transition
                 return 0
-            return 1
         return 0
 
     def checkWin(self):

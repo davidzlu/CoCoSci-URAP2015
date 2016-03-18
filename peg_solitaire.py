@@ -1,6 +1,7 @@
 import numpy as np
 import ast
 from peg_markov import *
+from Game import Game
 
 def create_board():
 	"""
@@ -119,3 +120,7 @@ def best_policy(board):
    return possible_actions_q[best_q]
 
 #board state 6 jumps from winning: '0000000001000000100000101000001010000010000000000'
+class PegSolitaireStates(Game):
+
+    def __init__(self):
+        return
