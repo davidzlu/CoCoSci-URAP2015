@@ -61,7 +61,7 @@ class Features:
         """
         results = []
         for i in range(n):
-            results.append(game.play(policy))
+            results.append(game.play(game, policy))
         return results
 
 if __name__ == '__main__':
