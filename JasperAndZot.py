@@ -132,9 +132,9 @@ class GameState(Game):
         if nextState in nextPossible:
             if nextState.checkWin():
                 #add reward for destroying tokens?
-                self.score += 100 # Reward for winning game
+                self.score += 100 # Reward for winning game = 100
                 return 100
-        return 0 # No reward for losing
+        return 0
 
     def copy(self):
         """Returns a new state with same instance variables as self.
@@ -188,7 +188,6 @@ class GameState(Game):
                GameState.tmp[index] = self.transition_prob(action, nextState)
                matrixRow.append(GameState.tmp[index])
         return matrixRow
-
 
     def piecesLeft(self):
         """Return the number of pieces left in wave as a float.

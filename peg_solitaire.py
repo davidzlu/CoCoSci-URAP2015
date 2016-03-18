@@ -1,15 +1,9 @@
 import abc
-from Game import *
 import numpy as np
 import ast
-<<<<<<< HEAD
 from peg_markov import *
 from Game import Game
-=======
 import random
-
-
->>>>>>> master
 
 def create_board():
 	"""
@@ -139,12 +133,6 @@ def best_policy(board):
    return possible_actions_q[best_q]
 
 #board state 6 jumps from winning: '0000000001000000100000101000001010000010000000000'
-<<<<<<< HEAD
-class PegSolitaireStates(Game):
-
-    def __init__(self):
-        return
-=======
 
 def random_policy(board):
     actions = legal_actions(board)
@@ -172,6 +160,3 @@ class PegSolitaire:
 
 # if __name__ == '__main__':
 # 	print('Subclass:', issubclass(PegSolitaire, Game))
-
-from peg_markov import *
->>>>>>> master
