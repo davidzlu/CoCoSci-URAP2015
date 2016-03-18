@@ -80,20 +80,17 @@ class GameState(Game):
         while not self.checkWin() and not self.checkLose():
             if self.phase == 1:
                 self.descend() # phase 1
-                self.waveTransition() #transition of phase
             elif self.phase == 2:
                 self.diceRoll() # roll dice for phase 2
                 moves2 = self.possible_moves_2(self.dice1, self.dice2) #create possible moves
                 mymove2 = strategy() #select move in possible moves
                 self.phase_two(self.dice1, mymove2)
-                self.waveTransition()
                 actionsTaken.append(mymove2)
             elif self.phase == 3:
                 moves3 = self.possible_moves_3() # generate possible moves for phase3
                 mymove3 = strategy() #select move for phase 3
                 prevScore = self.score
                 self.move_and_shoot(mymove3) #execute phase 3
-                self.waveTransition()
                 actionsTaken.append(mymove3)
                 rewardsGained.append(self.score - prevScore)
             elif self.phase == 4:
@@ -101,7 +98,6 @@ class GameState(Game):
                 mymove4 = strategy()
                 prevScore = self.score
                 self.phase_four(mymove4)
-                self.waveTransition()
                 actionsTaken.append(mymove4)
                 rewardsGained.append(self.score - prevScore)
             print("The current state is:")
@@ -226,9 +222,9 @@ class GameState(Game):
             return 5
 
     def waveTransition(self):
-        """Manages transitioning between waves.
+        """Manages transitioning between wave 1 and 2.
         """
-        if self.wave == 1 and self.piecesLeft() == 0:
+        if self.wave == 1 and self.piecesLeft() == 0 or self.wave == 1 and self.piecesLeft() > 0 and self.pumpCount < 6:
             zCount, fzCount, bCount, mCount, pCount = self.count_pieces()
             self.zombieCount = 24-zCount
             self.fZombieCount = 8-fzCount
@@ -237,15 +233,6 @@ class GameState(Game):
             self.pumpCount = 6-pCount
             self.wave = 2
             return self.pullPiece()
-        elif self.wave == 1 and self.piecesLeft() > 0 and self.pumpCount < 6:
-            self.wave = 2
-        elif self.wave == 2 and self.piecesLeft() == 0:
-            if self.checkWin():
-                self.reward
-                return 0
-            elif self.checkLose():
-                # Take care of lose transition
-                return 0
         return 0
 
     def checkWin(self):
@@ -257,7 +244,7 @@ class GameState(Game):
         return self.wave == 2 and self.pumpCount > 0 and self.piecesLeft == 0 and self.enemyOnBoard()
 
     def checkLose(self):
-        return self.pumpCount == 0
+        return self.pumpCount == 0 and self.wave == 2
 
     def phase_two(self, dice1, my_move):
         if self.wave == 1:
