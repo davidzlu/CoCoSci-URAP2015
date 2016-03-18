@@ -107,7 +107,7 @@ class GameState:
             print(self.board)
             statesVisited.append(self.copy())
             self.phase = (self.phase % 4) + 1
-        return (statesVisited, actionsTaken, rewardsGained)
+        return (statesVisited, actionsTaken, rewardsGained, self.checkWin())
 
     def diceRoll(self):
         """Returns a tuple of random integers between 1 and 6 inclusive.

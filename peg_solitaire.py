@@ -119,7 +119,7 @@ def play(strategy=human_player):
 		print('An illegal move was made. The player has lost the game.')
 		reward = -1
 	rewardsGained.append(reward)
-	return (statesVisited, actionsTaken, rewardsGained)
+	return (statesVisited, actionsTaken, rewardsGained, check_win(board))
 	
 def best_policy(board):
    actions = legal_actions(board)
