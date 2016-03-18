@@ -1,4 +1,6 @@
-import abc
+from abc import ABCMeta, abstractmethod
+from peg_solitaire import *
+from peg_markov import *
 
 class Game(object):
     __metaclass__ = abc.ABCMeta
@@ -31,4 +33,3 @@ class Game(object):
     @abc.abstractmethod
     def isLoseState(self):
         raise NotImplementedError("Must override")
-    

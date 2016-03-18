@@ -1,7 +1,15 @@
+import abc
+from Game import *
 import numpy as np
 import ast
+<<<<<<< HEAD
 from peg_markov import *
 from Game import Game
+=======
+import random
+
+
+>>>>>>> master
 
 def create_board():
 	"""
@@ -82,30 +90,41 @@ def human_player(board):
 
 def play(strategy=human_player):
 	"""
-    The main function for running a game of PegSolitaire. Default is set to
-    human_player phase but this function also accepts any algorithm which returns a move.
-    """
-	board = create_board()
+	The main function for running a game of PegSolitaire. Default is set to
+	human_player phase but this function also accepts any algorithm which returns a move.
+	"""
+	statesVisited = [] # Sequence of states visited during a game
+	actionsTaken = [] # Sequential actions taken during a game
+	rewardsGained = [] # Sequence of rewards obtained during a game
+	ps = PegSolitaire()
+	board = ps.board
 	print("The game has begun. The current board state is ")
 	print(board)
 	while not check_win(board):
 		cur_state = board2state(board)
+		statesVisited.append(cur_state)
 		moves = legal_actions(board)
-		move = strategy(board)
+		if strategy == human_player:
+			move = strategy(ps.board)
+		else:
+			move = strategy()
+		actionsTaken.append(move)
 		if move not in moves:
 			break
 		row, column, direction = move[0], move[1], move[2]
 		board = take_action(board, row, column, direction)
 		reward = 0
+		rewardsGained.append(reward)
 		print("The turn has ended. The current board state is ")
 		print(board)
 	if check_win(board):
 		print('The player has won the game!')
 		reward = 1
 	else:
-		print('An illegal move was made.')
+		print('An illegal move was made. The player has lost the game.')
 		reward = -1
-	return board, reward
+	rewardsGained.append(reward)
+	return (statesVisited, actionsTaken, rewardsGained)
 	
 def best_policy(board):
    actions = legal_actions(board)
@@ -120,7 +139,39 @@ def best_policy(board):
    return possible_actions_q[best_q]
 
 #board state 6 jumps from winning: '0000000001000000100000101000001010000010000000000'
+<<<<<<< HEAD
 class PegSolitaireStates(Game):
 
     def __init__(self):
         return
+=======
+
+def random_policy(board):
+    actions = legal_actions(board)
+    if len(actions) == 0:
+    	return random.choice(possible_actions(board))
+    return random.choice(actions)
+
+class PegSolitaire:
+
+	def __init__(self, board=create_board()):
+		self.board = board
+
+	def possible_actions(self):
+		return possible_actions(self.board)
+
+	def transition_prob_matrix(self):
+		return transition_prob_matrix(self.board)
+
+	def next_states(self):
+		state = board2state(self.board)
+		return next_states(state)
+
+	def play(self, strategy):
+		return play(strategy)
+
+# if __name__ == '__main__':
+# 	print('Subclass:', issubclass(PegSolitaire, Game))
+
+from peg_markov import *
+>>>>>>> master
