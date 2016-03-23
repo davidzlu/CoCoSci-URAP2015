@@ -99,10 +99,7 @@ def play(strategy=human_player):
 		cur_state = board2state(board)
 		statesVisited.append(cur_state)
 		moves = legal_actions(board)
-		if strategy == human_player:
-			move = strategy(ps.board)
-		else:
-			move = strategy()
+		move = strategy(ps.board)
 		actionsTaken.append(move)
 		if move not in moves:
 			break
@@ -148,6 +145,9 @@ class PegSolitaire:
 
 	def possible_actions(self):
 		return possible_actions(self.board)
+
+	def random_policy(self):
+		return random_policy
 
 	def transition_prob_matrix(self):
 		return transition_prob_matrix(self.board)

@@ -59,8 +59,11 @@ class Features:
     "Takes in the current game state and returns a randomly selected move"
     def random_policy(self):
         game = self.game
-        actions = game.possible_actions()
-        return random.choice(actions)
+        try:
+            return game.random_policy()
+        except AttributeError:
+            actions = game.possible_actions()
+            return random.choice(actions)
 
     def generateGames(self, game, policy, n):
         """
