@@ -22,7 +22,7 @@ class Features:
           actF: a function that returns possible actions.
         Returns number of possible actions in game. 
         """
-        return 0
+        return game.possible_actions()
 
     def winToFinal(self):
         """
@@ -64,9 +64,9 @@ class Features:
             results.append(game.play(policy))
         return results
 
-if __name__ == '__main__':
-    game = PegSolitaire()
-    ext = Features(game)
+# if __name__ == '__main__':
+#     game = PegSolitaire()
+#     ext = Features(game)
 
 
 
