@@ -67,6 +67,7 @@ class GameState:
         self.dice1 = 0
         self.dice2 = 0
 
+<<<<<<< HEAD
     # def random_policy(self):
     #     actions = self.possible_actions()
     #     return random.choice(actions)
