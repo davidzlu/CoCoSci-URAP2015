@@ -74,13 +74,14 @@ class Features:
           2) List of rewards received
 		Repeats this process n times, returning a list of each simulation's result.
         """
-        for i in range(n):
+        for i in range(n - 1):
             self.results.append(game.play(policy))
         return self.results
 
 # if __name__ == '__main__':
-#     game = PegSolitaire()
+#     game = GameState()
 #     ext = Features(game)
+#     policy = ext.random_policy
 
 
 

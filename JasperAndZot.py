@@ -54,8 +54,8 @@ class GameState:
     """
     tpm = {} # Maps (curState, action, nextState) to transition probability
 
-    def __init__(self, board=create_board(), zombieCount=24, fZombieCount=8, bombCount=4, multCount=3, pumpCount=6, wave=1, phase=2, score=0):
-        self.board = board
+    def __init__(self, zombieCount=24, fZombieCount=8, bombCount=4, multCount=3, pumpCount=6, wave=1, phase=2, score=0):
+        self.board = create_board()
         self.zombieCount = zombieCount
         self.fZombieCount = fZombieCount
         self.bombCount = bombCount
@@ -66,49 +66,6 @@ class GameState:
         self.score = score
         self.dice1 = 0
         self.dice2 = 0
-
-<<<<<<< HEAD
-    # def random_policy(self):
-    #     actions = self.possible_actions()
-    #     return random.choice(actions)
-
-    # def play(self, strategy):
-    #     """the functon that runs the process of playing the game."""
-    #     statesVisited = [] # Sequence of states visited during a game
-    #     actionsTaken = [] # Sequential actions taken during a game
-    #     rewardsGained = [] # Sequence of rewards obtained during a game
-    #     while not self.checkWin() and not self.checkLose():
-    #         if self.phase == 1:
-    #             self.descend() # phase 1
-    #             self.waveTransition() #transition of phase
-    #         elif self.phase == 2:
-    #             self.diceRoll() # roll dice for phase 2
-    #             moves2 = self.possible_moves_2(self.dice1, self.dice2) #create possible moves
-    #             mymove2 = strategy() #select move in possible moves
-    #             self.phase_two(self.dice1, mymove2)
-    #             self.waveTransition()
-    #             actionsTaken.append(mymove2)
-    #         elif self.phase == 3:
-    #             moves3 = self.possible_moves_3() # generate possible moves for phase3
-    #             mymove3 = strategy() #select move for phase 3
-    #             prevScore = self.score
-    #             self.move_and_shoot(mymove3) #execute phase 3
-    #             self.waveTransition()
-    #             actionsTaken.append(mymove3)
-    #             rewardsGained.append(self.score - prevScore)
-    #         elif self.phase == 4:
-    #             moves4 = self.possible_moves_4()
-    #             mymove4 = strategy()
-    #             prevScore = self.score
-    #             self.phase_four(mymove4)
-    #             self.waveTransition()
-    #             actionsTaken.append(mymove4)
-    #             rewardsGained.append(self.score - prevScore)
-    #         print("The current state is:")
-    #         print(self.board)
-    #         statesVisited.append(self.copy())
-    #         self.phase = (self.phase % 4) + 1
-    #     return (statesVisited, actionsTaken, rewardsGained)
 
     def diceRoll(self):
         """Returns a tuple of random integers between 1 and 6 inclusive.
@@ -193,6 +150,21 @@ class GameState:
                matrixRow.append(GameState.tmp[index])
         return matrixRow
 
+    def count_pieces(self):
+         state = board2state(self.board)
+         zombieCount, fZombieCount, bombCount, multCount, pumpCount = [0] * 5
+         for token in state:
+             if token == '1' or token == '8':
+                 zombieCount += 1
+             elif token == '2':
+                 fZombieCount += 1
+             elif token == '4' or token == '11':
+                 bombCount += 1
+             elif token == '5' or token == '12':
+                 multCount += 1
+             elif token == '6':
+                 pumpCount += 1
+         return zombieCount, fZombieCount, bombCount, multCount, pumpCount
 
     def piecesLeft(self):
         """Return the number of pieces left in wave as a float.
@@ -238,7 +210,7 @@ class GameState:
             self.wave = 2
             return self.pullPiece()
         elif self.wave == 1 and self.piecesLeft() > 0:
-            self.wave = 2
+            self.wave = 1
         elif self.wave == 2 and self.piecesLeft() == 0:
             if self.checkWin():
                 # Take care of win transition
@@ -327,10 +299,15 @@ class GameState:
                     token_two_ahead = 3
                 else:
                     token_two_ahead = 0
+            token_one_ahead = self.board[token[0] + 1, token[1]]
+            token_two_ahead = self.board[token[0] + 2, token[1]]        
             if token_one_ahead == 0 and token_two_ahead == 0 and (token[2] < 6 and token[2] != 3): #move two spaces
                 self.board[new_row2, col] = token[2]
                 self.board[old_pos] = 0
                 token = (token[0] + 2, token[1], token[2])
+                token_one_ahead = self.board[token[0] + 1, token[1]]
+                if token[2] == 4 and token_one_ahead == 6:
+                    self.explode(token)
             elif (token_one_ahead == 3 or token_one_ahead > 7) and token[2] == 2: #flaming zombies come thru
                 self.burn(token)
                 self.move(token)
@@ -470,7 +447,6 @@ class GameState:
                         moving_pieces.append(token)
         for token in moving_pieces:
             self.move(token)
-        self.phase = 2
 
 
     def find_adjacent(self, row, column):
@@ -493,6 +469,7 @@ class GameState:
         for item in immediate:
             self.board[item[0], item[1]] = 0
             if item[2] == 6:
+                self.score -= 10
                 self.pumpCount -= 1
             if item[2] == 4: #exploding bombs set off other bombs
                 self.explode(item)
@@ -645,63 +622,22 @@ class GameState:
                         if item[2] == 6:
                             pump.append(item)
                     if len(pump) == 1:
-                        if pump[0] is "nothing":
+                        if pump[0] is 'nothing':
                             break
                         else:
                             self.board[pump[0][0]][pump[0][1]] = 0
                             self.score = self.score - 10
+                            self.pumpCount -= 1
                     elif len(pump) == 2:
                         self.board[pump_chosen[0]][pump_chosen[1]] = 0
                         self.score = self.score - 10
-
-
-    def smash(self):
-        for row in range(8, 10):
-            for column in range(0, 6):
-                if self.board[row][column] == 1 or self.board[row][column] == 2:
-                    adjacent = self.find_adjacent(row, column)
-                    pump = []
-                    for item in adjacent:
-                        if item[2] == 6:
-                            pump.append(item)
-                    if len(pump) == 1:
-                        self.board[pump[0][0]][pump[0][1]] = 0
-                        self.score = self.score - 10
-                    elif len(pump) == 2:
-                        print("Your choices of pumpkin are:")
-                        print(pump)
-                        pump_chosen = ast.literal_eval(input("Enter the pumpkin to smash: "))
-                        while pump_chosen not in pump:
-                            pump_chosen = ast.literal_eval(input("Please enter an available pumpkin: "))
-                        self.board[pump_chosen[0]][pump_chosen[1]] = 0
-                        self.score = self.score - 10
-                    #Code below may be unnecessary as it should be handled in descend function. Tokens don't move during smash anyway
-                    # elif len(pump) == 0:
-                    #     if row == 9:
-                    #         if column == 0 or column == 1:
-                    #             if self.board[row][column + 1] == 0:
-                    #                 self.board[row][column + 1] = self.board[row][column]
-                    #                 self.board[row][column] = 0
-                    #         elif column == 5 or column == 4:
-                    #             if self.board[row][column - 1] == 0:
-                    #                 self.board[row][column - 1] = self.board[row][column]
-                    #                 self.board[row][column] = 0
-                    #         else:
-                    #             token = (row, column, self.board[row][column])
-                    #             direction = self.nearest_pumpkin(token)
-                    #             if direction == 'left' and self.board[row][column - 1] == 0:
-                    #                 self.board[row][column - 1] = self.board[row][column]
-                    #                 self.board[row][column] = 0
-                    #             elif direction == 'right' and self.board[row][column + 1] == 0:
-                    #                 self.board[row][column + 1] = self.board[row][column]
-                    #                 self.board[row][column] = 0
-
+                        self.pumpCount -= 1
 
     def possible_moves_2(self, dice1, dice2):
         """takes in state and two dices, return all possible moves"""
         if self.wave == 1:
             if dice1 == 1:
-                return [[self.pullPiece()], dice2 - 1]
+                return [[[self.pullPiece()], dice2 - 1]]
             elif dice1 == 2:
                 piece1 = self.pullPiece()
                 piece2 = self.pullPiece()
@@ -740,12 +676,12 @@ class GameState:
                 piece1 = self.pullPiece()
                 piece2 = self.pullPiece()
                 piece3 = self.pullPiece()
-                if dice2 != 1 and dice2 != 6:
+                if dice2 != 1 and dice2 < 5:
                     return [[[piece1, piece2, piece3], dice2 - 1], [[piece1, piece3, piece2], dice2 - 1], [[piece2, piece1, piece3], dice2 - 1], [[piece2, piece3, piece1], dice2 - 1], [[piece3, piece1, piece2], dice2 - 1], [[piece3, piece2, piece1], dice2 - 1], [[piece1, piece2, piece3], dice2], [[piece1, piece3, piece2], dice2], [[piece2, piece1, piece3], dice2], [[piece2, piece3, piece1], dice2], [[piece3, piece1, piece2], dice2], [[piece3, piece2, piece1], dice2]]
                 elif dice2 == 1:
                     return [[[piece1, piece2, piece3], 1], [[piece1, piece3, piece2], 1], [[piece2, piece1, piece3], 1], [[piece2, piece3, piece1], 1], [[piece3, piece1, piece2], 1], [[piece3, piece2, piece1], 1]]
                 else:
-                    return [[[piece1, piece2, piece3], 5], [[piece1, piece3, piece2], 5], [[piece2, piece1, piece3], 5], [[piece2, piece3, piece1], 5], [[piece3, piece1, piece2], 5], [[piece3, piece2, piece1], 5]]
+                    return [[[piece1, piece2, piece3], 4], [[piece1, piece3, piece2], 4], [[piece2, piece1, piece3], 4], [[piece2, piece3, piece1], 4], [[piece3, piece1, piece2], 4], [[piece3, piece2, piece1], 4]]
         elif self.wave == 2:
             if dice1 == 1:
                 piece1 = self.pullPiece()
@@ -764,7 +700,7 @@ class GameState:
                 elif dice2 == 1:
                     return [[[piece1, piece2], 1], [[piece2, piece1], 1]]
                 else:
-                    return [[[piece1, piece2], 5], [[piece2, piece1], 5]]
+                    return [[[piece1, piece2], 4], [[piece2, piece1], 4]]
             elif dice1 == 3:
                 piece1 = self.pullPiece()
                 piece2 = self.pullPiece()
@@ -778,32 +714,32 @@ class GameState:
                 piece1 = self.pullPiece()
                 piece2 = self.pullPiece()
                 piece3 = self.pullPiece()
-                if dice2 != 1 and dice2 != 6:
+                if dice2 != 1 and dice2 < 5:
                     return [[[piece1, piece2, piece3], dice2 - 1], [[piece1, piece3, piece2], dice2 - 1], [[piece2, piece1, piece3], dice2 - 1], [[piece2, piece3, piece1], dice2 - 1], [[piece3, piece1, piece2], dice2 - 1], [[piece3, piece2, piece1], dice2 - 1], [[piece1, piece2, piece3], dice2], [[piece1, piece3, piece2], dice2], [[piece2, piece1, piece3], dice2], [[piece2, piece3, piece1], dice2], [[piece3, piece1, piece2], dice2], [[piece3, piece2, piece1], dice2]]
                 elif dice2 == 1:
                     return [[[piece1, piece2, piece3], 1], [[piece1, piece3, piece2], 1], [[piece2, piece1, piece3], 1], [[piece2, piece3, piece1], 1], [[piece3, piece1, piece2], 1], [[piece3, piece2, piece1], 1]]
                 else:
-                    return [[[piece1, piece2, piece3], 5], [[piece1, piece3, piece2], 5], [[piece2, piece1, piece3], 5], [[piece2, piece3, piece1], 5], [[piece3, piece1, piece2], 5], [[piece3, piece2, piece1], 5]]
+                    return [[[piece1, piece2, piece3], 4], [[piece1, piece3, piece2], 4], [[piece2, piece1, piece3], 4], [[piece2, piece3, piece1], 4], [[piece3, piece1, piece2], 4], [[piece3, piece2, piece1], 4]]
             elif dice1 == 5:
                 piece1 = self.pullPiece()
                 piece2 = self.pullPiece()
                 piece3 = self.pullPiece()
-                if dice2 != 1 and dice2 != 6:
+                if dice2 != 1 and dice2 < 5:
                     return [[[piece1, piece2, piece3], dice2 - 1], [[piece1, piece3, piece2], dice2 - 1], [[piece2, piece1, piece3], dice2 - 1], [[piece2, piece3, piece1], dice2 - 1], [[piece3, piece1, piece2], dice2 - 1], [[piece3, piece2, piece1], dice2 - 1], [[piece1, piece2, piece3], dice2], [[piece1, piece3, piece2], dice2], [[piece2, piece1, piece3], dice2], [[piece2, piece3, piece1], dice2], [[piece3, piece1, piece2], dice2], [[piece3, piece2, piece1], dice2]]
                 elif dice2 == 1:
                     return [[[piece1, piece2, piece3], 1], [[piece1, piece3, piece2], 1], [[piece2, piece1, piece3], 1], [[piece2, piece3, piece1], 1], [[piece3, piece1, piece2], 1], [[piece3, piece2, piece1], 1]]
                 else:
-                    return [[[piece1, piece2, piece3], 5], [[piece1, piece3, piece2], 5], [[piece2, piece1, piece3], 5], [[piece2, piece3, piece1], 5], [[piece3, piece1, piece2], 5], [[piece3, piece2, piece1], 5]]
+                    return [[[piece1, piece2, piece3], 4], [[piece1, piece3, piece2], 4], [[piece2, piece1, piece3], 4], [[piece2, piece3, piece1], 4], [[piece3, piece1, piece2], 4], [[piece3, piece2, piece1], 4]]
             elif dice1 == 6:
                 piece1 = self.pullPiece()
                 piece2 = self.pullPiece()
                 piece3 = self.pullPiece()
-                if dice2 != 1 and dice2 != 6:
+                if dice2 != 1 and dice2 < 5:
                     return [[[piece1, piece2, piece3], dice2 - 1], [[piece1, piece3, piece2], dice2 - 1], [[piece2, piece1, piece3], dice2 - 1], [[piece2, piece3, piece1], dice2 - 1], [[piece3, piece1, piece2], dice2 - 1], [[piece3, piece2, piece1], dice2 - 1], [[piece1, piece2, piece3], dice2], [[piece1, piece3, piece2], dice2], [[piece2, piece1, piece3], dice2], [[piece2, piece3, piece1], dice2], [[piece3, piece1, piece2], dice2], [[piece3, piece2, piece1], dice2]]
                 elif dice2 == 1:
                     return [[[piece1, piece2, piece3], 1], [[piece1, piece3, piece2], 1], [[piece2, piece1, piece3], 1], [[piece2, piece3, piece1], 1], [[piece3, piece1, piece2], 1], [[piece3, piece2, piece1], 1]]
                 else:
-                    return [[[piece1, piece2, piece3], 5], [[piece1, piece3, piece2], 5], [[piece2, piece1, piece3], 5], [[piece2, piece3, piece1], 5], [[piece3, piece1, piece2], 5], [[piece3, piece2, piece1], 5]]
+                    return [[[piece1, piece2, piece3], 4], [[piece1, piece3, piece2], 4], [[piece2, piece1, piece3], 4], [[piece2, piece3, piece1], 4], [[piece3, piece1, piece2], 4], [[piece3, piece2, piece1], 4]]
 
     def possible_moves_3(self):
         moves = []
@@ -814,11 +750,11 @@ class GameState:
         return moves
 
     def possible_moves_4(self):
+        pump = []
         for row in range(8, 10):
             for column in range(0, 6):
                 if self.board[row][column] == 1 or self.board[row][column] == 2:
                     adjacent = self.find_adjacent(row, column)
-                    pump = []
                     for item in adjacent:
                         if item[2] == 6:
                             pump.append(item)
@@ -840,44 +776,60 @@ class GameState:
         actions = self.possible_actions()
         return random.choice(actions)
 
+    def human_player(self):
+        if self.phase == 2:
+            moves = self.possible_moves_2(self.dice1, self.dice2)
+        elif self.phase == 3:
+            moves = self.possible_moves_3()
+        elif self.phase == 4:
+            moves = self.possible_moves_4()
+        print("Your available moves are: ")
+        print(moves)
+        response = input("Enter the move you'd like to make: ")
+        my_move = ast.literal_eval(response)
+        while my_move not in moves:
+            my_move = ast.literal_eval(input("Please enter a valid move: "))
+        return my_move
+
+
     def play(self, strategy):
         """the functon that runs the process of playing the game."""
         statesVisited = [] # Sequence of states visited during a game
         actionsTaken = [] # Sequential actions taken during a game
         rewardsGained = [] # Sequence of rewards obtained during a game
+        print("The game has started")
+        print(self.board)
         while not self.checkWin() and not self.checkLose():
             if self.phase == 1:
                 self.descend() # phase 1
-                self.waveTransition() #transition of phase
+                print(self.phase)
             elif self.phase == 2:
                 self.diceRoll() # roll dice for phase 2
-                moves2 = self.possible_moves_2(self.dice1, self.dice2) #create possible moves
                 mymove2 = strategy() #select move in possible moves
                 self.phase_two(self.dice1, mymove2)
                 self.waveTransition()
                 actionsTaken.append(mymove2)
+                print(self.phase)
             elif self.phase == 3:
-                moves3 = self.possible_moves_3() # generate possible moves for phase3
                 mymove3 = strategy() #select move for phase 3
                 prevScore = self.score
                 self.move_and_shoot(mymove3) #execute phase 3
-                self.waveTransition()
                 actionsTaken.append(mymove3)
                 rewardsGained.append(self.score - prevScore)
+                print(self.phase)
             elif self.phase == 4:
-                moves4 = self.possible_moves_4()
                 mymove4 = strategy()
                 prevScore = self.score
                 self.phase_four(mymove4)
                 self.waveTransition()
                 actionsTaken.append(mymove4)
                 rewardsGained.append(self.score - prevScore)
+                print(self.phase)
             print("The current state is:")
             print(self.board)
             statesVisited.append(self.copy())
             self.phase = (self.phase % 4) + 1
         return (statesVisited, actionsTaken, rewardsGained)
-
 
 
     ########################################
@@ -904,4 +856,27 @@ class GameState:
                      self.wave, \
                      self.phase))
 
+# if __name__ == '__main__':
+#     gs = GameState()
+#     print(gs.play(gs.random_policy))
 
+
+# class JandZ:
+
+#     def __init__(self):
+#         self.gs = GameState()
+
+#     def possible_actions(self):
+#         return possible_actions(self.gs)
+
+#     def random_policy(self):
+#         return self.gs.random_policy
+
+#     def transition_prob_matrix(self):
+#         return transition_prob_matrix(self.gs)
+
+#     def next_states(self, action):
+#         return next_states(self.gs, action)
+
+#     def play(self, strategy):
+#         return self.gs.play(strategy)
