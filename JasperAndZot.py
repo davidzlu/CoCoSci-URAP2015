@@ -856,9 +856,10 @@ class GameState:
                      self.wave, \
                      self.phase))
 
-# if __name__ == '__main__':
-#     gs = GameState()
-#     print(gs.play(gs.random_policy))
+if __name__ == '__main__':
+    gs = GameState()
+    print(gs.play(gs.random_policy))
+    
 
 
 # class JandZ:
