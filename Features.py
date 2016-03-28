@@ -64,6 +64,8 @@ class Features:
         except AttributeError:
             actions = game.possible_actions()
             return random.choice(actions)
+        #except TypeError:
+            #return
 
     def generateGames(self, game, policy, n):
         """
@@ -80,8 +82,9 @@ class Features:
         return self.results
 
 # if __name__ == '__main__':
-#     game = PegSolitaire()
+#     game = GameState()
 #     ext = Features(game)
+#     policy = ext.random_policy
 
 
 
