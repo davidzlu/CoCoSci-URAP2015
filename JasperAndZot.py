@@ -764,6 +764,7 @@ class GameState:
 
     def possible_actions(self):
         if self.phase == 2:
+            self.diceRoll()
             return self.possible_moves_2(self.dice1, self.dice2)
         elif self.phase == 3:
             return self.possible_moves_3()
@@ -774,6 +775,8 @@ class GameState:
 
     def random_policy(self):
         actions = self.possible_actions()
+        #print(self.phase)
+        #print(" ")
         return random.choice(actions)
 
     def human_player(self):
