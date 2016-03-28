@@ -75,6 +75,7 @@ class Features:
 		Repeats this process n times, returning a list of each simulation's result.
         """
         for i in range(n):
+            #game = GameState()
             self.results.append(game.play(policy))
         return self.results
 
