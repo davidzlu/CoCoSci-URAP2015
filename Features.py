@@ -23,7 +23,7 @@ class Features:
           actF: a function that returns possible actions.
         Returns number of possible actions in game. 
         """
-        return 0
+        return game.possible_actions()
 
     def winToFinal(self):
         """
@@ -59,8 +59,11 @@ class Features:
     "Takes in the current game state and returns a randomly selected move"
     def random_policy(self):
         game = self.game
-        actions = game.possible_actions()
-        return random.choice(actions)
+        try:
+            return game.random_policy()
+        except AttributeError:
+            actions = game.possible_actions()
+            return random.choice(actions)
 
     def generateGames(self, game, policy, n):
         """
@@ -72,12 +75,12 @@ class Features:
 		Repeats this process n times, returning a list of each simulation's result.
         """
         for i in range(n):
-            self.results.append(game.play(game, policy))
+            self.results.append(game.play(policy))
         return self.results
 
-if __name__ == '__main__':
-    game = PegSolitaire()
-    ext = Features(game)
+# if __name__ == '__main__':
+#     game = PegSolitaire()
+#     ext = Features(game)
 
 
 

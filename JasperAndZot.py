@@ -68,44 +68,48 @@ class GameState(Game):
         self.dice1 = 0
         self.dice2 = 0
 
-    def random_policy(self):
-        actions = self.possible_actions()
-        return random.choice(actions)
+    # def random_policy(self):
+    #     actions = self.possible_actions()
+    #     return random.choice(actions)
 
-    def play(self, strategy):
-        """the functon that runs the process of playing the game."""
-        statesVisited = [] # Sequence of states visited during a game
-        actionsTaken = [] # Sequential actions taken during a game
-        rewardsGained = [] # Sequence of rewards obtained during a game
-        while not self.checkWin() and not self.checkLose():
-            if self.phase == 1:
-                self.descend() # phase 1
-            elif self.phase == 2:
-                self.diceRoll() # roll dice for phase 2
-                moves2 = self.possible_moves_2(self.dice1, self.dice2) #create possible moves
-                mymove2 = strategy() #select move in possible moves
-                self.phase_two(self.dice1, mymove2)
-                actionsTaken.append(mymove2)
-            elif self.phase == 3:
-                moves3 = self.possible_moves_3() # generate possible moves for phase3
-                mymove3 = strategy() #select move for phase 3
-                prevScore = self.score
-                self.move_and_shoot(mymove3) #execute phase 3
-                actionsTaken.append(mymove3)
-                rewardsGained.append(self.score - prevScore)
-            elif self.phase == 4:
-                moves4 = self.possible_moves_4()
-                mymove4 = strategy()
-                prevScore = self.score
-                self.phase_four(mymove4)
-                actionsTaken.append(mymove4)
-                rewardsGained.append(self.score - prevScore)
-            print("The current state is:")
-            print(self.board)
-            statesVisited.append(self.copy())
-            self.phase = (self.phase % 4) + 1
-        return (statesVisited, actionsTaken, rewardsGained, self.checkWin())
-
+    # def play(self, strategy):
+    #     """the functon that runs the process of playing the game."""
+    #     statesVisited = [] # Sequence of states visited during a game
+    #     actionsTaken = [] # Sequential actions taken during a game
+    #     rewardsGained = [] # Sequence of rewards obtained during a game
+    #     while not self.checkWin() and not self.checkLose():
+    #         if self.phase == 1:
+    #             self.descend() # phase 1
+    #             self.waveTransition() #transition of phase
+    #         elif self.phase == 2:
+    #             self.diceRoll() # roll dice for phase 2
+    #             moves2 = self.possible_moves_2(self.dice1, self.dice2) #create possible moves
+    #             mymove2 = strategy() #select move in possible moves
+    #             self.phase_two(self.dice1, mymove2)
+    #             self.waveTransition()
+    #             actionsTaken.append(mymove2)
+    #         elif self.phase == 3:
+    #             moves3 = self.possible_moves_3() # generate possible moves for phase3
+    #             mymove3 = strategy() #select move for phase 3
+    #             prevScore = self.score
+    #             self.move_and_shoot(mymove3) #execute phase 3
+    #             self.waveTransition()
+    #             actionsTaken.append(mymove3)
+    #             rewardsGained.append(self.score - prevScore)
+    #         elif self.phase == 4:
+    #             moves4 = self.possible_moves_4()
+    #             mymove4 = strategy()
+    #             prevScore = self.score
+    #             self.phase_four(mymove4)
+    #             self.waveTransition()
+    #             actionsTaken.append(mymove4)
+    #             rewardsGained.append(self.score - prevScore)
+    #         print("The current state is:")
+    #         print(self.board)
+    #         statesVisited.append(self.copy())
+    #         self.phase = (self.phase % 4) + 1
+    #     return (statesVisited, actionsTaken, rewardsGained)
+    
     def diceRoll(self):
         """Returns a tuple of random integers between 1 and 6 inclusive.
         """
@@ -813,13 +817,55 @@ class GameState(Game):
 
     def possible_actions(self):
         if self.phase == 2:
-            return possible_moves_2(self, self.dice1, self.dice2)
+            return self.possible_moves_2(self.dice1, self.dice2)
         elif self.phase == 3:
-            return possible_moves_3(self)
+            return self.possible_moves_3()
         elif self.phase == 4:
-            return possible_moves_4(self)
+            return self.possible_moves_4()
         else:
             return []
+
+    def random_policy(self):
+        actions = self.possible_actions()
+        return random.choice(actions)
+
+    def play(self, strategy):
+        """the functon that runs the process of playing the game."""
+        statesVisited = [] # Sequence of states visited during a game
+        actionsTaken = [] # Sequential actions taken during a game
+        rewardsGained = [] # Sequence of rewards obtained during a game
+        while not self.checkWin() and not self.checkLose():
+            if self.phase == 1:
+                self.descend() # phase 1
+                self.waveTransition() #transition of phase
+            elif self.phase == 2:
+                self.diceRoll() # roll dice for phase 2
+                moves2 = self.possible_moves_2(self.dice1, self.dice2) #create possible moves
+                mymove2 = strategy() #select move in possible moves
+                self.phase_two(self.dice1, mymove2)
+                self.waveTransition()
+                actionsTaken.append(mymove2)
+            elif self.phase == 3:
+                moves3 = self.possible_moves_3() # generate possible moves for phase3
+                mymove3 = strategy() #select move for phase 3
+                prevScore = self.score
+                self.move_and_shoot(mymove3) #execute phase 3
+                self.waveTransition()
+                actionsTaken.append(mymove3)
+                rewardsGained.append(self.score - prevScore)
+            elif self.phase == 4:
+                moves4 = self.possible_moves_4()
+                mymove4 = strategy()
+                prevScore = self.score
+                self.phase_four(mymove4)
+                self.waveTransition()
+                actionsTaken.append(mymove4)
+                rewardsGained.append(self.score - prevScore)
+            print("The current state is:")
+            print(self.board)
+            statesVisited.append(self.copy())
+            self.phase = (self.phase % 4) + 1
+        return (statesVisited, actionsTaken, rewardsGained)
 
 
 
