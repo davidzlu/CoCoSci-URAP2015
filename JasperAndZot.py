@@ -67,7 +67,7 @@ class GameState:
         self.dice1 = 0
         self.dice2 = 0
 
-<<<<<<< HEAD
+
     # def random_policy(self):
     #     actions = self.possible_actions()
     #     return random.choice(actions)
@@ -701,7 +701,7 @@ class GameState:
         """takes in state and two dices, return all possible moves"""
         if self.wave == 1:
             if dice1 == 1:
-                return [[self.pullPiece()], dice2 - 1]
+                return [[[self.pullPiece()], dice2 - 1]]
             elif dice1 == 2:
                 piece1 = self.pullPiece()
                 piece2 = self.pullPiece()
@@ -828,6 +828,7 @@ class GameState:
 
     def possible_actions(self):
         if self.phase == 2:
+            self.diceRoll()
             return self.possible_moves_2(self.dice1, self.dice2)
         elif self.phase == 3:
             return self.possible_moves_3()
@@ -838,6 +839,8 @@ class GameState:
 
     def random_policy(self):
         actions = self.possible_actions()
+        #print(self.phase)
+        #print(" ")
         return random.choice(actions)
 
     def play(self, strategy):
@@ -850,15 +853,15 @@ class GameState:
                 self.descend() # phase 1
                 self.waveTransition() #transition of phase
             elif self.phase == 2:
-                self.diceRoll() # roll dice for phase 2
-                moves2 = self.possible_moves_2(self.dice1, self.dice2) #create possible moves
-                mymove2 = strategy() #select move in possible moves
+                #self.diceRoll() # roll dice for phase 2
+                #moves2 = self.possible_moves_2(self.dice1, self.dice2) #create possible moves
+                mymove2 = strategy #select move in possible moves
                 self.phase_two(self.dice1, mymove2)
                 self.waveTransition()
                 actionsTaken.append(mymove2)
             elif self.phase == 3:
                 moves3 = self.possible_moves_3() # generate possible moves for phase3
-                mymove3 = strategy() #select move for phase 3
+                mymove3 = strategy #select move for phase 3
                 prevScore = self.score
                 self.move_and_shoot(mymove3) #execute phase 3
                 self.waveTransition()
@@ -866,7 +869,7 @@ class GameState:
                 rewardsGained.append(self.score - prevScore)
             elif self.phase == 4:
                 moves4 = self.possible_moves_4()
-                mymove4 = strategy()
+                mymove4 = strategy
                 prevScore = self.score
                 self.phase_four(mymove4)
                 self.waveTransition()

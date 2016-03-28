@@ -64,6 +64,8 @@ class Features:
         except AttributeError:
             actions = game.possible_actions()
             return random.choice(actions)
+        #except TypeError:
+            #return
 
     def generateGames(self, game, policy, n):
         """
