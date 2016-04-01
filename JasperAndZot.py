@@ -230,7 +230,11 @@ class GameState(Game):
         return self.wave == 2 and self.pumpCount > 0 and self.piecesLeft == 0 and self.enemyOnBoard()
 
     def isLoseState(self):
-        return self.pumpCount <= 0 #For some reason pumpCount too low
+        pCount = 0
+        for space in self.board[9]:
+            if space == 6:
+                pCount += 1
+        return pCount <= 0 #For some reason pumpCount too low
 
     def phase_two(self, dice1, my_move):
         if self.wave == 1:
@@ -828,7 +832,6 @@ class GameState(Game):
                 actionsTaken.append(mymove4)
                 rewardsGained.append(self.score - prevScore)
             print("Current phase:", self.phase)
-            print("pumpCount:", self.pumpCount)
             print("The current state is:")
             print(self.board)
             statesVisited.append(self.copy())
