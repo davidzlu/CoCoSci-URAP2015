@@ -27,4 +27,4 @@ class Minigame:
 
 	def check_full(self):
 		"""check if the minigame board is full"""
-		return np.count_zeros(self.board) == 0
+		return np.count_nonzero(self.board) == self.board.size
