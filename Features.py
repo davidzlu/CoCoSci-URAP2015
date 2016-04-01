@@ -1,12 +1,13 @@
-from peg_solitaire import PegSolitaire
-from JasperAndZot import *
+import peg_solitaire as ps
+import JasperAndZot as jz
 import random
 
 class Features:
 
-    def __init__(self, game):
-        self.game = game # Maybe the game's initial state? So for peg solitaire a full board?
-        self.results = []
+    def __init__(self, gameClass):
+        self.game = gameClass # The GameState class or its equivalent
+        self.results = [] # List of (states visited, actions taken, rewards gained) tuples
+        self.currentGame = None
 
     def entropy(self, prob_matrix):
         """
@@ -58,7 +59,7 @@ class Features:
 
     "Takes in the current game state and returns a randomly selected move"
     def random_policy(self):
-        game = self.game
+        game = self.currentGame
         try:
             return game.random_policy()
         except AttributeError:
@@ -67,7 +68,7 @@ class Features:
         #except TypeError:
             #return
 
-    def generateGames(self, game, policy, n):
+    def generateGames(self, policy, n):
         """
         Takes in a game's initial state and a policy, then simulates actions and state
         transitions until terminal state reached. Returns tuple of 3 elements
@@ -77,14 +78,14 @@ class Features:
 		Repeats this process n times, returning a list of each simulation's result.
         """
         for i in range(n):
-            #game = GameState()
-            self.results.append(game.play(policy))
+            gameStart = self.game()
+            self.currentGame = gameStart
+            self.results.append(self.currentGame.play(policy))
         return self.results
 
-# if __name__ == '__main__':
-#     game = GameState()
-#     ext = Features(game)
-#     policy = ext.random_policy
+if __name__ == '__main__':
+    jzinst = Features(jz.GameState)
+    jzinst.generateGames(jzinst.random_policy, 2)
 
 
 

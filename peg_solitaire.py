@@ -1,4 +1,3 @@
-import abc
 import numpy as np
 import ast
 from peg_markov import *
@@ -137,7 +136,7 @@ def random_policy(board):
     	return random.choice(possible_actions(board))
     return random.choice(actions)
 
-class PegSolitaire:
+class PegSolitaire(Game):
 
 	def __init__(self, board=create_board()):
 		self.board = board
