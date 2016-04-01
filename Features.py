@@ -85,7 +85,8 @@ class Features:
 
 if __name__ == '__main__':
     jzinst = Features(jz.GameState)
-    jzinst.generateGames(jzinst.random_policy, 2)
+    jzinst.generateGames(jzinst.random_policy, 10)
+    print len(jzinst.results)
 
 
 
