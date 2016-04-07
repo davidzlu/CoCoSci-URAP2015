@@ -1,0 +1,11 @@
+Results
+==========
+
+Peg Solitaire
+----------------
+For 1000 games run using a random policy:
+Number of Possible Actions = 176
+Win States : Final States = 0.0
+Lose States : Final States = 0.0
+Average Number of Moves Until Final State = 1.0245456
+
