@@ -35,3 +35,7 @@ class Minigame:
 	def check_final_range(self):
 		if self.check_full():
 			return 0
+
+	def put_number(self, num, row, column):
+		assert row < self.board.shape[0] and column < self.board.shape[1]
+		self.board(row, column) = num
