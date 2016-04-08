@@ -602,7 +602,7 @@ class GameState(Game):
             for index in range(0, 4):
                 row = 9 - index
                 token_type = self.board[row][my_move_3[1]]
-                if token_type == 1 or token_type == 2 or token_type == 4 or token_type == 5 or token_type == 8 or token_type == 11 or token_type == 12:
+                if token_type == 1 or token_type == 2 or token_type == 4 or token_type == 5 or token_type > 7:
                     token = (row, my_move_3[1], token_type)
                     self.flower(token)
                     break
@@ -610,7 +610,7 @@ class GameState(Game):
             for index in range(0, 4):
                 row = 9 - index
                 token_type = self.board[row][my_move_3[1]]
-                if token_type == 3 or token_type == 8 or token_type == 11 or token_type == 12:
+                if token_type == 3 or token_type > 7:
                     token = (row, my_move_3[1], token_type)
                     self.score = self.fire(token)[0] * (2 ** self.fire(token)[1]) + self.score
                     break
