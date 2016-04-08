@@ -1,11 +1,12 @@
 import random
+import itertools
 import numpy as np
 import ast
 
 def create_mini_game(row, column):
 	"""create empty board for minigames"""
-	board = np.zeros(row, column)
-	return board
+	board = np.zeros((row, column))
+	return board.astype(int)
 
 def roll_dice(n):
 	"""roll n dices at once"""
@@ -38,4 +39,92 @@ class Minigame:
 
 	def put_number(self, num, row, column):
 		assert row < self.board.shape[0] and column < self.board.shape[1]
-		self.board(row, column) = num
+		self.board[row, column] = num
+
+class Connection(Minigame): #will need to add UtopiaEngine later
+	"""A class that simulates the Connection part of the game
+		The UtopiaEngine class should check that there are
+		sufficient components available before creating an instance
+		of this class."""
+
+	def __init__(self):
+		game_temp = Minigame(2, 3)
+		self.board = game_temp.board
+		self.roll = []
+
+	def states(self): 
+		"""Returns each state as a set of 3 2x1 arrays."""
+		subset = []
+		for i in range(1, 7):
+			for j in range(1, 7):
+				subset.append(np.array([[i], [j]]))
+		allstates = list(itertools.combinations_with_replacement(subset, 3))
+		return allstates
+
+	def possible_actions(self):
+		positions = []
+		for i in range(3):
+			for j in range(3):
+				positions.append((i, j))
+		unique_moves = []
+		for n in range(1, 7):
+			for position in positions:
+				unique_moves.append(n, position)
+		return list(itertools.combinations(unique_moves, 2))
+
+
+	def state2board(self, state):
+		return np.hstack((state[0], state[1], state[2]))
+
+	def board2state(self, board):
+		return np.hsplit(board, 3)
+		
+	def roll_dice_get_number():
+		self.roll = Minigame.roll_dice_get_number(2)
+		return self.roll
+
+	# def toss(self, num):
+	# 	if (len(UtopiaEngine.wastebasket) < 10):
+	# 		UtopiaEngine.wastebasket.append(num)
+	# 		self.roll.remove(num)
+	# 		new_num = Minigame.roll_dice_get_number(1)
+	# 		self.roll.append(new_num)
+	# 	return self.roll
+
+	def play(self, strategy):
+		while not check_full():
+			result = roll_dice_get_number()
+			moves = strategy(result)
+			for move in moves:
+				num = move[0]
+				row = move[1][0]
+				col = move[1][1]
+				if self.board[row][col] == 0:
+					put_number(num, row, col)
+				# elif check_full():
+				# 	toss(num)
+		state = board2state(self.board)
+		link = 0
+		for pair in state:
+			diff = np.subtract(pair[0], pair[1])[0]
+			if diff < 0:
+				#UtopiaEngine.hitpts -= 1
+				decision = strategy() #determines whether to spend another component
+				if decision == 'continue':
+					link += 2
+				else:
+					return
+			else:
+				link += diff
+		return link
+
+
+		
+
+
+
+
+
+
+		
+		
