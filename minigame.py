@@ -30,7 +30,7 @@ class Minigame:
 		"""initial state for minigame"""
 		self.board = create_mini_game(row, column)
 
-	def roll_dice_get_number(n):
+	def roll_dice_get_number(self, n):
 		"""get number for each step"""
 		return roll_dice(n)
 
@@ -55,28 +55,33 @@ class Search(Minigame):
 				policy: a function that takes in the current state and returns a legal action
 		"""
 		while not self.check_full():
-			roll1, roll2 = roll_dice_get_number(2)
+			print("Current board: ")
+			print(self.board)
+			roll1, roll2 = self.roll_dice_get_number(2)
 			space1, space2 = policy(self)
-			self.board(space1) = roll1
-			self.board(space2) = roll2
+			self.board[space1] = roll1
+			self.board[space2] = roll2
+
+		print("Current board: ")
+		print(self.board)
 		val1 = self.board[0][0]*100 + self.board[0][1]*10 + self.board[0][2]
 		val2 = self.board[1][0]*100 + self.board[1][1]*10 + self.board[1][2]
+		print("Your serach result: ", val1-val2)
 		return val1 - val2
 
 	def legalActions(self):
 		"""Returns list of ways a pair of numbers can be placed on the board.
 			If no empty spaces, moves represented as list of form:
-				[(row, column) 1st number goes, (row, column) 2nd number goes]
+				[(row, column) where 1st number goes, (row, column) where 2nd number goes]
 		"""
 		emptySpaces = []
-		for row in self.board:
-			for space in row:
-				if space == -1:
-					emptySpaces.append((row, space))
+		for row in range(2):
+			for col in range(3):
+				if self.board[(row, col)] == 0:
+					emptySpaces.append( (row, col) )
 
 		# List of all pairs of spaces with repeats
 		# e.g. permutations([1, 2, 3], 2) returns [(1, 2), (1, 3), (2, 1), (2, 3), (3, 1), (3, 2)]
 		actions = list(permutations(emptySpaces, 2))
+		print("Actions: ", actions)
 		return actions
-
-
