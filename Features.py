@@ -24,7 +24,7 @@ class Features:
           actF: a function that returns possible actions.
         Returns number of possible actions in game. 
         """
-        return game.possible_actions()
+        return len(self.game.possible_actions(self.game()))
 
     def winToFinal(self):
         """
@@ -83,9 +83,10 @@ class Features:
             self.results.append(self.currentGame.play(policy))
         return self.results
 
-if __name__ == '__main__':
-    jzinst = Features(jz.GameState)
-    jzinst.generateGames(jzinst.random_policy, 2)
+#if __name__ == '__main__':
+    # jzinst = Features(jz.GameState)
+    # jzinst.generateGames(jzinst.random_policy, 2)
+
 
 
 
