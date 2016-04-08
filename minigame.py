@@ -1,12 +1,18 @@
 import random
-import itertools
 import numpy as np
 import ast
+from itertools import permutations, combinations_with_replacement, combinations
 
 def create_mini_game(row, column):
 	"""create empty board for minigames"""
 	board = np.zeros((row, column))
 	return board.astype(int)
+
+
+def create_mini_game(row, column):
+	"""create empty board for minigames"""
+	board = np.zeros([row, column])
+	return board
 
 def roll_dice(n):
 	"""roll n dices at once"""
@@ -15,6 +21,14 @@ def roll_dice(n):
 		roll = random.randint(1, 6)
 		result.append(roll)
 	return result
+
+def randomPolicy(state):
+	""" Generates next legal action for agent to take.
+		Arguments:
+			state: The current state for which an action will be generated.
+	"""
+	legalMoves = state.legalActions()
+	return random.choice(legalMoves)
 
 class Minigame:
 	"""a class for the minigames for Utopia Engine"""
@@ -61,6 +75,7 @@ class Activation(Minigame):
 				elif diff < 1:
 					# take 1 damage
 		return energy_point
+
 	def play(self, strategy, energy_point):
 		print("Activation started:")
 		while (!self.check_full()):
@@ -77,7 +92,6 @@ class Activation(Minigame):
 			return True
 		else:
 			return False
-
 
 class Connection(Minigame): #will need to add UtopiaEngine later
 	"""A class that simulates the Connection part of the game
@@ -96,7 +110,7 @@ class Connection(Minigame): #will need to add UtopiaEngine later
 		for i in range(1, 7):
 			for j in range(1, 7):
 				subset.append(np.array([[i], [j]]))
-		allstates = list(itertools.combinations_with_replacement(subset, 3))
+		allstates = list(combinations_with_replacement(subset, 3))
 		return allstates
 
 	def possible_actions(self):
@@ -108,7 +122,7 @@ class Connection(Minigame): #will need to add UtopiaEngine later
 		for n in range(1, 7):
 			for position in positions:
 				unique_moves.append(n, position)
-		return list(itertools.combinations(unique_moves, 2))
+		return list(combinations(unique_moves, 2))
 
 
 	def state2board(self, state):
@@ -156,3 +170,45 @@ class Connection(Minigame): #will need to add UtopiaEngine later
 				link += diff
 		return link
 
+class Search(Minigame):
+	"""Class for search minigame.
+	"""
+	def __init__(self):
+		Minigame.__init__(self, 2, 3)
+
+	def play(self, policy):
+		"""Play through one search round. Returns final difference after filling in board.
+			Arguments:
+				policy: a function that takes in the current state and returns a legal action
+		"""
+		while not self.check_full():
+			print("Current board: ")
+			print(self.board)
+			roll1, roll2 = self.roll_dice_get_number(2)
+			space1, space2 = policy(self)
+			self.board[space1] = roll1
+			self.board[space2] = roll2
+
+		print("Current board: ")
+		print(self.board)
+		val1 = self.board[0][0]*100 + self.board[0][1]*10 + self.board[0][2]
+		val2 = self.board[1][0]*100 + self.board[1][1]*10 + self.board[1][2]
+		print("Your serach result: ", val1-val2)
+		return val1 - val2
+
+	def legalActions(self):
+		"""Returns list of ways a pair of numbers can be placed on the board.
+			If no empty spaces, moves represented as list of form:
+				[(row, column) where 1st number goes, (row, column) where 2nd number goes]
+		"""
+		emptySpaces = []
+		for row in range(2):
+			for col in range(3):
+				if self.board[(row, col)] == 0:
+					emptySpaces.append( (row, col) )
+
+		# List of all pairs of spaces with repeats
+		# e.g. permutations([1, 2, 3], 2) returns [(1, 2), (1, 3), (2, 1), (2, 3), (3, 1), (3, 2)]
+		actions = list(permutations(emptySpaces, 2))
+		print("Actions: ", actions)
+		return actions

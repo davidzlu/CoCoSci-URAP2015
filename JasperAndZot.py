@@ -221,20 +221,27 @@ class GameState(Game):
             return 1
         return 0
 
-    def isWinState(self):
-        """Checks if current state is a win state.
+    def pumpkinCount(self):
+        """Counts pumpkins still on board.
         """
-        def enemyOnBoard(self):
-            zCount, fZCount, bCount, mCount, pCount = self.count_pieces()
-            return zCount > 0 or fZCount > 0 or bCount > 0 or mCount > 0
-        return self.wave == 2 and self.pumpCount > 0 and self.piecesLeft == 0 and self.enemyOnBoard()
-
-    def isLoseState(self):
         pCount = 0
         for space in self.board[9]:
             if space == 6:
                 pCount += 1
-        return pCount <= 0 #For some reason pumpCount too low
+        return pCount
+
+    def isWinState(self):
+
+        def enemyOnBoard(self):
+            """Checks if any enemy pieces still on board.
+            """
+            zCount, fZCount, bCount, mCount, pCount = self.count_pieces()
+            return zCount > 0 or fZCount > 0 or bCount > 0 or mCount > 0
+
+        return self.wave == 2 and self.pumpkinCount() > 0 and self.piecesLeft == 0 and self.enemyOnBoard()
+
+    def isLoseState(self):
+        return self.pumpkinCount() <= 0 #For some reason pumpCount too low
 
     def phase_two(self, dice1, my_move):
         if self.wave == 1:

@@ -86,7 +86,3 @@ class Features:
 #if __name__ == '__main__':
     # jzinst = Features(jz.GameState)
     # jzinst.generateGames(jzinst.random_policy, 2)
-
-
-
-
