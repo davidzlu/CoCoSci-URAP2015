@@ -5,7 +5,7 @@ from itertools import permutations
 
 def create_mini_game(row, column):
 	"""create empty board for minigames"""
-	board = np.zeros(row, column)
+	board = np.zeros([row, column])
 	return board
 
 def roll_dice(n):
@@ -15,6 +15,14 @@ def roll_dice(n):
 		roll = random.randint(1, 6)
 		result.append(roll)
 	return result
+
+def randomPolicy(state):
+	""" Generates next legal action for agent to take.
+		Arguments:
+			state: The current state for which an action will be generated.
+	"""
+	legalMoves = state.legalActions()
+	return random.choice(legalMoves)
 
 class Minigame:
 	"""a class for the minigames for Utopia Engine"""
@@ -40,27 +48,21 @@ class Minigame:
 class Search(Minigame):
 	"""Class for search minigame.
 	"""
-	def __init__(self):
-		board = []
-		for i in range(2):
-			row = []
-			for j in range(3):
-				row.append(-1)
-			board.append(row)
-		self.board = board
-		self.turnsLeft = 3
 
 	def play(self, policy):
 		"""Play through one search round. Returns final difference after filling in board.
+			Arguments:
+				policy: a function that takes in the current state and returns a legal action
 		"""
-		while self.turnsLeft > 0:
+		while not self.check_full():
 			rolls = roll_dice_get_number(2)
-			nextMove = policy(legalActions)
+			nextMove = policy(self)
+
 
 	def legalActions(self):
 		"""Returns list of ways a pair of numbers can be placed on the board.
 			Moves represented as list of form:
-				[space 1st number goes, space 2nd number goes]
+				[(row, column) 1st number goes, (row, column) 2nd number goes]
 		"""
 		emptySpaces = []
 		for row in self.board:
