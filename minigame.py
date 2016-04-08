@@ -55,13 +55,17 @@ class Search(Minigame):
 				policy: a function that takes in the current state and returns a legal action
 		"""
 		while not self.check_full():
-			rolls = roll_dice_get_number(2)
-			nextMove = policy(self)
-
+			roll1, roll2 = roll_dice_get_number(2)
+			space1, space2 = policy(self)
+			self.board(space1) = roll1
+			self.board(space2) = roll2
+		val1 = self.board[0][0]*100 + self.board[0][1]*10 + self.board[0][2]
+		val2 = self.board[1][0]*100 + self.board[1][1]*10 + self.board[1][2]
+		return val1 - val2
 
 	def legalActions(self):
 		"""Returns list of ways a pair of numbers can be placed on the board.
-			Moves represented as list of form:
+			If no empty spaces, moves represented as list of form:
 				[(row, column) 1st number goes, (row, column) 2nd number goes]
 		"""
 		emptySpaces = []
