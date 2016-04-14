@@ -320,7 +320,10 @@ class GameState(Game):
                 if token[2] == 4 and token_one_ahead == 6:
                     self.explode(token)
             elif (token_one_ahead == 3 or token_one_ahead > 7) and token[2] == 2: #flaming zombies come thru
-                self.burn(token)
+                self.burn((new_row1, token[1], token[2]))
+                self.move(token)
+            elif (token_one_ahead == 0) and (token_two_ahead == 3) and (token[2] == 2):
+                self.burn((new_row2, token[1], token[2]))
                 self.move(token)
             elif token_one_ahead == 3 and token[2] != 2: #move into a flower bed
                 self.board[new_row1, col] = token[2] + 7
@@ -343,6 +346,14 @@ class GameState(Game):
             else:
                 pass
         elif (new_row1 < 10): #token reaches magical barrier
+            token_one_ahead = self.board[token[0] + 1, token[1]]
+            token_two_ahead = self.board[token[0] + 2, token[1]]
+            if (token_one_ahead != 0) and (token_one_ahead != 6) and (token_one_ahead != 3) and (token[0] + 1 != 10):
+                self.move((token[0] + 1, token[1], token_one_ahead))
+                if token_one_ahead > 7:
+                    token_one_ahead = 3
+                else:
+                    token_one_ahead = 0
             if token[2] == 4 or token[2] == 11:
                 token = (new_row1, col, token[2])
                 self.board[old_pos] = 0
