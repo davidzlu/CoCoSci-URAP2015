@@ -66,6 +66,7 @@ class GameState(Game):
         self.score = score
         self.dice1 = 0
         self.dice2 = 0
+        self.transitionToWave2 = False
 
     def diceRoll(self):
         """Returns a tuple of random integers between 1 and 6 inclusive.
@@ -96,11 +97,6 @@ class GameState(Game):
                 self.score += 100 # Reward for winning game = 100
                 return 100
         return 0
-
-    def copy(self):
-        """Returns a new state with same instance variables as self.
-        """
-        return GameState(self.board, self.zombieCount, self.fZombieCount, self.bombCount, self.multCount, self.pumpCount, self.wave, self.phase)
         
     def transition_prob_matrix(self, curState, action, nextState):
         """Returns transition probability given (s, a, s') if it exists in
@@ -151,20 +147,22 @@ class GameState(Game):
         return matrixRow
 
     def count_pieces(self):
-         state = board2state(self.board)
-         zombieCount, fZombieCount, bombCount, multCount, pumpCount = [0] * 5
-         for token in state:
-             if token == '1' or token == '8':
-                 zombieCount += 1
-             elif token == '2':
-                 fZombieCount += 1
-             elif token == '4' or token == '11':
-                 bombCount += 1
-             elif token == '5' or token == '12':
-                 multCount += 1
-             elif token == '6':
-                 pumpCount += 1
-         return zombieCount, fZombieCount, bombCount, multCount, pumpCount
+        """Counts number of enemy pieces and pumpkins are currently on board.
+        """
+        state = board2state(self.board)
+        zombieCount, fZombieCount, bombCount, multCount, pumpCount = [0] * 5
+        for token in state:
+            if token == '1' or token == '8':
+                zombieCount += 1
+            elif token == '2':
+                fZombieCount += 1
+            elif token == '4' or token == '11':
+                bombCount += 1
+            elif token == '5' or token == '12':
+                multCount += 1
+            elif token == '6':
+                pumpCount += 1
+        return zombieCount, fZombieCount, bombCount, multCount, pumpCount
 
     def piecesLeft(self):
         """Return the number of pieces left in wave as a float.
@@ -177,9 +175,10 @@ class GameState(Game):
         the interval [0.0, 1.0) into 4 based on the probability of drawing
         a certain piece. Also accounts for wave transition when out of pieces.
         """
+        self.waveTransition()
         totalLeft = self.piecesLeft()
         if totalLeft == 0:
-            return self.waveTransition()
+            return 0
         zombieRange = self.zombieCount/totalLeft
         fZombieRange = (self.zombieCount+self.fZombieCount)/totalLeft
         bombRange = (self.zombieCount+self.fZombieCount+self.bombCount)/totalLeft
@@ -198,7 +197,9 @@ class GameState(Game):
             return 5
 
     def waveTransition(self):
-        """Manages transitioning between wave 1 and 2.
+        """Manages transitioning between wave 1 and 2. Returns 0 if not changing waves.
+        Returns True and adds pieces for wave 2 back into the state if changing from
+        wave 1 to wave 2. Changing self.wave occurs in phase_two
         """
         if self.wave == 1 and self.piecesLeft() == 0 or self.wave == 1 and self.piecesLeft() > 0 and self.pumpCount < 6:
             zCount, fzCount, bCount, mCount, pCount = self.count_pieces()
@@ -207,19 +208,9 @@ class GameState(Game):
             self.bombCount = 4-bCount
             self.multCount = 4-mCount
             self.pumpCount = 6-pCount
-            self.wave = 2
-            return self.pullPiece()
-        elif self.wave == 1 and self.piecesLeft() > 0:
-            self.wave = 1
-        elif self.wave == 2 and self.piecesLeft() == 0:
-            if self.isWinState():
-                # Take care of win transition
-                return 0
-            elif self.isLoseState():
-                # Take care of lose transition
-                return 0
-            return 1
-        return 0
+            self.transitionToWave2 = True
+            return True
+        return False
 
     def pumpkinCount(self):
         """Counts pumpkins still on board.
@@ -232,13 +223,12 @@ class GameState(Game):
 
     def isWinState(self):
 
-        def enemyOnBoard(self):
+        def enemyOnBoard():
             """Checks if any enemy pieces still on board.
             """
             zCount, fZCount, bCount, mCount, pCount = self.count_pieces()
             return zCount > 0 or fZCount > 0 or bCount > 0 or mCount > 0
-
-        return self.wave == 2 and self.pumpkinCount() > 0 and self.piecesLeft == 0 and self.enemyOnBoard()
+        return self.wave == 2 and self.pumpkinCount() > 0 and self.piecesLeft() == 0 and enemyOnBoard()
 
     def isLoseState(self):
         return self.pumpkinCount() <= 0 
@@ -287,6 +277,10 @@ class GameState(Game):
                 self.board[0][my_move[1] - 1] = my_move[0][0]
                 self.board[1][my_move[1]] = my_move[0][1]
                 self.board[0][my_move[1] + 1] = my_move[0][2]
+
+        if self.transitionToWave2:
+            self.wave = 2
+            self.transitionToWave2 = False
 
     """Helper method for descend() which takens in a token in the format (row, column, type). Moves only one token,
     unless there are tokens obstructing its movement, in which case those other tokens move as well."""
@@ -682,16 +676,19 @@ class GameState(Game):
                         self.pumpCount -= 1
 
     def possible_moves_2(self, dice1, dice2):
-        """takes in state and two dices, return all possible moves"""
+        """takes in state and two dices, return all possible moves and a boolean called transition
+        that marks if the game needs to transition to wave 2 in phase_two"""
         if self.wave == 1:
             if dice1 == 1:
-                return [[[self.pullPiece()], dice2 - 1]]
+                piece1 = self.pullPiece()
+                return [[[piece1], dice2 - 1]]
             elif dice1 == 2:
                 piece1 = self.pullPiece()
                 piece2 = self.pullPiece()
-
+                
                 if dice2 != 1 and dice2 != 6:
-                    return [[[piece1, piece2], dice2 - 1], [[piece2, piece1], dice2 - 1], [[piece1, piece2], dice2], [[piece2, piece1], dice2]]
+                    return [[[piece1, piece2], dice2 - 1], [[piece2, piece1], dice2 - 1],
+                            [[piece1, piece2], dice2], [[piece2, piece1], dice2]]
                 elif dice2 == 1:
                     return [[[piece1, piece2], 1], [[piece2, piece1], 1]]
                 else:
@@ -699,43 +696,75 @@ class GameState(Game):
             elif dice1 == 3:
                 piece1 = self.pullPiece()
                 piece2 = self.pullPiece()
+                
                 return [[[piece1, piece2], dice2], [[piece2, piece1], dice2]]
             elif dice1 == 4:
                 piece1 = self.pullPiece()
                 piece2 = self.pullPiece()
                 piece3 = self.pullPiece()
+
                 if dice2 != 1 and dice2 != 6:
-                    return [[[piece1, piece2, piece3], dice2 - 1], [[piece1, piece3, piece2], dice2 - 1], [[piece2, piece1, piece3], dice2 - 1], [[piece2, piece3, piece1], dice2 - 1], [[piece3, piece1, piece2], dice2 - 1], [[piece3, piece2, piece1], dice2 - 1], [[piece1, piece2, piece3], dice2], [[piece1, piece3, piece2], dice2], [[piece2, piece1, piece3], dice2], [[piece2, piece3, piece1], dice2], [[piece3, piece1, piece2], dice2], [[piece3, piece2, piece1], dice2]]
+                    return [[[piece1, piece2, piece3], dice2 - 1], [[piece1, piece3, piece2], dice2 - 1],
+                            [[piece2, piece1, piece3], dice2 - 1], [[piece2, piece3, piece1], dice2 - 1],
+                            [[piece3, piece1, piece2], dice2 - 1], [[piece3, piece2, piece1], dice2 - 1],
+                            [[piece1, piece2, piece3], dice2], [[piece1, piece3, piece2], dice2],
+                            [[piece2, piece1, piece3], dice2], [[piece2, piece3, piece1], dice2],
+                            [[piece3, piece1, piece2], dice2], [[piece3, piece2, piece1], dice2]]
                 elif dice2 == 1:
-                    return [[[piece1, piece2, piece3], 1], [[piece1, piece3, piece2], 1], [[piece2, piece1, piece3], 1], [[piece2, piece3, piece1], 1], [[piece3, piece1, piece2], 1], [[piece3, piece2, piece1], 1]]
+                    return [[[piece1, piece2, piece3], 1], [[piece1, piece3, piece2], 1],
+                            [[piece2, piece1, piece3], 1], [[piece2, piece3, piece1], 1],
+                            [[piece3, piece1, piece2], 1], [[piece3, piece2, piece1], 1]]
                 else:
-                    return [[[piece1, piece2, piece3], 5], [[piece1, piece3, piece2], 5], [[piece2, piece1, piece3], 5], [[piece2, piece3, piece1], 5], [[piece3, piece1, piece2], 5], [[piece3, piece2, piece1], 5]]
+                    return [[[piece1, piece2, piece3], 5], [[piece1, piece3, piece2], 5],
+                            [[piece2, piece1, piece3], 5], [[piece2, piece3, piece1], 5],
+                            [[piece3, piece1, piece2], 5], [[piece3, piece2, piece1], 5]]
             elif dice1 == 5:
                 piece1 = self.pullPiece()
                 piece2 = self.pullPiece()
                 piece3 = self.pullPiece()
                 if dice2 != 1 and dice2 != 6:
-                    return [[[piece1, piece2, piece3], dice2 - 1], [[piece1, piece3, piece2], dice2 - 1], [[piece2, piece1, piece3], dice2 - 1], [[piece2, piece3, piece1], dice2 - 1], [[piece3, piece1, piece2], dice2 - 1], [[piece3, piece2, piece1], dice2 - 1], [[piece1, piece2, piece3], dice2], [[piece1, piece3, piece2], dice2], [[piece2, piece1, piece3], dice2], [[piece2, piece3, piece1], dice2], [[piece3, piece1, piece2], dice2], [[piece3, piece2, piece1], dice2]]
+                    return [[[piece1, piece2, piece3], dice2 - 1], [[piece1, piece3, piece2], dice2 - 1],
+                            [[piece2, piece1, piece3], dice2 - 1], [[piece2, piece3, piece1], dice2 - 1],
+                            [[piece3, piece1, piece2], dice2 - 1], [[piece3, piece2, piece1], dice2 - 1],
+                            [[piece1, piece2, piece3], dice2], [[piece1, piece3, piece2], dice2],
+                            [[piece2, piece1, piece3], dice2], [[piece2, piece3, piece1], dice2],
+                            [[piece3, piece1, piece2], dice2], [[piece3, piece2, piece1], dice2]]
                 elif dice2 == 1:
-                    return [[[piece1, piece2, piece3], 1], [[piece1, piece3, piece2], 1], [[piece2, piece1, piece3], 1], [[piece2, piece3, piece1], 1], [[piece3, piece1, piece2], 1], [[piece3, piece2, piece1], 1]]
+                    return [[[piece1, piece2, piece3], 1], [[piece1, piece3, piece2], 1],
+                            [[piece2, piece1, piece3], 1], [[piece2, piece3, piece1], 1],
+                            [[piece3, piece1, piece2], 1], [[piece3, piece2, piece1], 1]]
                 else:
-                    return [[[piece1, piece2, piece3], 5], [[piece1, piece3, piece2], 5], [[piece2, piece1, piece3], 5], [[piece2, piece3, piece1], 5], [[piece3, piece1, piece2], 5], [[piece3, piece2, piece1], 5]]
+                    return [[[piece1, piece2, piece3], 5], [[piece1, piece3, piece2], 5],
+                            [[piece2, piece1, piece3], 5], [[piece2, piece3, piece1], 5],
+                            [[piece3, piece1, piece2], 5], [[piece3, piece2, piece1], 5]]
             elif dice1 == 6:
                 piece1 = self.pullPiece()
                 piece2 = self.pullPiece()
                 piece3 = self.pullPiece()
+
                 if dice2 != 1 and dice2 < 5:
-                    return [[[piece1, piece2, piece3], dice2 - 1], [[piece1, piece3, piece2], dice2 - 1], [[piece2, piece1, piece3], dice2 - 1], [[piece2, piece3, piece1], dice2 - 1], [[piece3, piece1, piece2], dice2 - 1], [[piece3, piece2, piece1], dice2 - 1], [[piece1, piece2, piece3], dice2], [[piece1, piece3, piece2], dice2], [[piece2, piece1, piece3], dice2], [[piece2, piece3, piece1], dice2], [[piece3, piece1, piece2], dice2], [[piece3, piece2, piece1], dice2]]
+                    return [[[piece1, piece2, piece3], dice2 - 1], [[piece1, piece3, piece2], dice2 - 1],
+                            [[piece2, piece1, piece3], dice2 - 1], [[piece2, piece3, piece1], dice2 - 1],
+                            [[piece3, piece1, piece2], dice2 - 1], [[piece3, piece2, piece1], dice2 - 1],
+                            [[piece1, piece2, piece3], dice2], [[piece1, piece3, piece2], dice2],
+                            [[piece2, piece1, piece3], dice2], [[piece2, piece3, piece1], dice2],
+                            [[piece3, piece1, piece2], dice2], [[piece3, piece2, piece1], dice2]]
                 elif dice2 == 1:
-                    return [[[piece1, piece2, piece3], 1], [[piece1, piece3, piece2], 1], [[piece2, piece1, piece3], 1], [[piece2, piece3, piece1], 1], [[piece3, piece1, piece2], 1], [[piece3, piece2, piece1], 1]]
+                    return [[[piece1, piece2, piece3], 1], [[piece1, piece3, piece2], 1],
+                            [[piece2, piece1, piece3], 1], [[piece2, piece3, piece1], 1],
+                            [[piece3, piece1, piece2], 1], [[piece3, piece2, piece1], 1]]
                 else:
-                    return [[[piece1, piece2, piece3], 4], [[piece1, piece3, piece2], 4], [[piece2, piece1, piece3], 4], [[piece2, piece3, piece1], 4], [[piece3, piece1, piece2], 4], [[piece3, piece2, piece1], 4]]
+                    return [[[piece1, piece2, piece3], 4], [[piece1, piece3, piece2], 4],
+                            [[piece2, piece1, piece3], 4], [[piece2, piece3, piece1], 4],
+                            [[piece3, piece1, piece2], 4], [[piece3, piece2, piece1], 4]]
         elif self.wave == 2:
             if dice1 == 1:
                 piece1 = self.pullPiece()
                 piece2 = self.pullPiece()
+                
                 if dice2 != 1 and dice2 != 6:
-                    return [[[piece1, piece2], dice2 - 1], [[piece2, piece1], dice2 - 1], [[piece1, piece2], dice2], [[piece2, piece1], dice2]]
+                    return [[[piece1, piece2], dice2 - 1], [[piece2, piece1], dice2 - 1],
+                            [[piece1, piece2], dice2], [[piece2, piece1], dice2]]
                 elif dice2 == 1:
                     return [[[piece1, piece2], 1], [[piece2, piece1], 1]]
                 else:
@@ -743,6 +772,7 @@ class GameState(Game):
             elif dice1 == 2:
                 piece1 = self.pullPiece()
                 piece2 = self.pullPiece()
+                
                 if dice2 != 1 and dice2 != 6:
                     return [[[piece1, piece2], dice2 - 1], [[piece2, piece1], dice2 - 1]]
                 elif dice2 == 1:
@@ -752,8 +782,10 @@ class GameState(Game):
             elif dice1 == 3:
                 piece1 = self.pullPiece()
                 piece2 = self.pullPiece()
+                
                 if dice2 != 1 and dice2 != 6:
-                    return [[[piece1, piece2], dice2 - 1], [[piece2, piece1], dice2 - 1], [[piece1, piece2], dice2], [[piece2, piece1], dice2]]
+                    return [[[piece1, piece2], dice2 - 1], [[piece2, piece1], dice2 - 1],
+                            [[piece1, piece2], dice2], [[piece2, piece1], dice2]]
                 elif dice2 == 1:
                     return [[[piece1, piece2], 1], [[piece2, piece1], 1]]
                 else:
@@ -762,32 +794,62 @@ class GameState(Game):
                 piece1 = self.pullPiece()
                 piece2 = self.pullPiece()
                 piece3 = self.pullPiece()
+                
                 if dice2 != 1 and dice2 < 5:
-                    return [[[piece1, piece2, piece3], dice2 - 1], [[piece1, piece3, piece2], dice2 - 1], [[piece2, piece1, piece3], dice2 - 1], [[piece2, piece3, piece1], dice2 - 1], [[piece3, piece1, piece2], dice2 - 1], [[piece3, piece2, piece1], dice2 - 1], [[piece1, piece2, piece3], dice2], [[piece1, piece3, piece2], dice2], [[piece2, piece1, piece3], dice2], [[piece2, piece3, piece1], dice2], [[piece3, piece1, piece2], dice2], [[piece3, piece2, piece1], dice2]]
+                    return [[[piece1, piece2, piece3], dice2 - 1], [[piece1, piece3, piece2], dice2 - 1],
+                            [[piece2, piece1, piece3], dice2 - 1], [[piece2, piece3, piece1], dice2 - 1],
+                            [[piece3, piece1, piece2], dice2 - 1], [[piece3, piece2, piece1], dice2 - 1],
+                            [[piece1, piece2, piece3], dice2], [[piece1, piece3, piece2], dice2],
+                            [[piece2, piece1, piece3], dice2], [[piece2, piece3, piece1], dice2],
+                            [[piece3, piece1, piece2], dice2], [[piece3, piece2, piece1], dice2]]
                 elif dice2 == 1:
-                    return [[[piece1, piece2, piece3], 1], [[piece1, piece3, piece2], 1], [[piece2, piece1, piece3], 1], [[piece2, piece3, piece1], 1], [[piece3, piece1, piece2], 1], [[piece3, piece2, piece1], 1]]
+                    return [[[piece1, piece2, piece3], 1], [[piece1, piece3, piece2], 1],
+                            [[piece2, piece1, piece3], 1], [[piece2, piece3, piece1], 1],
+                            [[piece3, piece1, piece2], 1], [[piece3, piece2, piece1], 1]]
                 else:
-                    return [[[piece1, piece2, piece3], 4], [[piece1, piece3, piece2], 4], [[piece2, piece1, piece3], 4], [[piece2, piece3, piece1], 4], [[piece3, piece1, piece2], 4], [[piece3, piece2, piece1], 4]]
+                    return [[[piece1, piece2, piece3], 4], [[piece1, piece3, piece2], 4],
+                            [[piece2, piece1, piece3], 4], [[piece2, piece3, piece1], 4],
+                            [[piece3, piece1, piece2], 4], [[piece3, piece2, piece1], 4]]
             elif dice1 == 5:
                 piece1 = self.pullPiece()
                 piece2 = self.pullPiece()
                 piece3 = self.pullPiece()
+                
                 if dice2 != 1 and dice2 < 5:
-                    return [[[piece1, piece2, piece3], dice2 - 1], [[piece1, piece3, piece2], dice2 - 1], [[piece2, piece1, piece3], dice2 - 1], [[piece2, piece3, piece1], dice2 - 1], [[piece3, piece1, piece2], dice2 - 1], [[piece3, piece2, piece1], dice2 - 1], [[piece1, piece2, piece3], dice2], [[piece1, piece3, piece2], dice2], [[piece2, piece1, piece3], dice2], [[piece2, piece3, piece1], dice2], [[piece3, piece1, piece2], dice2], [[piece3, piece2, piece1], dice2]]
+                    return [[[piece1, piece2, piece3], dice2 - 1], [[piece1, piece3, piece2], dice2 - 1],
+                            [[piece2, piece1, piece3], dice2 - 1], [[piece2, piece3, piece1], dice2 - 1],
+                            [[piece3, piece1, piece2], dice2 - 1], [[piece3, piece2, piece1], dice2 - 1],
+                            [[piece1, piece2, piece3], dice2], [[piece1, piece3, piece2], dice2],
+                            [[piece2, piece1, piece3], dice2], [[piece2, piece3, piece1], dice2],
+                            [[piece3, piece1, piece2], dice2], [[piece3, piece2, piece1], dice2]]
                 elif dice2 == 1:
-                    return [[[piece1, piece2, piece3], 1], [[piece1, piece3, piece2], 1], [[piece2, piece1, piece3], 1], [[piece2, piece3, piece1], 1], [[piece3, piece1, piece2], 1], [[piece3, piece2, piece1], 1]]
+                    return [[[piece1, piece2, piece3], 1], [[piece1, piece3, piece2], 1],
+                            [[piece2, piece1, piece3], 1], [[piece2, piece3, piece1], 1],
+                            [[piece3, piece1, piece2], 1], [[piece3, piece2, piece1], 1]]
                 else:
-                    return [[[piece1, piece2, piece3], 4], [[piece1, piece3, piece2], 4], [[piece2, piece1, piece3], 4], [[piece2, piece3, piece1], 4], [[piece3, piece1, piece2], 4], [[piece3, piece2, piece1], 4]]
+                    return [[[piece1, piece2, piece3], 4], [[piece1, piece3, piece2], 4],
+                            [[piece2, piece1, piece3], 4], [[piece2, piece3, piece1], 4],
+                            [[piece3, piece1, piece2], 4], [[piece3, piece2, piece1], 4]]
             elif dice1 == 6:
                 piece1 = self.pullPiece()
                 piece2 = self.pullPiece()
                 piece3 = self.pullPiece()
+                
                 if dice2 != 1 and dice2 < 5:
-                    return [[[piece1, piece2, piece3], dice2 - 1], [[piece1, piece3, piece2], dice2 - 1], [[piece2, piece1, piece3], dice2 - 1], [[piece2, piece3, piece1], dice2 - 1], [[piece3, piece1, piece2], dice2 - 1], [[piece3, piece2, piece1], dice2 - 1], [[piece1, piece2, piece3], dice2], [[piece1, piece3, piece2], dice2], [[piece2, piece1, piece3], dice2], [[piece2, piece3, piece1], dice2], [[piece3, piece1, piece2], dice2], [[piece3, piece2, piece1], dice2]]
+                    return [[[piece1, piece2, piece3], dice2 - 1], [[piece1, piece3, piece2], dice2 - 1],
+                            [[piece2, piece1, piece3], dice2 - 1], [[piece2, piece3, piece1], dice2 - 1],
+                            [[piece3, piece1, piece2], dice2 - 1], [[piece3, piece2, piece1], dice2 - 1],
+                            [[piece1, piece2, piece3], dice2], [[piece1, piece3, piece2], dice2],
+                            [[piece2, piece1, piece3], dice2], [[piece2, piece3, piece1], dice2],
+                            [[piece3, piece1, piece2], dice2], [[piece3, piece2, piece1], dice2]]
                 elif dice2 == 1:
-                    return [[[piece1, piece2, piece3], 1], [[piece1, piece3, piece2], 1], [[piece2, piece1, piece3], 1], [[piece2, piece3, piece1], 1], [[piece3, piece1, piece2], 1], [[piece3, piece2, piece1], 1]]
+                    return [[[piece1, piece2, piece3], 1], [[piece1, piece3, piece2], 1],
+                            [[piece2, piece1, piece3], 1], [[piece2, piece3, piece1], 1],
+                            [[piece3, piece1, piece2], 1], [[piece3, piece2, piece1], 1]]
                 else:
-                    return [[[piece1, piece2, piece3], 4], [[piece1, piece3, piece2], 4], [[piece2, piece1, piece3], 4], [[piece2, piece3, piece1], 4], [[piece3, piece1, piece2], 4], [[piece3, piece2, piece1], 4]]
+                    return [[[piece1, piece2, piece3], 4], [[piece1, piece3, piece2], 4],
+                            [[piece2, piece1, piece3], 4], [[piece2, piece3, piece1], 4],
+                            [[piece3, piece1, piece2], 4], [[piece3, piece2, piece1], 4]]
 
     def possible_moves_3(self):
         moves = []
@@ -811,6 +873,23 @@ class GameState(Game):
         return pump
 
     def possible_actions(self):
+        """Returns list of all possible actions one could take in any phase.
+        """
+        phase1 = GameState(phase=1)
+        phase2 = GameState(phase=2)
+        phase3 = GameState(phase=3)
+        phase4 = GameState(phase=4)
+
+        phase2Acts = phase2.legal_actions()
+        phase3Acts = phase3.legal_actions()
+        phase4Acts = phase4.legal_actions()
+
+        return phase2Acts + phase3Acts + phase4Acts
+
+
+    def legal_actions(self):
+        """Returns list of legal actions that agent can take in current state.
+        """
         if self.phase == 2:
             self.diceRoll()
             return self.possible_moves_2(self.dice1, self.dice2)
@@ -822,9 +901,7 @@ class GameState(Game):
             return []
 
     def random_policy(self):
-        actions = self.possible_actions()
-        #print(self.phase)
-        #print(" ")
+        actions = self.legal_actions()
         return random.choice(actions)
 
     def human_player(self):
@@ -850,37 +927,34 @@ class GameState(Game):
         rewardsGained = [] # Sequence of rewards obtained during a game
         print("The game has started")
         print(self.board)
+
         while not self.isWinState() and not self.isLoseState():
             if self.phase == 1:
                 self.descend() # phase 1
-            
             elif self.phase == 2:
                 self.diceRoll() # roll dice for phase 2
                 mymove2 = strategy() #select move in possible moves
                 self.phase_two(self.dice1, mymove2)
-                self.waveTransition()
                 actionsTaken.append(mymove2)
-            
             elif self.phase == 3:
                 mymove3 = strategy() #select move for phase 3
                 prevScore = self.score
                 self.move_and_shoot(mymove3) #execute phase 3
                 actionsTaken.append(mymove3)
                 rewardsGained.append(self.score - prevScore)
-            
             elif self.phase == 4:
                 mymove4 = strategy()
                 prevScore = self.score
                 self.phase_four(mymove4)
-                self.waveTransition()
                 actionsTaken.append(mymove4)
                 rewardsGained.append(self.score - prevScore)
             print("Current phase:", self.phase)
             print("The current state is:")
             print(self.board)
-            statesVisited.append(self.copy())
+            statesVisited.append(deepcopy(self))
             self.phase = (self.phase % 4) + 1
-        return (statesVisited, actionsTaken, rewardsGained, not self.isLoseState())
+
+        return (statesVisited, actionsTaken, rewardsGained)
 
 
     ########################################

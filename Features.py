@@ -32,9 +32,10 @@ class Features:
         """
         total_wins = 0
         for target in self.results:
-            if target[3] == True:
+            states = target[0]
+            if states[-1].isWinState():
                 total_wins = total_wins + 1
-        return total_wins / len(self.results)
+        return float(total_wins) / float(len(self.results))
 
 
     def loseToFinal(self):
@@ -43,9 +44,10 @@ class Features:
         """
         total_loses = 0
         for target in self.results:
-            if target[3] == False:
+            states = target[0]
+            if states[-1].isLoseState():
                 total_loses = total_loses + 1
-        return total_loses / len(self.results)
+        return float(total_loses) / float(len(self.results))
 
     def movesToFinal(self):
         """
@@ -54,7 +56,7 @@ class Features:
         total_acts = 0
         for target in self.results:
             total_acts = total_acts + len(target[1])
-        return total_acts / len(self.results)
+        return float(total_acts) / (len(self.results))
 
 
     "Takes in the current game state and returns a randomly selected move"
@@ -84,6 +86,35 @@ class Features:
             self.results.append(self.currentGame.play(policy))
         return self.results
 
-# if __name__ == '__main__':
-#     jzinst = Features(jz.GameState)
-#     jzinst.generateGames(jzinst.random_policy, 2)
+    def clearResults(self):
+        """
+        Deletes results from generated games by replacing self.results with empty list.
+        """
+        yesSet = {"Y", "y", "yes", "Yes"}
+        userConfirm = raw_input("Are you sure you want to clear the results? Y/N")
+        if userConfirm in yesSet:
+            self.results = []
+            print("Results cleared.")
+        else:
+            print("Results not cleared.")
+
+    def generateFeatures(self, fileName):
+        """
+        Calls all feature methods and writes results to text file.
+        """
+        toWrite = open(fileName, "w")
+        #toWrite.write("Entropy " + self.entropy())
+        toWrite.write("possibleActions " + str(self.possibleActions()) + "\n")
+        toWrite.write("winToFinal " + str(self.winToFinal()) + "\n")
+        toWrite.write("loseToFinal " + str(self.loseToFinal()) + "\n")
+        toWrite.write("movesToFinal " + str(self.movesToFinal()) + "\n")
+        toWrite.close()
+
+
+if __name__ == '__main__':
+    # psinst = Features(ps.PegSolitaire)
+    # psinst.generateGames(ps.random_policy, 10)
+    # psinst.generateFeatures("ps1")
+    # jzinst = Features(jz.GameState)
+    # jzinst.generateGames(jzinst.random_policy, 1000)
+    # jzinst.generateFeatures("jz1")
