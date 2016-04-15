@@ -94,27 +94,27 @@ def play(strategy=human_player):
 	print("The game has begun. The current board state is ")
 	print(board)
 	while not check_win(board):
-		cur_state = board2state(board)
+		cur_state = board2state(ps.board)
 		statesVisited.append(cur_state)
-		moves = legal_actions(board)
+		moves = legal_actions(ps.board)
 		move = strategy(ps.board)
 		actionsTaken.append(move)
 		if move not in moves:
 			break
 		row, column, direction = move[0], move[1], move[2]
-		board = take_action(board, row, column, direction)
+		ps.board = take_action(ps.board, row, column, direction)
 		reward = 0
 		rewardsGained.append(reward)
 		print("The turn has ended. The current board state is ")
 		print(board)
-	if check_win(board):
+	if check_win(ps.board):
 		print('The player has won the game!')
 		reward = 1
 	else:
 		print('An illegal move was made. The player has lost the game.')
 		reward = -1
 	rewardsGained.append(reward)
-	return (statesVisited, actionsTaken, rewardsGained, check_win(board))
+	return (statesVisited, actionsTaken, rewardsGained, check_win(ps.board))
 	
 def best_policy(board):
    actions = legal_actions(board)
@@ -138,8 +138,8 @@ def random_policy(board):
 
 class PegSolitaire(Game):
 
-	def __init__(self, board=create_board()):
-		self.board = board
+	def __init__(self):
+		self.board = create_board()
 
 	def possible_actions(self):
 		return possible_actions(self.board)
