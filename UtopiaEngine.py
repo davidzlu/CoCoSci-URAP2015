@@ -111,4 +111,7 @@ class GameBoard:
 				return enemy.area.treasure
 			else:
 				return enemy.area.component
+	def rest(self):
+		self.day = self.day + 1
+		self.hit = self.hit + 1
 
