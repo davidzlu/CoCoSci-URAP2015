@@ -232,7 +232,7 @@ class GameState(Game):
         return self.wave == 2 and self.pumpkinCount() > 0 and self.piecesLeft == 0 and self.enemyOnBoard()
 
     def isLoseState(self):
-        return self.pumpkinCount() <= 0 #For some reason pumpCount too low
+        return self.pumpkinCount() <= 0 
 
     def phase_two(self, dice1, my_move):
         if self.wave == 1:
@@ -294,16 +294,8 @@ class GameState(Game):
             token_two_ahead = self.board[token[0] + 2, token[1]]
             if (token_one_ahead != 0) and (token_one_ahead != 6) and (token_one_ahead != 3) and (token[0] + 1 != 10):
                 self.move((token[0] + 1, token[1], token_one_ahead))
-                if token_one_ahead > 7:
-                    token_one_ahead = 3
-                else:
-                    token_one_ahead = 0
             elif (token_one_ahead == 0) and (token_two_ahead != 0) and (token_two_ahead != 6) and (token_two_ahead != 3):
                 self.move((token[0] + 2, token[1], token_two_ahead))
-                if token_two_ahead > 7:
-                    token_two_ahead = 3
-                else:
-                    token_two_ahead = 0
             token_one_ahead = self.board[token[0] + 1, token[1]]
             token_two_ahead = self.board[token[0] + 2, token[1]]        
             if token_one_ahead == 0 and token_two_ahead == 0 and (token[2] < 6 and token[2] != 3): #move two spaces
@@ -313,9 +305,16 @@ class GameState(Game):
                 token_one_ahead = self.board[token[0] + 1, token[1]]
                 if token[2] == 4 and token_one_ahead == 6:
                     self.explode(token)
+                elif token[2] == 4 and token[0] == 9:
+                    self.explode(token)
             elif (token_one_ahead == 3 or token_one_ahead > 7) and token[2] == 2: #flaming zombies come thru
-                self.burn(token)
-                self.move(token)
+                self.burn((new_row1, token[1], token[2]))
+                self.board[new_row1, token[1]] = token[2]
+                self.board[old_pos] = 0
+            elif (token_one_ahead == 0) and (token_two_ahead == 3) and (token[2] == 2):
+                self.burn((new_row2, token[1], token[2]))
+                self.board[new_row2, token[1]] = token[2]
+                self.board[old_pos] = 0
             elif token_one_ahead == 3 and token[2] != 2: #move into a flower bed
                 self.board[new_row1, col] = token[2] + 7
                 if self.board[old_pos] > 7: #incase last position was in a flower bed
@@ -337,11 +336,19 @@ class GameState(Game):
             else:
                 pass
         elif (new_row1 < 10): #token reaches magical barrier
+            token_one_ahead = self.board[token[0] + 1, token[1]]
+            token_two_ahead = self.board[token[0] + 2, token[1]]
+            if (token_one_ahead != 0) and (token_one_ahead != 6) and (token_one_ahead != 3) and (token[0] + 1 != 10):
+                self.move((token[0] + 1, token[1], token_one_ahead))
+                if token_one_ahead > 7:
+                    token_one_ahead = 3
+                else:
+                    token_one_ahead = 0
             if token[2] == 4 or token[2] == 11:
                 token = (new_row1, col, token[2])
                 self.board[old_pos] = 0
                 self.explode(token)
-            elif token[2] == 5 or token[2] == 12: #multiplier disappears
+            elif (token[2] == 5 or token[2] == 12) and token_one_ahead == 0: #multiplier disappears
                 if token[2] == 12:
                     self.board[old_pos] = 3
                 else:
@@ -376,10 +383,26 @@ class GameState(Game):
             direction = self.nearest_pumpkin(token)
             #Then move
             if (direction == 'left'):
-                if self.board[9, one_left] == 3:
+                token_one_left = self.board[9, one_left]
+                dir_one_left = self.nearest_pumpkin((9, one_left, token_one_left))
+                token_two_left = self.board[9, two_left]
+                dir_two_left = self.nearest_pumpkin((9, two_left, token_two_left))
+                if token_one_left != 0 or token_one_left != 6 or token_one_left != 3:
+                    if dir_one_left == 'left':
+                        self.move((9, one_left, token_one_left))
+                elif token_two_left != 0 or token_two_left != 6 or token_two_left != 3:
+                    if dir_two_left == 'left':
+                        self.move((9, two_left, token_two_left))
+                token_one_left = self.board[9, one_left]
+                token_two_left = self.board[9, two_left]
+                if token_one_left == 3:
                     if token[2] == 2:
                         self.burn((token[0], one_left, 2))
-                        self.move(token)
+                        if self.board[9, two_left] == 0:
+                            self.board[9, two_left] = 2
+                        else:
+                            self.board[9, one_left] = 2
+                        self.board[old_pos] = 0
                     else:
                         self.board[9, one_left] = 8
                         if token[2] == 8:
@@ -403,10 +426,26 @@ class GameState(Game):
                 else:
                     pass
             elif (direction == 'right'):
+                token_one_right = self.board[9, one_right]
+                dir_one_right = self.nearest_pumpkin((9, one_right, token_one_right))
+                token_two_right = self.board[9, two_right]
+                dif_two_right = self.nearest_pumpkin((9, two_right, token_two_right))
+                if token_one_right != 0 or token_one_right != 6 or token_one_right != 3:
+                    if dir_one_right == 'right':
+                        self.move((9, one_right, token_one_right))
+                elif token_two_right != 0 or token_two_right != 6 or token_two_right != 3:
+                    if dif_two_right == 'right':
+                        self.move((9, two_right, token_two_right))
+                token_one_right = self.board[9, one_right]
+                token_two_right = self.board[9, two_right]
                 if self.board[9, one_right] == 3:
                     if token[2] == 2:
                         self.burn((token[0], one_right, 2))
-                        self.move(token)
+                        if self.board[9, two_right] == 0:
+                            self.board[9, two_right] = 2
+                        else:
+                            self.board[9, one_right] = 2
+                        self.board[old_pos] = 0
                     else:
                         self.board[9, one_right] = 8
                         if token[2] == 8:
@@ -431,8 +470,6 @@ class GameState(Game):
                     pass
             else: #don't move!
                 pass
-        else:
-            raise Exception('Whoops, something went wrong.')
 
     """Phase 1 of the game"""
     def descend(self):
@@ -603,7 +640,7 @@ class GameState(Game):
             for index in range(0, 4):
                 row = 9 - index
                 token_type = self.board[row][my_move_3[1]]
-                if token_type == 1 or token_type == 2 or token_type == 4 or token_type == 5 or token_type == 8 or token_type == 11 or token_type == 12:
+                if token_type == 1 or token_type == 2 or token_type == 4 or token_type == 5 or token_type > 7:
                     token = (row, my_move_3[1], token_type)
                     self.flower(token)
                     break
@@ -611,7 +648,7 @@ class GameState(Game):
             for index in range(0, 4):
                 row = 9 - index
                 token_type = self.board[row][my_move_3[1]]
-                if token_type == 3 or token_type == 8 or token_type == 11 or token_type == 12:
+                if token_type == 3 or token_type > 7:
                     token = (row, my_move_3[1], token_type)
                     self.score = self.fire(token)[0] * (2 ** self.fire(token)[1]) + self.score
                     break
@@ -843,7 +880,7 @@ class GameState(Game):
             print(self.board)
             statesVisited.append(self.copy())
             self.phase = (self.phase % 4) + 1
-        return (statesVisited, actionsTaken, rewardsGained)
+        return (statesVisited, actionsTaken, rewardsGained, not self.isLoseState())
 
 
     ########################################
@@ -873,7 +910,6 @@ class GameState(Game):
 if __name__ == '__main__':
     gs = GameState()
     print(gs.play(gs.random_policy))
-    
 
 
 # class JandZ:

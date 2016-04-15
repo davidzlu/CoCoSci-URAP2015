@@ -77,6 +77,7 @@ class Features:
           2) List of rewards received
 		Repeats this process n times, returning a list of each simulation's result.
         """
+        self.results = []
         for i in range(n):
             gameStart = self.game()
             self.currentGame = gameStart
