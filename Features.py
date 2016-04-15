@@ -32,9 +32,10 @@ class Features:
         """
         total_wins = 0
         for target in self.results:
-            if target[0][-1].isWinState():
+            states = target[0]
+            if states[-1].isWinState():
                 total_wins = total_wins + 1
-        return total_wins / len(self.results)
+        return float(total_wins) / float(len(self.results))
 
 
     def loseToFinal(self):
@@ -43,9 +44,10 @@ class Features:
         """
         total_loses = 0
         for target in self.results:
-            if target[0][-1].isLoseState():
+            states = target[0]
+            if states[-1].isLoseState():
                 total_loses = total_loses + 1
-        return total_loses / len(self.results)
+        return float(total_loses) / float(len(self.results))
 
     def movesToFinal(self):
         """
@@ -54,7 +56,7 @@ class Features:
         total_acts = 0
         for target in self.results:
             total_acts = total_acts + len(target[1])
-        return total_acts / len(self.results)
+        return float(total_acts) / (len(self.results))
 
 
     "Takes in the current game state and returns a randomly selected move"
@@ -113,6 +115,6 @@ if __name__ == '__main__':
     # psinst = Features(ps.PegSolitaire)
     # psinst.generateGames(ps.random_policy, 10)
     # psinst.generateFeatures("ps1")
-    jzinst = Features(jz.GameState)
-    jzinst.generateGames(jzinst.random_policy, 10)
-    jzinst.generateFeatures("jz1")
+    # jzinst = Features(jz.GameState)
+    # jzinst.generateGames(jzinst.random_policy, 1000)
+    # jzinst.generateFeatures("jz1")

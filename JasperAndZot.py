@@ -97,11 +97,6 @@ class GameState(Game):
                 self.score += 100 # Reward for winning game = 100
                 return 100
         return 0
-
-    def copy(self):
-        """Returns a new state with same instance variables as self.
-        """
-        return GameState(self.board, self.zombieCount, self.fZombieCount, self.bombCount, self.multCount, self.pumpCount, self.wave, self.phase)
         
     def transition_prob_matrix(self, curState, action, nextState):
         """Returns transition probability given (s, a, s') if it exists in
@@ -233,9 +228,6 @@ class GameState(Game):
             """
             zCount, fZCount, bCount, mCount, pCount = self.count_pieces()
             return zCount > 0 or fZCount > 0 or bCount > 0 or mCount > 0
-
-        print "Pieces left: ", self.piecesLeft()
-        print "Enemy on board: ", enemyOnBoard()
         return self.wave == 2 and self.pumpkinCount() > 0 and self.piecesLeft() == 0 and enemyOnBoard()
 
     def isLoseState(self):
@@ -881,6 +873,23 @@ class GameState(Game):
         return pump
 
     def possible_actions(self):
+        """Returns list of all possible actions one could take in any phase.
+        """
+        phase1 = GameState(phase=1)
+        phase2 = GameState(phase=2)
+        phase3 = GameState(phase=3)
+        phase4 = GameState(phase=4)
+
+        phase2Acts = phase2.legal_actions()
+        phase3Acts = phase3.legal_actions()
+        phase4Acts = phase4.legal_actions()
+
+        return phase2Acts + phase3Acts + phase4Acts
+
+
+    def legal_actions(self):
+        """Returns list of legal actions that agent can take in current state.
+        """
         if self.phase == 2:
             self.diceRoll()
             return self.possible_moves_2(self.dice1, self.dice2)
@@ -892,7 +901,7 @@ class GameState(Game):
             return []
 
     def random_policy(self):
-        actions = self.possible_actions()
+        actions = self.legal_actions()
         return random.choice(actions)
 
     def human_player(self):
@@ -920,7 +929,6 @@ class GameState(Game):
         print(self.board)
 
         while not self.isWinState() and not self.isLoseState():
-            
             if self.phase == 1:
                 self.descend() # phase 1
             elif self.phase == 2:
@@ -943,10 +951,10 @@ class GameState(Game):
             print("Current phase:", self.phase)
             print("The current state is:")
             print(self.board)
-            statesVisited.append(self.copy())
+            statesVisited.append(deepcopy(self))
             self.phase = (self.phase % 4) + 1
 
-        return (statesVisited, actionsTaken, rewardsGained, not self.isLoseState())
+        return (statesVisited, actionsTaken, rewardsGained)
 
 
     ########################################
