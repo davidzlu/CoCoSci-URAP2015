@@ -32,7 +32,7 @@ class Features:
         """
         total_wins = 0
         for target in self.results:
-            if target[3] == True:
+            if target[0][-1].isWinState():
                 total_wins = total_wins + 1
         return total_wins / len(self.results)
 
@@ -43,7 +43,7 @@ class Features:
         """
         total_loses = 0
         for target in self.results:
-            if target[3] == False:
+            if target[0][-1].isLoseState():
                 total_loses = total_loses + 1
         return total_loses / len(self.results)
 
@@ -83,6 +83,35 @@ class Features:
             self.results.append(self.currentGame.play(policy))
         return self.results
 
-#if __name__ == '__main__':
-    # jzinst = Features(jz.GameState)
-    # jzinst.generateGames(jzinst.random_policy, 2)
+    def clearResults(self):
+        """
+        Deletes results from generated games by replacing self.results with empty list.
+        """
+        yesSet = {"Y", "y", "yes", "Yes"}
+        userConfirm = raw_input("Are you sure you want to clear the results? Y/N")
+        if userConfirm in yesSet:
+            self.results = []
+            print("Results cleared.")
+        else:
+            print("Results not cleared.")
+
+    def generateFeatures(self, fileName):
+        """
+        Calls all feature methods and writes results to text file.
+        """
+        toWrite = open(fileName, "w")
+        #toWrite.write("Entropy " + self.entropy())
+        toWrite.write("possibleActions " + str(self.possibleActions()) + "\n")
+        toWrite.write("winToFinal " + str(self.winToFinal()) + "\n")
+        toWrite.write("loseToFinal " + str(self.loseToFinal()) + "\n")
+        toWrite.write("movesToFinal " + str(self.movesToFinal()) + "\n")
+        toWrite.close()
+
+
+if __name__ == '__main__':
+    # psinst = Features(ps.PegSolitaire)
+    # psinst.generateGames(ps.random_policy, 10)
+    # psinst.generateFeatures("ps1")
+    jzinst = Features(jz.GameState)
+    jzinst.generateGames(jzinst.random_policy, 10)
+    jzinst.generateFeatures("jz1")

@@ -178,8 +178,9 @@ class GameState(Game):
         a certain piece. Also accounts for wave transition when out of pieces.
         """
         totalLeft = self.piecesLeft()
+        self.waveTransition()
         if totalLeft == 0:
-            return self.waveTransition()
+            return 0
         zombieRange = self.zombieCount/totalLeft
         fZombieRange = (self.zombieCount+self.fZombieCount)/totalLeft
         bombRange = (self.zombieCount+self.fZombieCount+self.bombCount)/totalLeft
@@ -209,16 +210,6 @@ class GameState(Game):
             self.pumpCount = 6-pCount
             self.wave = 2
             return self.pullPiece()
-        elif self.wave == 1 and self.piecesLeft() > 0:
-            self.wave = 1
-        elif self.wave == 2 and self.piecesLeft() == 0:
-            if self.isWinState():
-                # Take care of win transition
-                return 0
-            elif self.isLoseState():
-                # Take care of lose transition
-                return 0
-            return 1
         return 0
 
     def pumpkinCount(self):
@@ -267,6 +258,9 @@ class GameState(Game):
                 self.board[0][my_move[1] + 1] = my_move[0][2]
         elif self.wave == 2:
             if dice1 == 1:
+                print my_move
+                print dice1
+                print self.piecesLeft()
                 self.board[0][my_move[1] - 1] = my_move[0][0]
                 self.board[1][my_move[1]] = my_move[0][1]
             elif dice1 == 2:
@@ -646,6 +640,7 @@ class GameState(Game):
 
     def possible_moves_2(self, dice1, dice2):
         """takes in state and two dices, return all possible moves"""
+        print "Wave",self.wave
         if self.wave == 1:
             if dice1 == 1:
                 return [[[self.pullPiece()], dice2 - 1]]
@@ -694,15 +689,18 @@ class GameState(Game):
                 else:
                     return [[[piece1, piece2, piece3], 4], [[piece1, piece3, piece2], 4], [[piece2, piece1, piece3], 4], [[piece2, piece3, piece1], 4], [[piece3, piece1, piece2], 4], [[piece3, piece2, piece1], 4]]
         elif self.wave == 2:
+            print "HERR"
             if dice1 == 1:
                 piece1 = self.pullPiece()
                 piece2 = self.pullPiece()
+                print piece1
+                print piece2
                 if dice2 != 1 and dice2 != 6:
-                    return [[[piece1, piece2], dice2 - 1], [[piece2, piece1], dice2 - 1], [[piece1, piece2], dice2], [[piece2, piece1], dice2]]
+                    return [ [[piece1, piece2], dice2 - 1], [[piece2, piece1], dice2 - 1], [[piece1, piece2], dice2], [[piece2, piece1], dice2] ]
                 elif dice2 == 1:
-                    return [[[piece1, piece2], 1], [[piece2, piece1], 1]]
+                    return [ [[piece1, piece2], 1], [[piece2, piece1], 1] ]
                 else:
-                    return [[[piece1, piece2], 5], [[piece2, piece1], 5]]
+                    return [ [[piece1, piece2], 5], [[piece2, piece1], 5] ]
             elif dice1 == 2:
                 piece1 = self.pullPiece()
                 piece2 = self.pullPiece()
@@ -725,6 +723,7 @@ class GameState(Game):
                 piece1 = self.pullPiece()
                 piece2 = self.pullPiece()
                 piece3 = self.pullPiece()
+                print "dice2:", dice2
                 if dice2 != 1 and dice2 < 5:
                     return [[[piece1, piece2, piece3], dice2 - 1], [[piece1, piece3, piece2], dice2 - 1], [[piece2, piece1, piece3], dice2 - 1], [[piece2, piece3, piece1], dice2 - 1], [[piece3, piece1, piece2], dice2 - 1], [[piece3, piece2, piece1], dice2 - 1], [[piece1, piece2, piece3], dice2], [[piece1, piece3, piece2], dice2], [[piece2, piece1, piece3], dice2], [[piece2, piece3, piece1], dice2], [[piece3, piece1, piece2], dice2], [[piece3, piece2, piece1], dice2]]
                 elif dice2 == 1:
@@ -820,6 +819,7 @@ class GameState(Game):
             elif self.phase == 2:
                 self.diceRoll() # roll dice for phase 2
                 mymove2 = strategy() #select move in possible moves
+                print
                 self.phase_two(self.dice1, mymove2)
                 self.waveTransition()
                 actionsTaken.append(mymove2)
