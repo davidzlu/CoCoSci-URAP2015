@@ -94,9 +94,9 @@ def play(strategy=human_player):
 	print("The game has begun. The current board state is ")
 	print(board)
 	while not check_win(board):
-		cur_state = board2state(ps.board)
+		cur_state = board2state(board)
 		statesVisited.append(cur_state)
-		moves = legal_actions(ps.board)
+		moves = legal_actions(board)
 		move = strategy(ps.board)
 		actionsTaken.append(move)
 		if move not in moves:
@@ -107,7 +107,7 @@ def play(strategy=human_player):
 		rewardsGained.append(reward)
 		print("The turn has ended. The current board state is ")
 		print(board)
-	if check_win(ps.board):
+	if check_win(board):
 		print('The player has won the game!')
 		reward = 1
 	else:
