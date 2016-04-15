@@ -319,6 +319,8 @@ class GameState(Game):
                 token_one_ahead = self.board[token[0] + 1, token[1]]
                 if token[2] == 4 and token_one_ahead == 6:
                     self.explode(token)
+                elif token[2] == 4 and token[0] == 9:
+                    self.explode(token)
             elif (token_one_ahead == 3 or token_one_ahead > 7) and token[2] == 2: #flaming zombies come thru
                 self.burn((new_row1, token[1], token[2]))
                 self.move(token)
@@ -396,7 +398,11 @@ class GameState(Game):
                 if self.board[9, one_left] == 3:
                     if token[2] == 2:
                         self.burn((token[0], one_left, 2))
-                        self.move(token)
+                        if self.board[9, two_left] == 0:
+                            self.board[9, two_left] = 2
+                        else:
+                            self.board[9, one_left] = 2
+                        self.board[old_pos] = 0
                     else:
                         self.board[9, one_left] = 8
                         if token[2] == 8:
@@ -423,7 +429,11 @@ class GameState(Game):
                 if self.board[9, one_right] == 3:
                     if token[2] == 2:
                         self.burn((token[0], one_right, 2))
-                        self.move(token)
+                        if self.board[9, two_right] == 0:
+                            self.board[9, two_right] = 2
+                        else:
+                            self.board[9, one_right] = 2
+                        self.board[old_pos] = 0
                     else:
                         self.board[9, one_right] = 8
                         if token[2] == 8:
