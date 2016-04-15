@@ -3,9 +3,16 @@ Results
 
 Peg Solitaire
 ----------------
-For 1000 games run using a random policy:
+For 1000 games run using a random policy on 4/8/16:
 Number of Possible Actions (including illegal actions) = 176
 Win States : Final States = 0.0
 Lose States : Final States = 1.0
 Average Number of Moves Until Final State = 1.0245456
 
+Jasper and Zot
+-------------------
+For 1000 games run using a random policy on 4/15/16:
+Number of Possible Actions = 12 (may not be accurate)
+Win States : Final States = 0.0
+Lose States : Final States = 1.0
+Average Number of Moves Until Final State = 27.99

@@ -241,7 +241,7 @@ class GameState(Game):
         return self.wave == 2 and self.pumpkinCount() > 0 and self.piecesLeft == 0 and self.enemyOnBoard()
 
     def isLoseState(self):
-        return self.pumpkinCount() <= 0 #For some reason pumpCount too low
+        return self.pumpkinCount() <= 0 
 
     def phase_two(self, dice1, my_move):
         if self.wave == 1:
@@ -315,10 +315,12 @@ class GameState(Game):
                     self.explode(token)
             elif (token_one_ahead == 3 or token_one_ahead > 7) and token[2] == 2: #flaming zombies come thru
                 self.burn((new_row1, token[1], token[2]))
-                self.move(token)
+                self.board[new_row1, token[1]] = token[2]
+                self.board[old_pos] = 0
             elif (token_one_ahead == 0) and (token_two_ahead == 3) and (token[2] == 2):
                 self.burn((new_row2, token[1], token[2]))
-                self.move(token)
+                self.board[new_row2, token[1]] = token[2]
+                self.board[old_pos] = 0
             elif token_one_ahead == 3 and token[2] != 2: #move into a flower bed
                 self.board[new_row1, col] = token[2] + 7
                 if self.board[old_pos] > 7: #incase last position was in a flower bed
@@ -388,11 +390,15 @@ class GameState(Game):
             #Then move
             if (direction == 'left'):
                 token_one_left = self.board[9, one_left]
+                dir_one_left = self.nearest_pumpkin((9, one_left, token_one_left))
                 token_two_left = self.board[9, two_left]
+                dir_two_left = self.nearest_pumpkin((9, two_left, token_two_left))
                 if token_one_left != 0 or token_one_left != 6 or token_one_left != 3:
-                    self.move((9, one_left, token_one_left))
+                    if dir_one_left == 'left':
+                        self.move((9, one_left, token_one_left))
                 elif token_two_left != 0 or token_two_left != 6 or token_two_left != 3:
-                    self.move((9, two_left, token_two_left))
+                    if dir_two_left == 'left':
+                        self.move((9, two_left, token_two_left))
                 token_one_left = self.board[9, one_left]
                 token_two_left = self.board[9, two_left]
                 if token_one_left == 3:
@@ -427,11 +433,15 @@ class GameState(Game):
                     pass
             elif (direction == 'right'):
                 token_one_right = self.board[9, one_right]
+                dir_one_right = self.nearest_pumpkin((9, one_right, token_one_right))
                 token_two_right = self.board[9, two_right]
+                dif_two_right = self.nearest_pumpkin((9, two_right, token_two_right))
                 if token_one_right != 0 or token_one_right != 6 or token_one_right != 3:
-                    self.move((9, one_right, token_one_right))
+                    if dir_one_right == 'right':
+                        self.move((9, one_right, token_one_right))
                 elif token_two_right != 0 or token_two_right != 6 or token_two_right != 3:
-                    self.move((9, two_right, token_two_right))
+                    if dif_two_right == 'right':
+                        self.move((9, two_right, token_two_right))
                 token_one_right = self.board[9, one_right]
                 token_two_right = self.board[9, two_right]
                 if self.board[9, one_right] == 3:
@@ -870,7 +880,7 @@ class GameState(Game):
             print(self.board)
             statesVisited.append(self.copy())
             self.phase = (self.phase % 4) + 1
-        return (statesVisited, actionsTaken, rewardsGained)
+        return (statesVisited, actionsTaken, rewardsGained, not self.isLoseState())
 
 
     ########################################
@@ -900,14 +910,6 @@ class GameState(Game):
 if __name__ == '__main__':
     gs = GameState()
     print(gs.play(gs.random_policy))
-    gs = GameState()
-    gs.board[9, 0] = 0
-    gs.board[9, 1] = 0
-    gs.board[9, 2] = 2
-    gs.board[9, 3] = 2
-    gs.board[9, 4] = 3
-    print(gs.board)
-    
 
 
 # class JandZ:

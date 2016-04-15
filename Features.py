@@ -77,12 +77,13 @@ class Features:
           2) List of rewards received
 		Repeats this process n times, returning a list of each simulation's result.
         """
+        self.results = []
         for i in range(n):
             gameStart = self.game()
             self.currentGame = gameStart
             self.results.append(self.currentGame.play(policy))
         return self.results
 
-#if __name__ == '__main__':
-    # jzinst = Features(jz.GameState)
-    # jzinst.generateGames(jzinst.random_policy, 2)
+# if __name__ == '__main__':
+#     jzinst = Features(jz.GameState)
+#     jzinst.generateGames(jzinst.random_policy, 2)
