@@ -300,16 +300,8 @@ class GameState(Game):
             token_two_ahead = self.board[token[0] + 2, token[1]]
             if (token_one_ahead != 0) and (token_one_ahead != 6) and (token_one_ahead != 3) and (token[0] + 1 != 10):
                 self.move((token[0] + 1, token[1], token_one_ahead))
-                if token_one_ahead > 7:
-                    token_one_ahead = 3
-                else:
-                    token_one_ahead = 0
             elif (token_one_ahead == 0) and (token_two_ahead != 0) and (token_two_ahead != 6) and (token_two_ahead != 3):
                 self.move((token[0] + 2, token[1], token_two_ahead))
-                if token_two_ahead > 7:
-                    token_two_ahead = 3
-                else:
-                    token_two_ahead = 0
             token_one_ahead = self.board[token[0] + 1, token[1]]
             token_two_ahead = self.board[token[0] + 2, token[1]]        
             if token_one_ahead == 0 and token_two_ahead == 0 and (token[2] < 6 and token[2] != 3): #move two spaces
@@ -360,7 +352,7 @@ class GameState(Game):
                 token = (new_row1, col, token[2])
                 self.board[old_pos] = 0
                 self.explode(token)
-            elif token[2] == 5 or token[2] == 12: #multiplier disappears
+            elif (token[2] == 5 or token[2] == 12) and token_one_ahead == 0: #multiplier disappears
                 if token[2] == 12:
                     self.board[old_pos] = 3
                 else:
@@ -395,7 +387,15 @@ class GameState(Game):
             direction = self.nearest_pumpkin(token)
             #Then move
             if (direction == 'left'):
-                if self.board[9, one_left] == 3:
+                token_one_left = self.board[9, one_left]
+                token_two_left = self.board[9, two_left]
+                if token_one_left != 0 or token_one_left != 6 or token_one_left != 3:
+                    self.move((9, one_left, token_one_left))
+                elif token_two_left != 0 or token_two_left != 6 or token_two_left != 3:
+                    self.move((9, two_left, token_two_left))
+                token_one_left = self.board[9, one_left]
+                token_two_left = self.board[9, two_left]
+                if token_one_left == 3:
                     if token[2] == 2:
                         self.burn((token[0], one_left, 2))
                         if self.board[9, two_left] == 0:
@@ -426,6 +426,14 @@ class GameState(Game):
                 else:
                     pass
             elif (direction == 'right'):
+                token_one_right = self.board[9, one_right]
+                token_two_right = self.board[9, two_right]
+                if token_one_right != 0 or token_one_right != 6 or token_one_right != 3:
+                    self.move((9, one_right, token_one_right))
+                elif token_two_right != 0 or token_two_right != 6 or token_two_right != 3:
+                    self.move((9, two_right, token_two_right))
+                token_one_right = self.board[9, one_right]
+                token_two_right = self.board[9, two_right]
                 if self.board[9, one_right] == 3:
                     if token[2] == 2:
                         self.burn((token[0], one_right, 2))
@@ -458,8 +466,6 @@ class GameState(Game):
                     pass
             else: #don't move!
                 pass
-        else:
-            raise Exception('Whoops, something went wrong.')
 
     """Phase 1 of the game"""
     def descend(self):
@@ -894,6 +900,13 @@ class GameState(Game):
 if __name__ == '__main__':
     gs = GameState()
     print(gs.play(gs.random_policy))
+    gs = GameState()
+    gs.board[9, 0] = 0
+    gs.board[9, 1] = 0
+    gs.board[9, 2] = 2
+    gs.board[9, 3] = 2
+    gs.board[9, 4] = 3
+    print(gs.board)
     
 
 
