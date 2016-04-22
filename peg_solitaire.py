@@ -293,40 +293,41 @@ def human_player(board):
 
 
 def play(strategy=human_player):
-    """
-    The main function for running a game of PegSolitaire. Default is set to
-    human_player phase but this function also accepts any algorithm which returns a move.
-    """
-    statesVisited = [] # Sequence of states visited during a game
-    actionsTaken = [] # Sequential actions taken during a game
-    rewardsGained = [] # Sequence of rewards obtained during a game
-    ps = PegSolitaire()
-    board = ps.board
-    print("The game has begun. The current board state is ")
-    print(board)
-    while not check_win(board):
-        cur_state = board2state(board)
-        statesVisited.append(cur_state)
-        moves = legal_actions(board)
-        move = strategy(ps.board)
-        actionsTaken.append(move)
-        if move not in moves:
-            break
-        row, column, direction = move[0], move[1], move[2]
-        board = take_action(board, row, column, direction)
-        reward = 0
-        rewardsGained.append(reward)
-        print("The turn has ended. The current board state is ")
-        print(board)
-    if check_win(board):
-        print('The player has won the game!')
-        reward = 1
-    else:
-        print('An illegal move was made. The player has lost the game.')
-        reward = -1
-    rewardsGained.append(reward)
-    return (statesVisited, actionsTaken, rewardsGained, check_win(board))
-    
+	"""
+	The main function for running a game of PegSolitaire. Default is set to
+	human_player phase but this function also accepts any algorithm which returns a move.
+	"""
+	statesVisited = [] # Sequence of states visited during a game
+	actionsTaken = [] # Sequential actions taken during a game
+	rewardsGained = [] # Sequence of rewards obtained during a game
+	ps = PegSolitaire()
+	board = ps.board
+	print("The game has begun. The current board state is ")
+	print(board)
+	while not check_win(board):
+		cur_state = board2state(board)
+		statesVisited.append(cur_state)
+		moves = legal_actions(board)
+		move = strategy(ps.board)
+		actionsTaken.append(move)
+		if move not in moves:
+			break
+		row, column, direction = move[0], move[1], move[2]
+		ps.board = take_action(ps.board, row, column, direction)
+		reward = 0
+		rewardsGained.append(reward)
+		print("The turn has ended. The current board state is ")
+		print(board)
+	if check_win(board):
+		print('The player has won the game!')
+		reward = 1
+	else:
+		print('An illegal move was made. The player has lost the game.')
+		reward = -1
+	rewardsGained.append(reward)
+	return (statesVisited, actionsTaken, rewardsGained, check_win(ps.board))
+	
+
 def best_policy(board):
    actions = legal_actions(board)
    curr_state = board2state(board)
@@ -352,8 +353,9 @@ class PegSolitaire(Game):
     def __init__(self):
         self.board = create_board()
 
-    def possible_actions(self):
-        return possible_actions(self.board)
+    def possible_actions(self, state):
+        board = state2board(state)
+        return legal_actions(board)
 
     def random_policy(self):
         return random_policy
@@ -369,10 +371,10 @@ class PegSolitaire(Game):
         return play(strategy)
 
     def isLoseState(self):
-        return
+        return check_win(self.board)
 
     def isWinState(self):
-        return
+        return check_win(self.board)
 
 # if __name__ == '__main__':
 #     print('Subclass:', issubclass(PegSolitaire, Game))
