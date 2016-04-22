@@ -25,11 +25,17 @@ class Features:
 
     def possibleActions(self):
         """
-        Parameters:
-          actF: a function that returns possible actions.
-        Returns number of possible actions in game. 
+        Returns the average number of moves possible at any state in the game.
         """
-        return len(self.game.possible_actions(self.game()))
+        total = 0
+        for i in range(len(self.results)):
+            subtotal = 0
+            allstates = self.results[i][0] 
+            for state in allstates:
+                # either self might be the state, or an actual state gets passed in
+                subtotal += len(self.game.possible_actions(state, state)) 
+            total += subtotal / len(allstates)
+        return total / len(self.results)
 
     def winToFinal(self):
         """
@@ -123,8 +129,8 @@ class Features:
 
 
 if __name__ == '__main__':
-    # psinst = Features(ps.PegSolitaire)
-    # psinst.generateGames(ps.random_policy, 10)
+    psinst = Features(ps.PegSolitaire)
+    psinst.generateGames(ps.random_policy, 10)
     # # psinst.generateFeatures("ps1")
     # jzinst = Features(jz.GameState)
     # jzinst.generateGames(jzinst.random_policy, 10000)

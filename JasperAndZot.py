@@ -886,7 +886,7 @@ class GameState(Game):
             pump.append( (None,) )
         return pump
 
-    def possible_actions(self):
+    def possible_actions(self, state):
         """Returns list of all possible actions one could take in any phase.
         """
         phase1 = GameState(phase=1)
