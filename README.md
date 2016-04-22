@@ -9,11 +9,11 @@ The 10 games selected for analysis based on ratings pulled from this [database](
 1. Peg Solitaire (`peg_solitaire.py` `peg_markov.py`)
 2. Solitaire/Patience
 3. Wolfpack
-4. Jasper and Zot (`JasperAndZot.py` currently in progress)
+4. Jasper and Zot (`JasperAndZot.py`)
 5. Legions of Darkness
 6. B-29 Superfortress
-7. Field Commander: Napoleon
-8. Steel Wolves: The German Submarine Campaign Against Allied Shipping
+7. Utopia Engine (`UtopiaEngine.py` `minigame.py` currently in progress)
+8. Field Commander: Napoleon
 9. Where There is Discord: War in the South Atlantic
 10. Thunderbolt Apache Leader
 
