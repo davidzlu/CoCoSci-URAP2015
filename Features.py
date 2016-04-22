@@ -1,6 +1,7 @@
 import peg_solitaire as ps
 import JasperAndZot as jz
 import random
+import math
 import numpy as np
 
 class Features:
@@ -35,7 +36,24 @@ class Features:
                 # either self might be the state, or an actual state gets passed in
                 subtotal += len(self.game.possible_actions(state, state)) 
             total += subtotal / len(allstates)
-        return total / len(self.results)
+        average = total / len(self.results)
+        return average
+
+    def actionsStd(self):
+        """ Returns the average standard deviation of possible moves
+         over all the games"""
+
+        average = self.possibleActions()
+        total = 0
+        for i in range(len(self.results)):
+            subtotal = 0
+            allstates = self.results[i][0] 
+            for state in allstates:
+                # either self might be the state, or an actual state gets passed in
+                subtotal += (len(self.game.possible_actions(state, state)) - average) ** 2
+            total += math.sqrt(subtotal / len(allstates))
+        std = total / len(self.results)
+        return std
 
     def winToFinal(self):
         """
@@ -46,6 +64,16 @@ class Features:
             if target[3] == True:
                 total_wins = total_wins + 1
         return float(total_wins) / float(len(self.results))
+
+    def numWinStates(self):
+        diff_wins = 0
+        winStates = []
+        for target in self.results:
+            if target[3] == True:
+                if target[0][-1] not in winStates:
+                    winStates.append(target[0][-1])
+                    diff_wins += 1
+        return diff_wins
 
 
     def loseToFinal(self):
