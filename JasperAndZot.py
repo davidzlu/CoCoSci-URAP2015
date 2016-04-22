@@ -98,17 +98,22 @@ class GameState(Game):
                 return 100
         return 0
         
-    def transition_prob_matrix(self, curState, action, nextState):
+    def lookup_transition_prob_matrix(self, action, nextState):
         """Returns transition probability given (s, a, s') if it exists in
         transition_prob_matrix. Otherwise calculates the probability, enters it
         into transition_prob_matrix and returns the probability.
         """
+        curState = deepcopy(self)
+        action = tuple(action)
         if (curState, action, nextState) in GameState.tpm:
             return GameState.tpm[(curState, action, nextState)]
         else:
             prob = self.transition_prob(curState, action, nextState)
             GameState.tpm[(curState, action, nextState)] = prob
             return prob
+
+    def transition_prob_matrix(self):
+        return np.array(self.tpm.values())
 
     def next_states(self, action):
         states = []
@@ -117,33 +122,42 @@ class GameState(Game):
             states.append(next_state.descend())
         elif self.phase == 0 or self.phase == 2: #states after rolling and placing
             for i in range(1, 7):
-                for j in range(1, 7): #all possible combinations of dicerolls
+                try:
+                    # Need to get all possible ways to pull pieces onto board
+                    # given that you know the formation
                     next_state = deepcopy(self)
-                    states.append(next_state.phase_two(i, j, action))
+                    next_state.dice1 = i
+                    next_state.phase_two(i, action)
+                    states.append(next_state)
+                except IndexError:
+                    continue
         elif self.phase == 3: #states after moving and spellcasting
-            states.append(next_state.move_and_shoot(action))
+            next_state.move_and_shoot(action)
+            states.append(next_state)
         elif self.phase == 4: #states after smash
-           states.append(next_state.phase_four(action))
+            next_state.phase_four(action)
+            states.append(next_state)
         return states
 
-    def transition_prob(self, action, nextState): #are self and curState not the same thing?? -Priyam
-        """Returns probability of transitioning from curState to nextState given action.
+    def transition_prob(self, action, nextState):
+        """Returns probability of transitioning from curState (self) to nextState given action.
         """
         nextPossible = self.next_states(action)
         if nextState in nextPossible:
-            return 1.0/len(nextPossible)
+            return 1.0/float(len(nextPossible))
         return 0.0
 
     def getMatrixRow(self, action):
-        """Returns row of transition probability matrix, specified by curState and action.
+        """Returns row of transition probability matrix, specified by curState (self) and action.
         """
         matrixRow = []
         nextPossible = self.next_states(action)
+        curState = deepcopy(self)
         for nextState in nextPossible:
-          index = (curState, action, nextState)
-          if index not in GameState.tmp:
-               GameState.tmp[index] = self.transition_prob(action, nextState)
-               matrixRow.append(GameState.tmp[index])
+            index = (curState, action, nextState)
+            if index not in GameState.tpm:
+                GameState.tpm[index] = self.transition_prob(action, nextState)
+            matrixRow.append(GameState.tpm[index])
         return matrixRow
 
     def count_pieces(self):
@@ -664,7 +678,7 @@ class GameState(Game):
                         if item[2] == 6:
                             pump.append(item)
                     if len(pump) == 1:
-                        if pump[0] is 'nothing':
+                        if pump[0] is None:
                             break
                         else:
                             self.board[pump[0][0]][pump[0][1]] = 0
@@ -869,7 +883,7 @@ class GameState(Game):
                         if item[2] == 6:
                             pump.append(item)
         if len(pump) == 0:
-            pump.append("nothing")
+            pump.append( (None,) )
         return pump
 
     def possible_actions(self):
@@ -925,8 +939,8 @@ class GameState(Game):
         statesVisited = [] # Sequence of states visited during a game
         actionsTaken = [] # Sequential actions taken during a game
         rewardsGained = [] # Sequence of rewards obtained during a game
-        print("The game has started")
-        print(self.board)
+        # print("The game has started")
+        # print(self.board)
 
         while not self.isWinState() and not self.isLoseState():
             if self.phase == 1:
@@ -934,52 +948,51 @@ class GameState(Game):
             elif self.phase == 2:
                 self.diceRoll() # roll dice for phase 2
                 mymove2 = strategy() #select move in possible moves
+                hashableMove = tuple(map(lambda x : tuple(x) if type(x) is list else x, mymove2))
+                self.getMatrixRow(hashableMove)
                 self.phase_two(self.dice1, mymove2)
                 actionsTaken.append(mymove2)
             elif self.phase == 3:
                 mymove3 = strategy() #select move for phase 3
+                hashableMove = tuple(map(lambda x : tuple(x) if type(x) is list else x, mymove3))
+                self.getMatrixRow(hashableMove)
                 prevScore = self.score
                 self.move_and_shoot(mymove3) #execute phase 3
                 actionsTaken.append(mymove3)
                 rewardsGained.append(self.score - prevScore)
             elif self.phase == 4:
                 mymove4 = strategy()
+                hashableMove = tuple(map(lambda x : tuple(x) if type(x) is list else x, mymove4))
+                self.getMatrixRow(hashableMove)
                 prevScore = self.score
                 self.phase_four(mymove4)
                 actionsTaken.append(mymove4)
                 rewardsGained.append(self.score - prevScore)
-            print("Current phase:", self.phase)
-            print("The current state is:")
-            print(self.board)
+            # print("Current phase:", self.phase)
+            # print("The current state is:")
+            # print(self.board)
             statesVisited.append(deepcopy(self))
             self.phase = (self.phase % 4) + 1
 
-        return (statesVisited, actionsTaken, rewardsGained)
+        return (statesVisited, actionsTaken, rewardsGained, self.isWinState())
 
-
-    ########################################
-    # Helper methods for transition matrix #
-    ########################################
+    ##########################
+    # Helper methods for tpm #
+    ##########################
 
     def __eq__(self, other):
-        return self.board == other.board \
+        return np.array_equal(self.board, other.board) \
                and self.zombieCount == other.zombieCount \
                and self.fZombieCount == other.fZombieCount \
                and self.bombCount == other.bombCount \
                and self.multCount == other.multCount \
                and self.pumpCount == other.pumpCount \
                and self.wave == other.wave \
-               and self.phase == other.phase
+               and self.phase == other.phase \
+               and self.score == other.score \
+               and self.dice1 == other.dice1 \
+               and self.dice2 == other.dice2 \
 
-    def __hash__(self):
-        return hash((self.board, \
-                     self.zombieCount, \
-                     self.fZombieCount, \
-                     self.bombCount, \
-                     self.multCount, \
-                     self.pumpCount, \
-                     self.wave, \
-                     self.phase))
 
 if __name__ == '__main__':
     gs = GameState()
