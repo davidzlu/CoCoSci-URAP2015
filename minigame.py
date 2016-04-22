@@ -87,6 +87,17 @@ class Activation(Minigame):
 			self.put_number(moves[1][0], moves[1][1], moves[1][2])
 			print("This is the current state of the board:")
 			print(self.board)
+			for i in range(0, 4):
+				if self.board(0, i) - self.board(1, i) == 0:
+					self.board(0, i) = 0
+					self.board(1, i) = 0
+					print("difference = 0: reroll")
+					numbers = self.roll_dice_get_number()
+					print("These are numbers you can put in the board:")
+					print(numbers)
+					moves = strategy(numbers, self.board)
+					self.put_number(moves[0][0], moves[0][1], moves[0][2])
+			self.put_number(moves[1][0], moves[1][1], moves[1][2])
 		energy_point = energy_point + self.check_final_range()
 		if energy_point >= 4:
 			return True
@@ -212,3 +223,4 @@ class Search(Minigame):
 		actions = list(permutations(emptySpaces, 2))
 		print("Actions: ", actions)
 		return actions
+		
