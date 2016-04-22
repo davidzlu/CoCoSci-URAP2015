@@ -1,6 +1,7 @@
 import peg_solitaire as ps
 import JasperAndZot as jz
 import random
+import numpy as np
 
 class Features:
 
@@ -9,14 +10,18 @@ class Features:
         self.results = [] # List of (states visited, actions taken, rewards gained) tuples
         self.currentGame = None
 
-    def entropy(self, prob_matrix):
+    def entropy(self):
         """
-        Parameters:
-          prob_matrix: the transition probability matrix for the game
         Returns entropy of outcome distribution.
         https://en.wikipedia.org/wiki/Entropy_%28information_theory%29#Definition
         """
-        return 0
+        tpm = self.game().transition_prob_matrix()
+        logtpm = np.log(tpm)
+        ent = 0.0
+        for i in range(len(tpm)):
+            if tpm[i] != 0:
+                ent += tpm[i]*logtpm[i]
+        return -ent
 
     def possibleActions(self):
         """
@@ -32,8 +37,7 @@ class Features:
         """
         total_wins = 0
         for target in self.results:
-            states = target[0]
-            if states[-1].isWinState():
+            if target[3] == True:
                 total_wins = total_wins + 1
         return float(total_wins) / float(len(self.results))
 
@@ -44,8 +48,7 @@ class Features:
         """
         total_loses = 0
         for target in self.results:
-            states = target[0]
-            if states[-1].isLoseState():
+            if target[3] == False:
                 total_loses = total_loses + 1
         return float(total_loses) / float(len(self.results))
 
@@ -84,6 +87,9 @@ class Features:
             gameStart = self.game()
             self.currentGame = gameStart
             self.results.append(self.currentGame.play(policy))
+            if i > 0 and i % 4999 == 0:
+                self.generateFeatures("temp")
+            # print("Finished game number", i)
         return self.results
 
     def clearResults(self):
@@ -102,19 +108,24 @@ class Features:
         """
         Calls all feature methods and writes results to text file.
         """
+        fileName += ".txt"
         toWrite = open(fileName, "w")
-        #toWrite.write("Entropy " + self.entropy())
+        toWrite.write( "Results from " + str(len(self.results)) + " games\n" )
+
+        # Features to calculate below
+        toWrite.write("Entropy " + str(self.entropy()) + "\n")
         toWrite.write("possibleActions " + str(self.possibleActions()) + "\n")
         toWrite.write("winToFinal " + str(self.winToFinal()) + "\n")
         toWrite.write("loseToFinal " + str(self.loseToFinal()) + "\n")
         toWrite.write("movesToFinal " + str(self.movesToFinal()) + "\n")
+
         toWrite.close()
 
 
 if __name__ == '__main__':
     # psinst = Features(ps.PegSolitaire)
-    # psinst.generateGames(ps.random_policy, 10)
+    # psinst.generateGames(ps.random_policy, 1000)
     # psinst.generateFeatures("ps1")
-    # jzinst = Features(jz.GameState)
-    # jzinst.generateGames(jzinst.random_policy, 1000)
-    # jzinst.generateFeatures("jz1")
+    jzinst = Features(jz.GameState)
+    jzinst.generateGames(jzinst.random_policy, 10000)
+    jzinst.generateFeatures("jz1")
