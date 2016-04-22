@@ -45,8 +45,12 @@ class Features:
         total_loses = 0
         for target in self.results:
             states = target[0]
-            if states[-1].isLoseState():
-                total_loses = total_loses + 1
+            try:
+                if states[-1].isLoseState():
+                    total_loses = total_loses + 1
+            except AttributeError:
+                if game.isWinState(states[-1]) == False:
+                    total_loses = total_loses + 1
         return float(total_loses) / float(len(self.results))
 
     def movesToFinal(self):
@@ -112,8 +116,8 @@ class Features:
 
 
 if __name__ == '__main__':
-    # psinst = Features(ps.PegSolitaire)
-    # psinst.generateGames(ps.random_policy, 10)
+    psinst = Features(ps.PegSolitaire)
+    psinst.generateGames(ps.random_policy, 10)
     # psinst.generateFeatures("ps1")
     # jzinst = Features(jz.GameState)
     # jzinst.generateGames(jzinst.random_policy, 1000)

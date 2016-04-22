@@ -249,6 +249,9 @@ def take_action(board, endrow, endcolumn, direction):
         x[endrow][endcolumn + 2] = 0
     return x
 
+def isWinState(state):
+   return 
+
 def check_win(board):
     """
     Checks if the player has won or not by counting the number of pegs left.
@@ -354,7 +357,7 @@ class PegSolitaire(Game):
         self.board = create_board()
 
     def possible_actions(self):
-        return possible_actions(self.board)
+        return legal_actions(self.board)
 
     def random_policy(self):
         return random_policy
@@ -370,10 +373,10 @@ class PegSolitaire(Game):
         return play(strategy)
 
     def isLoseState(self):
-        return
+        return check_win(self.board)
 
     def isWinState(self):
-        return
+        return check_win(self.board)
 
 # if __name__ == '__main__':
 #     print('Subclass:', issubclass(PegSolitaire, Game))
