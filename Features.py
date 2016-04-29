@@ -120,6 +120,18 @@ class Features:
                 n += 1
         return total_steps/n
 
+    def avgRewardAtEachTimeStep(self):
+        """
+        Calculates mean of rewards at each time step, and returns as a list.
+        """
+        averages = []
+        for game in self.results:
+            rewards = game[2]
+            for reward in rewards:
+
+
+        return averages
+
     "Takes in the current game state and returns a randomly selected move"
     def random_policy(self):
         game = self.currentGame
