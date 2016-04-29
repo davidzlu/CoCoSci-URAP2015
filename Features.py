@@ -75,7 +75,6 @@ class Features:
                     diff_wins += 1
         return diff_wins
 
-
     def loseToFinal(self):
         """
         Returns ratio of lose states to final states.
@@ -116,7 +115,6 @@ class Features:
                 total_steps += i
                 n += 1
         return total_steps/n
-
 
     "Takes in the current game state and returns a randomly selected move"
     def random_policy(self):
