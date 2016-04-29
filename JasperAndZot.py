@@ -994,6 +994,10 @@ class GameState(Game):
                and self.dice2 == other.dice2 \
 
 
+    # If getting not hashable error, try uncommenting below function
+    # def __hash__(self):
+    #     return id(self)
+
 if __name__ == '__main__':
     gs = GameState()
     print(gs.play(gs.random_policy))
