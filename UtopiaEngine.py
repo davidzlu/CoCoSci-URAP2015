@@ -3,6 +3,8 @@ import numpy as np
 import ast
 from minigame import *
 
+possible_minigames = ["Search", "Activation", "Connection"]
+
 class Enemy:
 	def __init__(self, level, attack, hit, area, spirit = False):
 		self.level = level
@@ -75,6 +77,7 @@ class GameBoard:
 		self.area4 = Area4()
 		self.area5 = Area5()
 		self.area6 = Area6()
+		self.possible_areas = [self.area1, self.area2, self.area3, self.area4, self.area5, self.area6]
 		self.tools = ["Dowsing Rod", "Paralysis Wand", "Focus Charm"]
 		self.construct = {} #dictionary: key->name of construct, value->activation pts
 		self.treasure = []
@@ -105,13 +108,83 @@ class GameBoard:
 			if enemy_dice in enemy.attack:
 				damage_taken = damage_taken + 1
 		self.take_damage(damage_taken)
-		get_item_or_not = roll_dice(1)
-		if get_item_or_not <= enemy.level:
-			if enemy.level = 5:
-				return enemy.area.treasure
-			else:
-				return enemy.area.component
+		# get_item_or_not = roll_dice(1)
+		# if get_item_or_not <= enemy.level:
+		# 	if enemy.level == 5:
+		# 		return enemy.area.treasure
+		# 	else:
+		# 		return enemy.area.component
 	def rest(self):
 		self.day = self.day + 1
 		self.hit = self.hit + 1
+	def play(self, stretagy):
+		while self.day < self.end_day - self.skull:
+			self.eventCycle()
+			action_to_take = stretagy(possible_minigames)
+			if action_to_take == "Search":
+				search_game = Search()
+				search_area = stretagy(self.possible_areas)
+				outcome = search_game.play(stretagy)
+				if outcome >= 0 and outcome <= 10: # find construct
+					if search_area.construct is None:
+						if search_area.component in self.component:
+							self.component[search_area.component] += 2
+						else:
+							self.component[search_area.component] = 2
+					else:
+						self.construct[search_area.construct] = 0
+						search_area.construct = None
+				elif outcome >= 11 and outcome <= 99: # find component
+					if search_area.component in self.component:
+						self.component[search_area.component] += 1
+					else:
+						self.component[search_area.component] = 1
+				elif outcome in range(100, 200) or outcome in range(-100, 0): #combat lv1
+					self.combat(search_area.enemy1)
+					get_item_or_not = roll_dice(1)
+					if get_item_or_not <= 1:
+						if search_area.component in self.component:
+							self.component[search_area.component] += 1
+						else:
+							self.component[search_area.component] = 1
+				elif outcome in range(200, 300) or outcome in range(-200, -100): #combat lv2
+					self.combat(search_area.enemy2)
+					get_item_or_not = roll_dice(1)
+					if get_item_or_not <= 2:
+						if search_area.component in self.component:
+							self.component[search_area.component] += 1
+						else:
+							self.component[search_area.component] = 1
+				elif outcome in range(300, 400) or outcome in range(-300, -200): #combat lv3
+					self.combat(search_area.enemy3)
+					get_item_or_not = roll_dice(1)
+					if get_item_or_not <= 3:
+						if search_area.component in self.component:
+							self.component[search_area.component] += 1
+						else:
+							self.component[search_area.component] = 1
+				elif outcome in range(400, 500) or outcome in range(-400, -300): #combat lv4
+					self.combat(search_area.enemy4)
+					get_item_or_not = roll_dice(1)
+					if get_item_or_not <= 4:
+						if search_area.component in self.component:
+							self.component[search_area.component] += 1
+						else:
+							self.component[search_area.component] = 1
+				elif outcome in range(500, 556) or outcome in range(-555, -400): #combat lv5
+					self.combat(search_area.enemy5)
+					get_item_or_not = roll_dice(1)
+					if get_item_or_not <= 5:
+						if search_area.treasure not in self.treasure:
+							self.treasure.append(search_area.treasure)
+				if self.hit < 0: #run out of life
+					break
+				elif self.hit == 0: # rest till restore
+					self.rest()
+					self.rest()
+					self.rest()
+					self.rest()
+					self.rest()
+					self.rest()
+			
 
