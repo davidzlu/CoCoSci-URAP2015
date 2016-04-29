@@ -40,20 +40,24 @@ class Features:
         return average
 
     def actionsStd(self):
-        """ Returns the average standard deviation of possible moves
+        """ Returns the corrected sample standard deviation of possible moves
          over all the games"""
 
         average = self.possibleActions()
         total = 0
-        for i in range(len(self.results)):
+        N = len(self.results)
+        for i in range(N):
             subtotal = 0
             allstates = self.results[i][0] 
             for state in allstates:
                 # either self might be the state, or an actual state gets passed in
                 subtotal += (len(self.game.possible_actions(state, state)) - average) ** 2
-            total += math.sqrt(subtotal / len(allstates))
-        std = total / len(self.results)
+        std = math.sqrt((1 / (N - 1)) * subtotal)
         return std
+
+    def SEM(self, std):
+        N = len(self.results)
+        return std / math.sqrt(N)
 
     def winToFinal(self):
         """
@@ -94,6 +98,28 @@ class Features:
         for target in self.results:
             total_acts = total_acts + len(target[1])
         return float(total_acts) / (len(self.results))
+
+    def avgStepsToReward(self):
+        """
+        Returns average number of actions taken before a nonzero reward recieved.
+        """
+        steps_to_reward = []
+        for game in self.results:
+            rewards = game[2]
+            steps = 0.0
+            for reward in rewards:
+                steps += 1.0
+                if reward != 0:
+                    steps_to_reward.append(steps)
+                    steps = 0.0
+
+        total_steps = 0.0
+        n = 0.0
+        for i in steps_to_reward:
+            if i != 0:
+                total_steps += i
+                n += 1
+        return total_steps/n
 
 
     "Takes in the current game state and returns a randomly selected move"
@@ -152,14 +178,15 @@ class Features:
         toWrite.write("winToFinal " + str(self.winToFinal()) + "\n")
         toWrite.write("loseToFinal " + str(self.loseToFinal()) + "\n")
         toWrite.write("movesToFinal " + str(self.movesToFinal()) + "\n")
+        toWrite.write("avgStepsToReward " + str(self.avgStepsToReward()) + "\n")
 
         toWrite.close()
 
 
 if __name__ == '__main__':
-    psinst = Features(ps.PegSolitaire)
-    psinst.generateGames(ps.random_policy, 10)
-    # # psinst.generateFeatures("ps1")
-    # jzinst = Features(jz.GameState)
-    # jzinst.generateGames(jzinst.random_policy, 10000)
-    # jzinst.generateFeatures("jz1")
+    # psinst = Features(ps.PegSolitaire)
+    # psinst.generateGames(ps.random_policy, 10)
+    # psinst.generateFeatures("ps1")
+    jzinst = Features(jz.GameState)
+    jzinst.generateGames(jzinst.random_policy, 100)
+    jzinst.generateFeatures("jz1")
