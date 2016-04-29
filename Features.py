@@ -40,20 +40,24 @@ class Features:
         return average
 
     def actionsStd(self):
-        """ Returns the average standard deviation of possible moves
+        """ Returns the corrected sample standard deviation of possible moves
          over all the games"""
 
         average = self.possibleActions()
         total = 0
-        for i in range(len(self.results)):
+        N = len(self.results)
+        for i in range(N):
             subtotal = 0
             allstates = self.results[i][0] 
             for state in allstates:
                 # either self might be the state, or an actual state gets passed in
                 subtotal += (len(self.game.possible_actions(state, state)) - average) ** 2
-            total += math.sqrt(subtotal / len(allstates))
-        std = total / len(self.results)
+        std = math.sqrt((1 / (N - 1)) * subtotal)
         return std
+
+    def SEM(self, std):
+        N = len(self.results)
+        return std / math.sqrt(N)
 
     def winToFinal(self):
         """
