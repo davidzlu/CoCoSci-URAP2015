@@ -4,6 +4,7 @@ import ast
 from minigame import *
 
 possible_minigames = ["Search", "Activation", "Connection"]
+connection_comb = [["Scrying Lens", "Seal of Balance", "Silver"], ["Seal of Balance", "Scrying Lens", "Silver"], ["Seal of Balance", "Hermetic Mirror", "Silica"], ["Hermetic Mirror", "Seal of Balance", "Silica"], ["Seal of Balance", "Golden Chassis", "Quartz"], ["Golden Chassis", "Seal of Balance", "Quartz"], ["Hermetic Mirror", "Void Gate", "Wax"], ["Void Gate", "Hermetic Mirror", "Wax"], ["Void Gate", "Golden Chassis", "Gum"], ["Golden Chassis", "Void Gate", "Gum"], ["Golden Chassis", "Crystal Battery", "Lead"], ["Crystal Battery", "Golden Chassis", "Lead"]]
 
 class Enemy:
 	def __init__(self, level, attack, hit, area, spirit = False):
@@ -191,12 +192,9 @@ class GameBoard:
 					self.rest()
 					self.rest()
 			elif action_to_take == "Activation": #activation
-				if len(self.construct) == 0: #no construct can be activated
-					action_to_take = stretagy(possible_minigames)
-				else:
+				if len(self.construct) != 0: #no construct can be activated
 					construct_to_activate = stretagy(self.construct)
 					if self.construct[construct_to_activate] >= 200 and self.construct[construct_to_activate] < 999: #haven't been activated and used up 2 chances
-						self.day += 1
 						self.construct[construct_to_activate] = 999
 					elif self.construct[construct_to_activate] < 999:
 						activation_game = Activation()
@@ -205,4 +203,16 @@ class GameBoard:
 						self.construct[construct_to_activate] = outcome[0]
 						if outcome[0] != 999:
 							self.construct[construct_to_activate] += 100
-#			elif action_to_take == "Connection":
+					self.day += 1
+			elif action_to_take == "Connection":
+				construct_to_connect1 = stretagy(self.construct)
+				construct_to_connect2 = stretagy(self.construct)
+				component_to_connect = stretagy(self.component)
+				connectable = False
+				for comb in connection_comb:
+					if construct_to_connect1 = comb[0] and construct_to_connect2 = comb[1] and component_to_connect = comb[2]:
+						connectable = True
+				if connectable:
+					connection_game = Connection()
+					link_num = connection_game.play(stretagy)
+					
