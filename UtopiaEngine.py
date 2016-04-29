@@ -124,6 +124,10 @@ class GameBoard:
 			if action_to_take == "Search":
 				search_game = Search()
 				search_area = stretagy(self.possible_areas)
+				if len(search_area.daytracker) == 0:
+					self.day += 1
+				else:
+					self.day += search_area.daytracker.pop()
 				outcome = search_game.play(stretagy)
 				if outcome >= 0 and outcome <= 10: # find construct
 					if search_area.construct is None:
@@ -186,5 +190,19 @@ class GameBoard:
 					self.rest()
 					self.rest()
 					self.rest()
-			
-
+			elif action_to_take == "Activation": #activation
+				if len(self.construct) == 0: #no construct can be activated
+					action_to_take = stretagy(possible_minigames)
+				else:
+					construct_to_activate = stretagy(self.construct)
+					if self.construct[construct_to_activate] >= 200 and self.construct[construct_to_activate] < 999: #haven't been activated and used up 2 chances
+						self.day += 1
+						self.construct[construct_to_activate] = 999
+					elif self.construct[construct_to_activate] < 999:
+						activation_game = Activation()
+						outcome = activation_game.play(stretagy, self.construct[construct_to_activate])
+						self.take_damage(outcome[1])
+						self.construct[construct_to_activate] = outcome[0]
+						if outcome[0] != 999:
+							self.construct[construct_to_activate] += 100
+#			elif action_to_take == "Connection":

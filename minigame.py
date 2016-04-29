@@ -99,11 +99,12 @@ class Activation(Minigame):
 					moves = strategy(numbers, self.board)
 					self.put_number(moves[0][0], moves[0][1], moves[0][2])
 			self.put_number(moves[1][0], moves[1][1], moves[1][2])
-		energy_point = energy_point + self.check_final_range()
-		if energy_point >= 4:
-			return True
+		damage_taken = self.check_final_range[1]
+		energy_point = energy_point + self.check_final_range()[0]
+		if energy_point % 100 >= 4:
+			return 999, damage_taken
 		else:
-			return False
+			return energy_point, damage_taken
 
 class Connection(Minigame): #will need to add UtopiaEngine later
 	"""A class that simulates the Connection part of the game
