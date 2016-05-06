@@ -28,32 +28,101 @@ class Features:
         """
         Returns the average number of moves possible at any state in the game.
         """
-        total = 0
+        subtotal = 0
+        N = 0
         for i in range(len(self.results)):
-            subtotal = 0
+            #subtotal = 0
             allstates = self.results[i][0] 
             for state in allstates:
                 # either self might be the state, or an actual state gets passed in
-                subtotal += len(self.game.possible_actions(state, state)) 
-            total += subtotal / len(allstates)
-        average = total / len(self.results)
+                numActs = len(self.game.possible_actions(state, state))
+                subtotal += numActs
+            N += len(allstates)
+        average = subtotal / N
         return average
 
-    def actionsStd(self):
-        """ Returns the corrected sample standard deviation of possible moves
-         over all the games"""
+    # def otherStd(self):
+    #     varTotal = 0
+    #     N = len(self.results)
+    #     for i in range(N):
+    #         allstates = self.results[i][0]
+    #         actCounts = []
+    #         for state in allstates:
+    #             actCounts.append(len(self.game.possible_actions(state, state)))
+    #         varTotal += np.var(actCounts)
+    #     std = math.sqrt((varTotal / N))
+    #     return std
 
-        average = self.possibleActions()
-        total = 0
-        N = len(self.results)
-        for i in range(N):
-            subtotal = 0
-            allstates = self.results[i][0] 
-            for state in allstates:
-                # either self might be the state, or an actual state gets passed in
-                subtotal += (len(self.game.possible_actions(state, state)) - average) ** 2
-        std = math.sqrt((1 / (N - 1)) * subtotal)
+    def avg(self, featureVects):
+        """Takes in a list of lists, where each list represents a game and the values
+        in that list are the values per time step that you want the stddev of
+        e.g. average possible moves, rewards gained
+
+        Returns the weighted mean for all samples"""
+        
+        subtotal = 0
+        N = 0
+        for i in range(len(featureVects)): 
+            for vect in featureVects:
+                subtotal += np.sum(vect)
+                N += len(vect)
+        average = subtotal / N
+        return average
+
+    def stddev(self, featureVects):
+        """Takes in a list of lists, where each list represents a game and the values
+        in that list are the values per time step that you want the stddev of
+        e.g. average possible moves, rewards gained
+
+        Returns the overall stddev for all the games played"""
+        average = self.avg(featureVects)
+        grandN = 0
+        subtotal = 0
+        numGames = len(featureVects)
+        for i in range(numGames):
+            for vect in featureVects:
+                Ni = len(vect)
+                grandN += Ni
+                subtotal += (Ni - 1) * (np.std(vect) ** 2) + \
+                    (Ni * (np.mean(vect) ** 2))
+        sqrd = (subtotal - (grandN * (average ** 2))) / (grandN - 1)
+        std = math.sqrt(sqrd)
         return std
+
+
+    def actionsStd(self):
+        # """ Returns the corrected sample standard deviation of possible moves
+        #  over all the games"""
+
+    #     average = self.possibleActions()
+    #     total = 0
+    #     N = len(self.results)
+    #     for i in range(N):
+    #         subtotal = 0
+    #         allstates = self.results[i][0] 
+    #         for state in allstates:
+    #             # either self might be the state, or an actual state gets passed in
+    #             subtotal += (len(self.game.possible_actions(state, state)) - average) ** 2
+    #     std = math.sqrt((1 / (N - 1)) * subtotal)
+    #     return std   
+
+        # Code for overall stddev of nonoverlapping subsamples
+        average = self.possibleActions()
+        grandN = 0
+        subtotal = 0
+        numGames = len(self.results)
+        for i in range(numGames):
+            allstates = self.results[i][0]
+            Ni = len(allstates)
+            grandN += Ni
+            actCounts = []
+            for state in allstates:
+                actCounts.append(len(self.game.possible_actions(state, state)))
+            subtotal += (Ni - 1) * (np.std(actCounts) ** 2) + \
+                (Ni * (np.mean(actCounts) ** 2))
+        sqrd = (subtotal - (grandN * (average ** 2))) / (grandN - 1)
+        std = math.sqrt(sqrd)
+        return std     
 
     def SEM(self, std):
         N = len(self.results)
@@ -185,8 +254,8 @@ class Features:
 
 if __name__ == '__main__':
     # psinst = Features(ps.PegSolitaire)
-    # psinst.generateGames(ps.random_policy, 10)
+    # psinst.generateGames(ps.random_policy, 1000)
     # psinst.generateFeatures("ps1")
     jzinst = Features(jz.GameState)
-    jzinst.generateGames(jzinst.random_policy, 100)
-    jzinst.generateFeatures("jz1")
+    jzinst.generateGames(jzinst.random_policy, 10)
+    # jzinst.generateFeatures("jz1")
