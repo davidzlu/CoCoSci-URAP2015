@@ -3,6 +3,7 @@ import JasperAndZot as jz
 import random
 import math
 import numpy as np
+import matplotlib.pyplot as plt
 
 class Features:
 
@@ -41,25 +42,13 @@ class Features:
         average = subtotal / N
         return average
 
-    # def otherStd(self):
-    #     varTotal = 0
-    #     N = len(self.results)
-    #     for i in range(N):
-    #         allstates = self.results[i][0]
-    #         actCounts = []
-    #         for state in allstates:
-    #             actCounts.append(len(self.game.possible_actions(state, state)))
-    #         varTotal += np.var(actCounts)
-    #     std = math.sqrt((varTotal / N))
-    #     return std
-
     def avg(self, featureVects):
         """Takes in a list of lists, where each list represents a game and the values
         in that list are the values per time step that you want the stddev of
         e.g. average possible moves, rewards gained
 
         Returns the weighted mean for all samples"""
-        
+
         subtotal = 0
         N = 0
         for i in range(len(featureVects)): 
@@ -75,53 +64,45 @@ class Features:
         e.g. average possible moves, rewards gained
 
         Returns the overall stddev for all the games played"""
-        average = self.avg(featureVects)
-        grandN = 0
-        subtotal = 0
+        # average = self.avg(featureVects)
+        # grandN = 0
+        # subtotal = 0
+        means = []
         numGames = len(featureVects)
         for i in range(numGames):
             for vect in featureVects:
-                Ni = len(vect)
-                grandN += Ni
-                subtotal += (Ni - 1) * (np.std(vect) ** 2) + \
-                    (Ni * (np.mean(vect) ** 2))
-        sqrd = (subtotal - (grandN * (average ** 2))) / (grandN - 1)
-        std = math.sqrt(sqrd)
+                means.append(np.mean(vect))
+        #         Ni = len(vect)
+        #         grandN += Ni
+        #         subtotal += (Ni - 1) * (np.std(vect) ** 2) + \
+        #             (Ni * (np.mean(vect) ** 2))
+        # sqrd = (subtotal - (grandN * (average ** 2))) / (grandN - 1)
+        # std = math.sqrt(sqrd)
+        std = np.std(means)
         return std
+  
 
+    def actionsStd(self): 
 
-    def actionsStd(self):
-        # """ Returns the corrected sample standard deviation of possible moves
-        #  over all the games"""
-
-    #     average = self.possibleActions()
-    #     total = 0
-    #     N = len(self.results)
-    #     for i in range(N):
-    #         subtotal = 0
-    #         allstates = self.results[i][0] 
-    #         for state in allstates:
-    #             # either self might be the state, or an actual state gets passed in
-    #             subtotal += (len(self.game.possible_actions(state, state)) - average) ** 2
-    #     std = math.sqrt((1 / (N - 1)) * subtotal)
-    #     return std   
-
-        # Code for overall stddev of nonoverlapping subsamples
-        average = self.possibleActions()
-        grandN = 0
-        subtotal = 0
+        # average = self.possibleActions()
+        # grandN = 0
+        # subtotal = 0
+        means = []
         numGames = len(self.results)
         for i in range(numGames):
             allstates = self.results[i][0]
-            Ni = len(allstates)
-            grandN += Ni
+            # Ni = len(allstates)
+            # grandN += Ni
             actCounts = []
             for state in allstates:
                 actCounts.append(len(self.game.possible_actions(state, state)))
-            subtotal += (Ni - 1) * (np.std(actCounts) ** 2) + \
-                (Ni * (np.mean(actCounts) ** 2))
-        sqrd = (subtotal - (grandN * (average ** 2))) / (grandN - 1)
-        std = math.sqrt(sqrd)
+            means.append(np.mean(actCounts))
+
+        #     subtotal += (Ni - 1) * (np.std(actCounts) ** 2) + \
+        #         (Ni * (np.mean(actCounts) ** 2))
+        # sqrd = (subtotal - (grandN * (average ** 2))) / (grandN - 1)
+        # std = math.sqrt(sqrd)
+        std = np.std(means)
         return std     
 
     def SEM(self, std):
@@ -253,9 +234,59 @@ class Features:
 
 
 if __name__ == '__main__':
-    # psinst = Features(ps.PegSolitaire)
-    # psinst.generateGames(ps.random_policy, 1000)
+    ngames = 100
+    psinst = Features(ps.PegSolitaire)
+    psinst.generateGames(ps.random_policy, ngames)
     # psinst.generateFeatures("ps1")
     jzinst = Features(jz.GameState)
-    jzinst.generateGames(jzinst.random_policy, 10)
+    jzinst.generateGames(jzinst.random_policy, ngames)
     # jzinst.generateFeatures("jz1")
+
+    n_groups = 2
+    # Average Actions
+    pActAvg = psinst.possibleActions()
+    jzActAvg = jzinst.possibleActions()
+    pActStd = psinst.actionsStd()
+    jzActStd = jzinst.actionsStd()
+    ActMeans = (pActAvg, jzActAvg)
+    ActStddevs = (psinst.SEM(pActStd), jzinst.SEM(jzActStd))
+
+    # Average Rewards
+    prewards = []
+    jzrewards = []
+    for i in range(ngames):
+        prewards.append(psinst.results[i][2])
+        jzrewards.append(jzinst.results[i][2])
+    pRewAvg = psinst.avg(prewards)
+    jzRewAvg = jzinst.avg(jzrewards)
+    pRewStd = psinst.stddev(prewards)
+    jzRewStd = jzinst.stddev(jzrewards)
+    RewMeans = (pRewAvg, jzRewStd)
+    RewStds = (psinst.SEM(pRewStd), jzinst.SEM(jzRewStd))
+
+
+    index = np.arange(n_groups)
+    bar_width = 0.35
+
+    opacity = 0.4
+    error_config = {'ecolor' : '0.3'}
+
+    plt.figure(1)
+    plt.bar(index, ActMeans, bar_width, alpha=opacity, yerr=ActStddevs, error_kw=error_config)
+
+    plt.xlabel('Game')
+    plt.ylabel('Average Number of Possible Moves')
+    plt.title('Average Number of Possible Moves by Game')
+    plt.xticks(index + bar_width / 2, ('Peg Solitaire', 'Jasper and Zot'))
+
+    plt.figure(2)
+    plt.bar(index, RewMeans, bar_width, alpha=opacity, yerr=RewStds, error_kw=error_config)
+
+    plt.xlabel('Game')
+    plt.ylabel('Average Reward')
+    plt.title('Average Reward Given by Game')
+    plt.xticks(index + bar_width / 2, ('Peg Solitaire', 'Jasper and Zot'))
+
+
+    plt.tight_layout()
+    plt.show()
