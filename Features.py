@@ -13,7 +13,8 @@ class Features:
 
     def entropy(self):
         """
-        Returns entropy of outcome distribution.
+        Returns average over entropy of outcome distribution for every (state, action) pair
+        in the transition probability matrix.
         https://en.wikipedia.org/wiki/Entropy_%28information_theory%29#Definition
         """
         tpm = self.game().transition_prob_matrix()
