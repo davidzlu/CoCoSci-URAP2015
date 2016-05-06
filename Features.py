@@ -17,12 +17,18 @@ class Features:
         https://en.wikipedia.org/wiki/Entropy_%28information_theory%29#Definition
         """
         tpm = self.game().transition_prob_matrix()
-        logtpm = np.log(tpm)
-        ent = 0.0
-        for i in range(len(tpm)):
-            if tpm[i] != 0:
-                ent += tpm[i]*logtpm[i]
-        return -ent
+        estimated_entropy = 0.0
+        # for game in self.results:
+        #     game_states = game[0]
+        for state, action, _nextState in tpm.keys():
+            prob_vector = state.getMatrixRow(action)
+            log_vector = np.log(prob_vector)
+            vector_ent = 0.0
+            for i in range(len(prob_vector)):
+                if prob_vector[i] != 0:
+                    vector_ent += prob_vector[i]*log_vector[i]
+            estimated_entropy += vector_ent
+        return -estimated_entropy/len(tpm)
 
     def possibleActions(self):
         """
@@ -128,7 +134,7 @@ class Features:
         for game in self.results:
             rewards = game[2]
             for reward in rewards:
-
+                break
 
         return averages
 
@@ -198,5 +204,5 @@ if __name__ == '__main__':
     # psinst.generateGames(ps.random_policy, 10)
     # psinst.generateFeatures("ps1")
     jzinst = Features(jz.GameState)
-    jzinst.generateGames(jzinst.random_policy, 100)
+    jzinst.generateGames(jzinst.random_policy, 1000)
     jzinst.generateFeatures("jz1")
