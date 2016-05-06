@@ -18,12 +18,18 @@ class Features:
         https://en.wikipedia.org/wiki/Entropy_%28information_theory%29#Definition
         """
         tpm = self.game().transition_prob_matrix()
-        logtpm = np.log(tpm)
-        ent = 0.0
-        for i in range(len(tpm)):
-            if tpm[i] != 0:
-                ent += tpm[i]*logtpm[i]
-        return -ent
+        estimated_entropy = 0.0
+        # for game in self.results:
+        #     game_states = game[0]
+        for state, action, _nextState in tpm.keys():
+            prob_vector = state.getMatrixRow(action)
+            log_vector = np.log(prob_vector)
+            vector_ent = 0.0
+            for i in range(len(prob_vector)):
+                if prob_vector[i] != 0:
+                    vector_ent += prob_vector[i]*log_vector[i]
+            estimated_entropy += vector_ent
+        return -estimated_entropy/len(tpm)
 
     def possibleActions(self):
         """
@@ -108,7 +114,6 @@ class Features:
                     diff_wins += 1
         return diff_wins
 
-
     def loseToFinal(self):
         """
         Returns ratio of lose states to final states.
@@ -150,6 +155,17 @@ class Features:
                 n += 1
         return total_steps/n
 
+    def avgRewardAtEachTimeStep(self):
+        """
+        Calculates mean of rewards at each time step, and returns as a list.
+        """
+        averages = []
+        for game in self.results:
+            rewards = game[2]
+            for reward in rewards:
+                break
+
+        return averages
 
     "Takes in the current game state and returns a randomly selected move"
     def random_policy(self):
@@ -269,3 +285,4 @@ if __name__ == '__main__':
 
     plt.tight_layout()
     plt.show()
+
