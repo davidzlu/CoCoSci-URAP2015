@@ -93,6 +93,7 @@ class GameBoard:
 		self.godhand = 0 # energy in god hand device
 		self.finalAct = 0
 		self.numConnected = 0
+		self.wastebasket = []
 	def eventCycle(self):
 		if self.day in self.eventdays:
 			self.event = random.choice(self.events)
@@ -217,7 +218,7 @@ class GameBoard:
 						connectable = True
 						setToConnect = comb
 				if connectable:
-					connection_game = Connection()
+					connection_game = Connection(self)
 					link_num = connection_game.play(strategy)
 					if link_num >= 0:
 						self.finalAct += link_num
