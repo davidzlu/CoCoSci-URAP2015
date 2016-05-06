@@ -4,7 +4,7 @@ import ast
 from minigame import *
 
 possible_minigames = ["Search", "Activation", "Connection"]
-connection_comb = [["Scrying Lens", "Seal of Balance", "Silver"], ["Seal of Balance", "Scrying Lens", "Silver"], ["Seal of Balance", "Hermetic Mirror", "Silica"], ["Hermetic Mirror", "Seal of Balance", "Silica"], ["Seal of Balance", "Golden Chassis", "Quartz"], ["Golden Chassis", "Seal of Balance", "Quartz"], ["Hermetic Mirror", "Void Gate", "Wax"], ["Void Gate", "Hermetic Mirror", "Wax"], ["Void Gate", "Golden Chassis", "Gum"], ["Golden Chassis", "Void Gate", "Gum"], ["Golden Chassis", "Crystal Battery", "Lead"], ["Crystal Battery", "Golden Chassis", "Lead"]]
+connection_comb = [["Scrying Lens", "Seal of Balance", "Silver", False],  ["Seal of Balance", "Hermetic Mirror", "Silica", False], ["Golden Chassis", "Seal of Balance", "Quartz", False], ["Hermetic Mirror", "Void Gate", "Wax", False], ["Void Gate", "Golden Chassis", "Gum", False], ["Golden Chassis", "Crystal Battery", "Lead", False]]
 
 class Enemy:
 	def __init__(self, level, attack, hit, area, spirit = False):
@@ -91,6 +91,8 @@ class GameBoard:
 		self.event = null
 		self.events = ["Fleeting visions", "Foul Water", "Good Forture", "Active Monsters"]
 		self.godhand = 0 # energy in god hand device
+		self.finalAct = 0
+		self.numConnected = 0
 	def eventCycle(self):
 		if self.day in self.eventdays:
 			self.event = random.choice(self.events)
@@ -118,18 +120,18 @@ class GameBoard:
 	def rest(self):
 		self.day = self.day + 1
 		self.hit = self.hit + 1
-	def play(self, stretagy):
+	def play(self, strategy):
 		while self.day < self.end_day - self.skull:
 			self.eventCycle()
-			action_to_take = stretagy(possible_minigames)
+			action_to_take = strategy(possible_minigames)
 			if action_to_take == "Search":
 				search_game = Search()
-				search_area = stretagy(self.possible_areas)
+				search_area = strategy(self.possible_areas)
 				if len(search_area.daytracker) == 0:
 					self.day += 1
 				else:
 					self.day += search_area.daytracker.pop()
-				outcome = search_game.play(stretagy)
+				outcome = search_game.play(strategy)
 				if outcome >= 0 and outcome <= 10: # find construct
 					if search_area.construct is None:
 						if search_area.component in self.component:
@@ -193,26 +195,51 @@ class GameBoard:
 					self.rest()
 			elif action_to_take == "Activation": #activation
 				if len(self.construct) != 0: #no construct can be activated
-					construct_to_activate = stretagy(self.construct)
+					construct_to_activate = strategy(self.construct)
 					if self.construct[construct_to_activate] >= 200 and self.construct[construct_to_activate] < 999: #haven't been activated and used up 2 chances
 						self.construct[construct_to_activate] = 999
 					elif self.construct[construct_to_activate] < 999:
 						activation_game = Activation()
-						outcome = activation_game.play(stretagy, self.construct[construct_to_activate])
+						outcome = activation_game.play(strategy, self.construct[construct_to_activate])
 						self.take_damage(outcome[1])
 						self.construct[construct_to_activate] = outcome[0]
 						if outcome[0] != 999:
 							self.construct[construct_to_activate] += 100
 					self.day += 1
 			elif action_to_take == "Connection":
-				construct_to_connect1 = stretagy(self.construct)
-				construct_to_connect2 = stretagy(self.construct)
-				component_to_connect = stretagy(self.component)
+				construct_to_connect1 = strategy(self.construct)
+				construct_to_connect2 = strategy(self.construct)
+				component_to_connect = strategy(self.component)
 				connectable = False
+				setToConnect = []
 				for comb in connection_comb:
-					if construct_to_connect1 = comb[0] and construct_to_connect2 = comb[1] and component_to_connect = comb[2]:
+					if construct_to_connect1 in comb and construct_to_connect2 in comb and component_to_connect = comb[2]:
 						connectable = True
+						setToConnect = comb
 				if connectable:
 					connection_game = Connection()
-					link_num = connection_game.play(stretagy)
+					link_num = connection_game.play(strategy)
+					if link_num >= 0:
+						self.finalAct += link_num
+						setToConnect[3] = True #these components are connected
+						self.numConnected += 1
+						if self.numConnected == 6:
+							possible_minigames.append("Final Activation")
+			elif action_to_take == "Final Activation":
+				hitptsToSpend = strategy(self.finalAct)
+				self.hit += hitptsToSpend
+				self.finalAct -= hitptsToSpend
+				final_game = FinalActivation(self.finalAct)
+				result = final_game.play(strategy)
+				if result == True:
+					print("You've activated the Utopia Engine and saved the world!")
+					#give reward
+					break
+				else:
+					self.day = self.day + 1
+					self.hit = self.hit + 1
+
+
+
+
 					

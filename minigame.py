@@ -173,12 +173,12 @@ class Connection(Minigame): #will need to add UtopiaEngine later
 		for pair in state:
 			diff = np.subtract(pair[0], pair[1])[0]
 			if diff < 0:
-				#UtopiaEngine.hitpts -= 1
+				#UtopiaEngine.hit -= 1
 				decision = strategy() #determines whether to spend another component
 				if decision == 'continue':
 					link += 2
 				else:
-					return
+					return -1
 			else:
 				link += diff
 		return link
@@ -225,4 +225,18 @@ class Search(Minigame):
 		actions = list(permutations(emptySpaces, 2))
 		print("Actions: ", actions)
 		return actions
-		
+
+
+class FinalActivation(Minigame):
+
+	def __init__(self, finalActivationDifficulty):
+		self.actNum = finalActivationNumber
+
+	def play(self, policy):
+		playerSum = np.sum(roll_dice(2))
+		if playerSum >= self.actNum:
+			return True
+		else:
+			return False
+
+
