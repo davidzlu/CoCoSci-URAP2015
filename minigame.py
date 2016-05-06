@@ -112,10 +112,11 @@ class Connection(Minigame): #will need to add UtopiaEngine later
 		sufficient components available before creating an instance
 		of this class."""
 
-	def __init__(self):
+	def __init__(self, gamestate):
 		game_temp = Minigame(2, 3)
 		self.board = game_temp.board
 		self.roll = []
+		self.gamestate = gamestate #the bigger board
 
 	def states(self): 
 		"""Returns each state as a set of 3 2x1 arrays."""
@@ -148,13 +149,13 @@ class Connection(Minigame): #will need to add UtopiaEngine later
 		self.roll = Minigame.roll_dice_get_number(2)
 		return self.roll
 
-	# def toss(self, num):
-	# 	if (len(UtopiaEngine.wastebasket) < 10):
-	# 		UtopiaEngine.wastebasket.append(num)
-	# 		self.roll.remove(num)
-	# 		new_num = Minigame.roll_dice_get_number(1)
-	# 		self.roll.append(new_num)
-	# 	return self.roll
+	def toss(self, num):
+		if (len(gamestate.wastebasket) < 10):
+			gamestate.wastebasket.append(num)
+			self.roll.remove(num)
+			new_num = Minigame.roll_dice_get_number(1)
+			self.roll.append(new_num)
+		return self.roll
 
 	def play(self, strategy):
 		while not check_full():
@@ -166,19 +167,19 @@ class Connection(Minigame): #will need to add UtopiaEngine later
 				col = move[1][1]
 				if self.board[row][col] == 0:
 					put_number(num, row, col)
-				# elif check_full():
-				# 	toss(num)
+				elif check_full():
+					toss(num)
 		state = board2state(self.board)
 		link = 0
 		for pair in state:
 			diff = np.subtract(pair[0], pair[1])[0]
 			if diff < 0:
-				#UtopiaEngine.hitpts -= 1
+				gamestate.hit -= 1
 				decision = strategy() #determines whether to spend another component
 				if decision == 'continue':
 					link += 2
 				else:
-					return
+					return -1
 			else:
 				link += diff
 		return link
@@ -225,4 +226,18 @@ class Search(Minigame):
 		actions = list(permutations(emptySpaces, 2))
 		print("Actions: ", actions)
 		return actions
-		
+
+
+class FinalActivation(Minigame):
+
+	def __init__(self, finalActivationDifficulty):
+		self.actNum = finalActivationNumber
+
+	def play(self, policy):
+		playerSum = np.sum(roll_dice(2))
+		if playerSum >= self.actNum:
+			return True
+		else:
+			return False
+
+
