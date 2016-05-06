@@ -32,7 +32,6 @@ class Features:
         subtotal = 0
         N = 0
         for i in range(len(self.results)):
-            #subtotal = 0
             allstates = self.results[i][0] 
             for state in allstates:
                 # either self might be the state, or an actual state gets passed in
@@ -64,44 +63,24 @@ class Features:
         e.g. average possible moves, rewards gained
 
         Returns the overall stddev for all the games played"""
-        # average = self.avg(featureVects)
-        # grandN = 0
-        # subtotal = 0
         means = []
         numGames = len(featureVects)
         for i in range(numGames):
             for vect in featureVects:
                 means.append(np.mean(vect))
-        #         Ni = len(vect)
-        #         grandN += Ni
-        #         subtotal += (Ni - 1) * (np.std(vect) ** 2) + \
-        #             (Ni * (np.mean(vect) ** 2))
-        # sqrd = (subtotal - (grandN * (average ** 2))) / (grandN - 1)
-        # std = math.sqrt(sqrd)
         std = np.std(means)
         return std
   
 
     def actionsStd(self): 
-
-        # average = self.possibleActions()
-        # grandN = 0
-        # subtotal = 0
         means = []
         numGames = len(self.results)
         for i in range(numGames):
             allstates = self.results[i][0]
-            # Ni = len(allstates)
-            # grandN += Ni
             actCounts = []
             for state in allstates:
                 actCounts.append(len(self.game.possible_actions(state, state)))
             means.append(np.mean(actCounts))
-
-        #     subtotal += (Ni - 1) * (np.std(actCounts) ** 2) + \
-        #         (Ni * (np.mean(actCounts) ** 2))
-        # sqrd = (subtotal - (grandN * (average ** 2))) / (grandN - 1)
-        # std = math.sqrt(sqrd)
         std = np.std(means)
         return std     
 
