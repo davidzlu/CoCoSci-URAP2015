@@ -642,12 +642,6 @@ class GameState(Game):
                 GameState.move_3.append([spell, column])
         self.board[10, jasper_x] = 0
         self.board[10, my_move_3[1]] = 7
-        #I think the code below belongs in a play function instead of in a phase function. - Priyam
-        # print("Your available moves are:")
-        # print(move_3)
-        # my_move_3 = ast.literal_eval(input("Enter the move you'd like to make: "))
-        # while my_move not in moves:
-        #     my_move_3 = ast.literal_eval(input("Please enter a valid move: "))
         if my_move_3[0] == 0:#flower power
             for index in range(0, 4):
                 row = 9 - index
@@ -993,30 +987,10 @@ class GameState(Game):
 
 
     # If getting not hashable error, try uncommenting below function
-    # def __hash__(self):
-    #     return id(self)
+    def __hash__(self):
+        return id(self)
 
-if __name__ == '__main__':
-    gs = GameState()
-    print(gs.play(gs.random_policy))
+# if __name__ == '__main__':
+#     gs = GameState()
+#     print(gs.play(gs.random_policy))
 
-
-# class JandZ:
-
-#     def __init__(self):
-#         self.gs = GameState()
-
-#     def possible_actions(self):
-#         return possible_actions(self.gs)
-
-#     def random_policy(self):
-#         return self.gs.random_policy
-
-#     def transition_prob_matrix(self):
-#         return transition_prob_matrix(self.gs)
-
-#     def next_states(self, action):
-#         return next_states(self.gs, action)
-
-#     def play(self, strategy):
-#         return self.gs.play(strategy)

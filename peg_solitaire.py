@@ -302,8 +302,8 @@ def play(strategy=human_player):
 	rewardsGained = [] # Sequence of rewards obtained during a game
 	ps = PegSolitaire()
 	board = ps.board
-	print("The game has begun. The current board state is ")
-	print(board)
+	# print("The game has begun. The current board state is ")
+	# print(board)
 	while not check_win(board):
 		cur_state = board2state(board)
 		statesVisited.append(cur_state)
@@ -316,13 +316,13 @@ def play(strategy=human_player):
 		ps.board = take_action(ps.board, row, column, direction)
 		reward = 0
 		rewardsGained.append(reward)
-		print("The turn has ended. The current board state is ")
-		print(board)
+		# print("The turn has ended. The current board state is ")
+		# print(board)
 	if check_win(board):
-		print('The player has won the game!')
+		# print('The player has won the game!')
 		reward = 1
 	else:
-		print('An illegal move was made. The player has lost the game.')
+		# print('An illegal move was made. The player has lost the game.')
 		reward = -1
 	rewardsGained.append(reward)
 	return (statesVisited, actionsTaken, rewardsGained, check_win(ps.board))
