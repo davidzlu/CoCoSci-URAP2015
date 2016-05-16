@@ -4,7 +4,7 @@ import ast
 from minigame import *
 
 possible_minigames = ["Search", "Activation", "Connection"]
-connection_comb = [["Scrying Lens", "Seal of Balance", "Silver"], ["Seal of Balance", "Scrying Lens", "Silver"], ["Seal of Balance", "Hermetic Mirror", "Silica"], ["Hermetic Mirror", "Seal of Balance", "Silica"], ["Seal of Balance", "Golden Chassis", "Quartz"], ["Golden Chassis", "Seal of Balance", "Quartz"], ["Hermetic Mirror", "Void Gate", "Wax"], ["Void Gate", "Hermetic Mirror", "Wax"], ["Void Gate", "Golden Chassis", "Gum"], ["Golden Chassis", "Void Gate", "Gum"], ["Golden Chassis", "Crystal Battery", "Lead"], ["Crystal Battery", "Golden Chassis", "Lead"]]
+connection_comb = [["Scrying Lens", "Seal of Balance", "Silver", False],  ["Seal of Balance", "Hermetic Mirror", "Silica", False], ["Golden Chassis", "Seal of Balance", "Quartz", False], ["Hermetic Mirror", "Void Gate", "Wax", False], ["Void Gate", "Golden Chassis", "Gum", False], ["Golden Chassis", "Crystal Battery", "Lead", False]]
 
 class Enemy:
 	def __init__(self, level, attack, hit, area, spirit = False):
@@ -91,8 +91,9 @@ class GameBoard:
 		self.event = null
 		self.events = ["Fleeting visions", "Foul Water", "Good Forture", "Active Monsters"]
 		self.godhand = 0 # energy in god hand device
-		self.finalActivation = False
-		self.connection = []
+		self.finalAct = 0
+		self.numConnected = 0
+		self.wastebasket = []
 	def eventCycle(self):
 		if self.day in self.eventdays:
 			self.event = random.choice(self.events)
@@ -117,116 +118,136 @@ class GameBoard:
 		# 		return enemy.area.treasure
 		# 	else:
 		# 		return enemy.area.component
+	def score(self):
+		score = 0
+		for x in self.construct:
+			if self.construct[x] >= 999:
+				score += 5
+		score += 10 * len(self.construct)
+		
 	def rest(self):
 		self.day = self.day + 1
 		self.hit = self.hit + 1
-	def play(self, stretagy):
+	def play(self, strategy):
 		while self.day < self.end_day - self.skull:
-			if not self.finalActivation:
-				self.eventCycle()
-				action_to_take = stretagy(possible_minigames)
-				if action_to_take == "Search":
-					search_game = Search()
-					search_area = stretagy(self.possible_areas)
-					if len(search_area.daytracker) == 0:
-						self.day += 1
-					else:
-						self.day += search_area.daytracker.pop()
-					outcome = search_game.play(stretagy)
-					if outcome >= 0 and outcome <= 10: # find construct
-						if search_area.construct is None:
-							if search_area.component in self.component:
-								self.component[search_area.component] += 2
-							else:
-								self.component[search_area.component] = 2
+			self.eventCycle()
+			action_to_take = strategy(possible_minigames)
+			if action_to_take == "Search":
+				search_game = Search()
+				search_area = strategy(self.possible_areas)
+				if len(search_area.daytracker) == 0:
+					self.day += 1
+				else:
+					self.day += search_area.daytracker.pop()
+				outcome = search_game.play(strategy)
+				if outcome >= 0 and outcome <= 10: # find construct
+					if search_area.construct is None:
+						if search_area.component in self.component:
+							self.component[search_area.component] += 2
 						else:
-							self.construct[search_area.construct] = 0
-							search_area.construct = None
-					elif outcome >= 11 and outcome <= 99: # find component
+							self.component[search_area.component] = 2
+					else:
+						self.construct[search_area.construct] = 0
+						search_area.construct = None
+				elif outcome >= 11 and outcome <= 99: # find component
+					if search_area.component in self.component:
+						self.component[search_area.component] += 1
+					else:
+						self.component[search_area.component] = 1
+				elif outcome in range(100, 200) or outcome in range(-100, 0): #combat lv1
+					self.combat(search_area.enemy1)
+					get_item_or_not = roll_dice(1)
+					if get_item_or_not <= 1:
 						if search_area.component in self.component:
 							self.component[search_area.component] += 1
 						else:
 							self.component[search_area.component] = 1
-					elif outcome in range(100, 200) or outcome in range(-100, 0): #combat lv1
-						self.combat(search_area.enemy1)
-						get_item_or_not = roll_dice(1)
-						if get_item_or_not <= 1:
-							if search_area.component in self.component:
-								self.component[search_area.component] += 1
-							else:
-								self.component[search_area.component] = 1
-					elif outcome in range(200, 300) or outcome in range(-200, -100): #combat lv2
-						self.combat(search_area.enemy2)
-						get_item_or_not = roll_dice(1)
-						if get_item_or_not <= 2:
-							if search_area.component in self.component:
-								self.component[search_area.component] += 1
-							else:
-								self.component[search_area.component] = 1
-					elif outcome in range(300, 400) or outcome in range(-300, -200): #combat lv3
-						self.combat(search_area.enemy3)
-						get_item_or_not = roll_dice(1)
-						if get_item_or_not <= 3:
-							if search_area.component in self.component:
-								self.component[search_area.component] += 1
-							else:
-								self.component[search_area.component] = 1
-					elif outcome in range(400, 500) or outcome in range(-400, -300): #combat lv4
-						self.combat(search_area.enemy4)
-						get_item_or_not = roll_dice(1)
-						if get_item_or_not <= 4:
-							if search_area.component in self.component:
-								self.component[search_area.component] += 1
-							else:
-								self.component[search_area.component] = 1
-					elif outcome in range(500, 556) or outcome in range(-555, -400): #combat lv5
-						self.combat(search_area.enemy5)
-						get_item_or_not = roll_dice(1)
-						if get_item_or_not <= 5:
-							if search_area.treasure not in self.treasure:
-								self.treasure.append(search_area.treasure)
-					if self.hit < 0: #run out of life
-						break
-					elif self.hit == 0: # rest till restore
-						self.rest()
-						self.rest()
-						self.rest()
-						self.rest()
-						self.rest()
-						self.rest()
-				elif action_to_take == "Activation": #activation
-					if len(self.construct) != 0: #no construct can be activated
-						construct_to_activate = stretagy(self.construct)
-						if self.construct[construct_to_activate] >= 200 and self.construct[construct_to_activate] < 999: #haven't been activated and used up 2 chances
-							self.construct[construct_to_activate] = 999
-						elif self.construct[construct_to_activate] < 999:
-							activation_game = Activation()
-							outcome = activation_game.play(stretagy, self.construct[construct_to_activate])
-							self.take_damage(outcome[1])
-							self.construct[construct_to_activate] = outcome[0]
-							if outcome[0] != 999:
-								self.construct[construct_to_activate] += 100
-						self.day += 1
-				elif action_to_take == "Connection":
-					construct_to_connect1 = stretagy(self.construct)
-					construct_to_connect2 = stretagy(self.construct)
-					component_to_connect = stretagy(self.component)
-					connectable = False
-					for comb in connection_comb:
-						if construct_to_connect1 = comb[0] and construct_to_connect2 = comb[1] and component_to_connect = comb[2]:
-							connectable = True
-					if connectable:
-						connection_game = Connection()
-						link_num = connection_game.play(stretagy)
-						self.connection.append(link_num)
-			else:
-				difficulty = sum(self.connection)
-				# TODO: implement a strategy of reducing difficulty by taking damage here!
-				result = roll_dice(2)
-				if result[0] + result[1] >= difficulty:
-					# TODO: win the game!
+				elif outcome in range(200, 300) or outcome in range(-200, -100): #combat lv2
+					self.combat(search_area.enemy2)
+					get_item_or_not = roll_dice(1)
+					if get_item_or_not <= 2:
+						if search_area.component in self.component:
+							self.component[search_area.component] += 1
+						else:
+							self.component[search_area.component] = 1
+				elif outcome in range(300, 400) or outcome in range(-300, -200): #combat lv3
+					self.combat(search_area.enemy3)
+					get_item_or_not = roll_dice(1)
+					if get_item_or_not <= 3:
+						if search_area.component in self.component:
+							self.component[search_area.component] += 1
+						else:
+							self.component[search_area.component] = 1
+				elif outcome in range(400, 500) or outcome in range(-400, -300): #combat lv4
+					self.combat(search_area.enemy4)
+					get_item_or_not = roll_dice(1)
+					if get_item_or_not <= 4:
+						if search_area.component in self.component:
+							self.component[search_area.component] += 1
+						else:
+							self.component[search_area.component] = 1
+				elif outcome in range(500, 556) or outcome in range(-555, -400): #combat lv5
+					self.combat(search_area.enemy5)
+					get_item_or_not = roll_dice(1)
+					if get_item_or_not <= 5:
+						if search_area.treasure not in self.treasure:
+							self.treasure.append(search_area.treasure)
+				if self.hit < 0: #run out of life
+					break
+				elif self.hit == 0: # rest till restore
+					self.rest()
+					self.rest()
+					self.rest()
+					self.rest()
+					self.rest()
+					self.rest()
+			elif action_to_take == "Activation": #activation
+				if len(self.construct) != 0: #no construct can be activated
+					construct_to_activate = strategy(self.construct)
+					if self.construct[construct_to_activate] >= 200 and self.construct[construct_to_activate] < 999: #haven't been activated and used up 2 chances
+						self.construct[construct_to_activate] = 999
+					elif self.construct[construct_to_activate] < 999:
+						activation_game = Activation()
+						outcome = activation_game.play(strategy, self.construct[construct_to_activate])
+						self.take_damage(outcome[1])
+						self.construct[construct_to_activate] = outcome[0]
+						if outcome[0] != 999:
+							self.construct[construct_to_activate] += 100
+					self.day += 1
+			elif action_to_take == "Connection":
+				construct_to_connect1 = strategy(self.construct)
+				construct_to_connect2 = strategy(self.construct)
+				component_to_connect = strategy(self.component)
+				connectable = False
+				setToConnect = []
+				for comb in connection_comb:
+					if construct_to_connect1 in comb and construct_to_connect2 in comb and component_to_connect = comb[2]:
+						connectable = True
+						setToConnect = comb
+				if connectable:
+					connection_game = Connection(self)
+					link_num = connection_game.play(strategy)
+					if link_num >= 0:
+						self.finalAct += link_num
+						setToConnect[3] = True #these components are connected
+						self.numConnected += 1
+						if self.numConnected == 6:
+							possible_minigames.append("Final Activation")
+			elif action_to_take == "Final Activation":
+				hitptsToSpend = strategy(self.finalAct)
+				self.hit += hitptsToSpend
+				self.finalAct -= hitptsToSpend
+				final_game = FinalActivation(self.finalAct)
+				result = final_game.play(strategy)
+				if result == True:
+					print("You've activated the Utopia Engine and saved the world!")
+					#give reward
 					break
 				else:
-					self.take_damage(1)
-					self.day += 1
+					self.day = self.day + 1
+					self.hit = self.hit + 1
+
+
+
+
 					

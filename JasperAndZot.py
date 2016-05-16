@@ -18,8 +18,6 @@ from Game import Game
     12 = multiplier + flower bed
     """
 
-
-
 def create_board():
     """Initializes starting game board with 6 pumpkins and Jasper"""
     board = np.zeros((11, 6))
@@ -939,8 +937,8 @@ class GameState(Game):
         statesVisited = [] # Sequence of states visited during a game
         actionsTaken = [] # Sequential actions taken during a game
         rewardsGained = [] # Sequence of rewards obtained during a game
-        # print("The game has started")
-        # print(self.board)
+        print("The game has started")
+        print(self.board)
 
         while not self.isWinState() and not self.isLoseState():
             if self.phase == 1:
@@ -968,9 +966,9 @@ class GameState(Game):
                 self.phase_four(mymove4)
                 actionsTaken.append(mymove4)
                 rewardsGained.append(self.score - prevScore)
-            # print("Current phase:", self.phase)
-            # print("The current state is:")
-            # print(self.board)
+            print("Current phase:", self.phase)
+            print("The current state is:")
+            print(self.board)
             statesVisited.append(deepcopy(self))
             self.phase = (self.phase % 4) + 1
 
