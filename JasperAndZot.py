@@ -931,6 +931,7 @@ class GameState(Game):
         statesVisited = [] # Sequence of states visited during a game
         actionsTaken = [] # Sequential actions taken during a game
         rewardsGained = [] # Sequence of rewards obtained during a game
+        legalActions = []
         print("The game has started")
         print(self.board)
 
@@ -942,12 +943,14 @@ class GameState(Game):
                 mymove2 = strategy() #select move in possible moves
                 hashableMove = tuple(map(lambda x : tuple(x) if type(x) is list else x, mymove2))
                 self.getMatrixRow(hashableMove)
+                legalActions.append(hashableMove)
                 self.phase_two(self.dice1, mymove2)
                 actionsTaken.append(mymove2)
             elif self.phase == 3:
                 mymove3 = strategy() #select move for phase 3
                 hashableMove = tuple(map(lambda x : tuple(x) if type(x) is list else x, mymove3))
                 self.getMatrixRow(hashableMove)
+                legalActions.append(hashableMove)
                 prevScore = self.score
                 self.move_and_shoot(mymove3) #execute phase 3
                 actionsTaken.append(mymove3)
@@ -956,6 +959,7 @@ class GameState(Game):
                 mymove4 = strategy()
                 hashableMove = tuple(map(lambda x : tuple(x) if type(x) is list else x, mymove4))
                 self.getMatrixRow(hashableMove)
+                legalActions.append(hashableMove)
                 prevScore = self.score
                 self.phase_four(mymove4)
                 actionsTaken.append(mymove4)
@@ -966,7 +970,7 @@ class GameState(Game):
             statesVisited.append(deepcopy(self))
             self.phase = (self.phase % 4) + 1
 
-        return (statesVisited, actionsTaken, rewardsGained, self.isWinState())
+        return (statesVisited, actionsTaken, rewardsGained, self.isWinState(), legalActions)
 
     ##########################
     # Helper methods for tpm #

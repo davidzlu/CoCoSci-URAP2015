@@ -126,8 +126,12 @@ class GameBoard:
 		score += 10 * len(self.construct)
 		
 	def rest(self):
+		if "Void Gate" in self.construct && self.construct["Void Gate"] >= 999:
+			self.hit += 1.5
+		else:
+			self.hit += 1
 		self.day = self.day + 1
-		self.hit = self.hit + 1
+		
 	def play(self, strategy):
 		while self.day < self.end_day - self.skull:
 			self.eventCycle()
@@ -195,12 +199,18 @@ class GameBoard:
 				if self.hit < 0: #run out of life
 					break
 				elif self.hit == 0: # rest till restore
-					self.rest()
-					self.rest()
-					self.rest()
-					self.rest()
-					self.rest()
-					self.rest()
+					if "Void Gate" in self.construct && self.construct["Void Gate"] >=999:
+						self.rest()
+						self.rest()
+						self.rest()
+						self.rest()
+					else:
+						self.rest()
+						self.rest()
+						self.rest()
+						self.rest()
+						self.rest()
+						self.rest()
 			elif action_to_take == "Activation": #activation
 				if len(self.construct) != 0: #no construct can be activated
 					construct_to_activate = strategy(self.construct)
