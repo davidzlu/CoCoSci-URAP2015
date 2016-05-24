@@ -111,7 +111,7 @@ class GameState(Game):
             return prob
 
     def transition_prob_matrix(self):
-        return np.array(self.tpm.values())
+        return self.tpm
 
     def next_states(self, action):
         states = []
@@ -993,8 +993,8 @@ class GameState(Game):
 
 
     # If getting not hashable error, try uncommenting below function
-    # def __hash__(self):
-    #     return id(self)
+    def __hash__(self):
+        return id(self)
 
 if __name__ == '__main__':
     gs = GameState()
