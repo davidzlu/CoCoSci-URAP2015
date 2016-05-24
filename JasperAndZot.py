@@ -642,12 +642,6 @@ class GameState(Game):
                 GameState.move_3.append([spell, column])
         self.board[10, jasper_x] = 0
         self.board[10, my_move_3[1]] = 7
-        #I think the code below belongs in a play function instead of in a phase function. - Priyam
-        # print("Your available moves are:")
-        # print(move_3)
-        # my_move_3 = ast.literal_eval(input("Enter the move you'd like to make: "))
-        # while my_move not in moves:
-        #     my_move_3 = ast.literal_eval(input("Please enter a valid move: "))
         if my_move_3[0] == 0:#flower power
             for index in range(0, 4):
                 row = 9 - index
@@ -937,6 +931,7 @@ class GameState(Game):
         statesVisited = [] # Sequence of states visited during a game
         actionsTaken = [] # Sequential actions taken during a game
         rewardsGained = [] # Sequence of rewards obtained during a game
+        legalActions = []
         print("The game has started")
         print(self.board)
 
@@ -948,12 +943,14 @@ class GameState(Game):
                 mymove2 = strategy() #select move in possible moves
                 hashableMove = tuple(map(lambda x : tuple(x) if type(x) is list else x, mymove2))
                 self.getMatrixRow(hashableMove)
+                legalActions.append(hashableMove)
                 self.phase_two(self.dice1, mymove2)
                 actionsTaken.append(mymove2)
             elif self.phase == 3:
                 mymove3 = strategy() #select move for phase 3
                 hashableMove = tuple(map(lambda x : tuple(x) if type(x) is list else x, mymove3))
                 self.getMatrixRow(hashableMove)
+                legalActions.append(hashableMove)
                 prevScore = self.score
                 self.move_and_shoot(mymove3) #execute phase 3
                 actionsTaken.append(mymove3)
@@ -962,6 +959,7 @@ class GameState(Game):
                 mymove4 = strategy()
                 hashableMove = tuple(map(lambda x : tuple(x) if type(x) is list else x, mymove4))
                 self.getMatrixRow(hashableMove)
+                legalActions.append(hashableMove)
                 prevScore = self.score
                 self.phase_four(mymove4)
                 actionsTaken.append(mymove4)
@@ -972,7 +970,7 @@ class GameState(Game):
             statesVisited.append(deepcopy(self))
             self.phase = (self.phase % 4) + 1
 
-        return (statesVisited, actionsTaken, rewardsGained, self.isWinState())
+        return (statesVisited, actionsTaken, rewardsGained, self.isWinState(), legalActions)
 
     ##########################
     # Helper methods for tpm #
@@ -996,27 +994,7 @@ class GameState(Game):
     def __hash__(self):
         return id(self)
 
-if __name__ == '__main__':
-    gs = GameState()
-    print(gs.play(gs.random_policy))
+# if __name__ == '__main__':
+#     gs = GameState()
+#     print(gs.play(gs.random_policy))
 
-
-# class JandZ:
-
-#     def __init__(self):
-#         self.gs = GameState()
-
-#     def possible_actions(self):
-#         return possible_actions(self.gs)
-
-#     def random_policy(self):
-#         return self.gs.random_policy
-
-#     def transition_prob_matrix(self):
-#         return transition_prob_matrix(self.gs)
-
-#     def next_states(self, action):
-#         return next_states(self.gs, action)
-
-#     def play(self, strategy):
-#         return self.gs.play(strategy)
