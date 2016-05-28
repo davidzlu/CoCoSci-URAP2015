@@ -6,6 +6,9 @@ from minigame import *
 possible_minigames = ["Search", "Activation", "Connection"]
 connection_comb = [["Scrying Lens", "Seal of Balance", "Silver", False],  ["Seal of Balance", "Hermetic Mirror", "Silica", False], ["Golden Chassis", "Seal of Balance", "Quartz", False], ["Hermetic Mirror", "Void Gate", "Wax", False], ["Void Gate", "Golden Chassis", "Gum", False], ["Golden Chassis", "Crystal Battery", "Lead", False]]
 
+def random_policy(options, board = None):
+	return random.choice(options)
+
 class Enemy:
 	def __init__(self, level, attack, hit, area, spirit = False):
 		self.level = level
@@ -126,7 +129,7 @@ class GameBoard:
 		score += 10 * len(self.construct)
 		
 	def rest(self):
-		if "Void Gate" in self.construct && self.construct["Void Gate"] >= 999:
+		if "Void Gate" in self.construct and self.construct["Void Gate"] >= 999:
 			self.hit += 1.5
 		else:
 			self.hit += 1
@@ -199,7 +202,7 @@ class GameBoard:
 				if self.hit < 0: #run out of life
 					break
 				elif self.hit == 0: # rest till restore
-					if "Void Gate" in self.construct && self.construct["Void Gate"] >=999:
+					if "Void Gate" in self.construct and self.construct["Void Gate"] >=999:
 						self.rest()
 						self.rest()
 						self.rest()
@@ -213,7 +216,7 @@ class GameBoard:
 						self.rest()
 			elif action_to_take == "Activation": #activation
 				if len(self.construct) != 0: #no construct can be activated
-					construct_to_activate = strategy(self.construct)
+					construct_to_activate = strategy(list(self.construct.keys()))
 					if self.construct[construct_to_activate] >= 200 and self.construct[construct_to_activate] < 999: #haven't been activated and used up 2 chances
 						self.construct[construct_to_activate] = 999
 					elif self.construct[construct_to_activate] < 999:
@@ -225,13 +228,16 @@ class GameBoard:
 							self.construct[construct_to_activate] += 100
 					self.day += 1
 			elif action_to_take == "Connection":
-				construct_to_connect1 = strategy(self.construct)
-				construct_to_connect2 = strategy(self.construct)
-				component_to_connect = strategy(self.component)
+				if (len(self.construct) >= 2) and (len(self.component) != 0):
+					constructs = list(self.construct.keys())
+					construct_to_connect1 = strategy(constructs)
+					constructs.remove(construct_to_connect1)
+					construct_to_connect2 = strategy(constructs)
+					component_to_connect = strategy(list(self.component).keys())
 				connectable = False
 				setToConnect = []
 				for comb in connection_comb:
-					if construct_to_connect1 in comb and construct_to_connect2 in comb and component_to_connect = comb[2]:
+					if construct_to_connect1 in comb and construct_to_connect2 in comb and component_to_connect == comb[2]:
 						connectable = True
 						setToConnect = comb
 				if connectable:
@@ -244,7 +250,7 @@ class GameBoard:
 						if self.numConnected == 6:
 							possible_minigames.append("Final Activation")
 			elif action_to_take == "Final Activation":
-				hitptsToSpend = strategy(self.finalAct)
+				hitptsToSpend = strategy(list(range(self.finalAct + 1)))
 				self.hit += hitptsToSpend
 				self.finalAct -= hitptsToSpend
 				final_game = FinalActivation(self.finalAct)
