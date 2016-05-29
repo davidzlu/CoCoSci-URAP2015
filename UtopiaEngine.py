@@ -6,8 +6,12 @@ from minigame import *
 possible_minigames = ["Search", "Activation", "Connection"]
 connection_comb = [["Scrying Lens", "Seal of Balance", "Silver", False],  ["Seal of Balance", "Hermetic Mirror", "Silica", False], ["Golden Chassis", "Seal of Balance", "Quartz", False], ["Hermetic Mirror", "Void Gate", "Wax", False], ["Void Gate", "Golden Chassis", "Gum", False], ["Golden Chassis", "Crystal Battery", "Lead", False]]
 
-def random_policy(options, board = None):
-	return random.choice(options)
+def random_policy(options, minigame = False):
+	"""options needs to be a list, for example, a list of actions"""
+	if minigame:
+		return random.sample(options, 2)
+	else:
+		return random.choice(options)
 
 class Enemy:
 	def __init__(self, level, attack, hit, area, spirit = False):
@@ -250,7 +254,7 @@ class GameBoard:
 						if self.numConnected == 6:
 							possible_minigames.append("Final Activation")
 			elif action_to_take == "Final Activation":
-				hitptsToSpend = strategy(list(range(self.finalAct + 1)))
+				hitptsToSpend = strategy(list(range(self.hit + 1)))
 				self.hit += hitptsToSpend
 				self.finalAct -= hitptsToSpend
 				final_game = FinalActivation(self.finalAct)

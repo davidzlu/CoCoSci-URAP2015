@@ -55,6 +55,23 @@ class Minigame:
 		assert row < self.board.shape[0] and column < self.board.shape[1]
 		self.board[row][column] = num
 
+	def legalActions(self, numrows, numcols):
+		"""Returns list of ways a pair of numbers can be placed on the board.
+			If no empty spaces, moves represented as list of form:
+				[(row, column) where 1st number goes, (row, column) where 2nd number goes]
+		"""
+		emptySpaces = []
+		for row in range(numrows):
+			for col in range(numcols):
+				if self.board[(row, col)] == 0:
+					emptySpaces.append( (row, col) )
+
+		# List of all pairs of spaces with repeats
+		# e.g. permutations([1, 2, 3], 2) returns [(1, 2), (1, 3), (2, 1), (2, 3), (3, 1), (3, 2)]
+		actions = list(permutations(emptySpaces, 2))
+		print("Actions: ", actions)
+		return actions
+
 class Activation(Minigame):
 	def __init__(self):
 		"""create a 2*4 board"""
@@ -83,9 +100,9 @@ class Activation(Minigame):
 			numbers = self.roll_dice_get_number()
 			print("These are numbers you can put in the board:")
 			print(numbers)
-			moves = strategy(numbers, self.board)
-			self.put_number(moves[0][0], moves[0][1], moves[0][2])
-			self.put_number(moves[1][0], moves[1][1], moves[1][2])
+			moves = strategy(self.legalActions(2, 4), True)
+			self.put_number(numbers[0], moves[0][0], moves[0][1])
+			self.put_number(numbers[1], moves[1][0], moves[1][1])
 			print("This is the current state of the board:")
 			print(self.board)
 			for i in range(0, 4):
@@ -96,9 +113,9 @@ class Activation(Minigame):
 					numbers = self.roll_dice_get_number()
 					print("These are numbers you can put in the board:")
 					print(numbers)
-					moves = strategy(numbers, self.board)
-					self.put_number(moves[0][0], moves[0][1], moves[0][2])
-			self.put_number(moves[1][0], moves[1][1], moves[1][2])
+					moves = strategy(self.legalActions(2, 4), True)
+					self.put_number(numbers[0], moves[0][0], moves[0][1])
+			self.put_number(numbers[1], moves[1][0], moves[1][1])
 		damage_taken = self.check_final_range[1]
 		energy_point = energy_point + self.check_final_range()[0]
 		if energy_point % 100 >= 4:
@@ -106,7 +123,7 @@ class Activation(Minigame):
 		else:
 			return energy_point, damage_taken
 
-class Connection(Minigame): #will need to add UtopiaEngine later
+class Connection(Minigame): 
 	"""A class that simulates the Connection part of the game
 		The UtopiaEngine class should check that there are
 		sufficient components available before creating an instance
@@ -145,7 +162,7 @@ class Connection(Minigame): #will need to add UtopiaEngine later
 	def board2state(self, board):
 		return np.hsplit(board, 3)
 		
-	def roll_dice_get_number():
+	def roll_dice_get_number(self):
 		self.roll = Minigame.roll_dice_get_number(2)
 		return self.roll
 
@@ -159,23 +176,24 @@ class Connection(Minigame): #will need to add UtopiaEngine later
 
 	def play(self, strategy):
 		while not check_full():
-			result = roll_dice_get_number()
-			moves = strategy(result)
+			result = self.roll_dice_get_number()
+			for number in result:
+				decision = strategy(['keep', 'toss'])
+				if decision is 'toss':
+					self.toss(number)
+			moves = strategy(self.legalActions(2, 3), True)
 			for move in moves:
-				num = move[0]
-				row = move[1][0]
-				col = move[1][1]
-				if self.board[row][col] == 0:
-					put_number(num, row, col)
-				elif check_full():
-					toss(num)
+				num = strategy(result)
+				result.remove(num) #prevents the number from being used again
+				row = move[0]
+				col = move[1]
 		state = board2state(self.board)
 		link = 0
 		for pair in state:
 			diff = np.subtract(pair[0], pair[1])[0]
 			if diff < 0:
 				gamestate.hit -= 1
-				decision = strategy() #determines whether to spend another component
+				decision = strategy(['continue', 'stop']) #determines whether to spend another component
 				if decision == 'continue':
 					link += 2
 				else:
@@ -199,7 +217,8 @@ class Search(Minigame):
 			print("Current board: ")
 			print(self.board)
 			roll1, roll2 = self.roll_dice_get_number(2)
-			space1, space2 = policy(self)
+			spaces = policy(self.legalActions(), True)
+			space1, space2 = spaces[0], spaces[1]
 			self.board[space1] = roll1
 			self.board[space2] = roll2
 
@@ -207,25 +226,11 @@ class Search(Minigame):
 		print(self.board)
 		val1 = self.board[0][0]*100 + self.board[0][1]*10 + self.board[0][2]
 		val2 = self.board[1][0]*100 + self.board[1][1]*10 + self.board[1][2]
-		print("Your serach result: ", val1-val2)
+		print("Your search result: ", val1-val2)
 		return val1 - val2
 
 	def legalActions(self):
-		"""Returns list of ways a pair of numbers can be placed on the board.
-			If no empty spaces, moves represented as list of form:
-				[(row, column) where 1st number goes, (row, column) where 2nd number goes]
-		"""
-		emptySpaces = []
-		for row in range(2):
-			for col in range(3):
-				if self.board[(row, col)] == 0:
-					emptySpaces.append( (row, col) )
-
-		# List of all pairs of spaces with repeats
-		# e.g. permutations([1, 2, 3], 2) returns [(1, 2), (1, 3), (2, 1), (2, 3), (3, 1), (3, 2)]
-		actions = list(permutations(emptySpaces, 2))
-		print("Actions: ", actions)
-		return actions
+		return self.legalActions(2, 3)
 
 
 class FinalActivation(Minigame):
