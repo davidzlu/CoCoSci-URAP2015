@@ -13,6 +13,27 @@ def random_policy(options, minigame = False):
 	else:
 		return random.choice(options)
 
+def human_player(options, minigame = False):
+    print("Your available moves are: ")
+    print(options)
+    if minigame: #make two choices
+    	moves = []
+    	response = input("Select the first spot where you'd like to place a number: ")
+    	my_move = ast.literal_eval(response)
+    	while my_move not in options:
+        	my_move = ast.literal_eval(input("Please enter a valid move: "))
+    	move1 = moves.append(my_move)
+    	response = input("Select the second spot where you'd like to place a number: ")
+    	my_move = ast.literal_eval(response)
+    	while my_move not in options:
+        	my_move = ast.literal_eval(input("Please enter a valid move: "))
+    	move2 = moves.append(my_move)
+    	return moves
+    my_move = input("Enter the choice you'd like to make: ")
+    if type(options[0]) is not str:
+    	my_move = ast.literal_eval(my_move)
+    return my_move
+
 class Enemy:
 	def __init__(self, level, attack, hit, area, spirit = False):
 		self.level = level
@@ -30,7 +51,7 @@ class Area:
 		self.treasure = treasure
 class Area1(Area):
 	def __init__(self):
-		Area.__init__(1, [1, 1, 0, 1, 0, 0], "Seal of Balance", "Silver", "Ice Plate")
+		Area.__init__(self, 1, [1, 1, 0, 1, 0, 0], "Seal of Balance", "Silver", "Ice Plate")
 		self.enemy1 = Enemy(1, [1], [5, 6], self)
 		self.enemy2 = Enemy(2, [1], [6], self)
 		self.enemy3 = Enemy(3, [1, 2], [6], self)
@@ -38,7 +59,7 @@ class Area1(Area):
 		self.enemy5 = Enemy(5, [1, 2, 3, 4], [6], self)
 class Area2(Area):
 	def __init__(self):
-		Area.__init__(2, [1, 0, 0, 1, 0, 0], "Hermetic Mirror", "Quartz", "Bracelet of Ios")
+		Area.__init__(self, 2, [1, 0, 0, 1, 0, 0], "Hermetic Mirror", "Quartz", "Bracelet of Ios")
 		self.enemy1 = Enemy(1, [1, 2], [5, 6], self)
 		self.enemy2 = Enemy(2, [1], [6], self)
 		self.enemy3 = Enemy(3, [1], [6], self)
@@ -46,7 +67,7 @@ class Area2(Area):
 		self.enemy5 = Enemy(5, [1, 2, 3, 4], [6], self, True)
 class Area3(Area):
 	def __init__(self):
-		Area.__init__(3, [1, 0, 1, 0, 1, 0], "Void Gate", "Gum", "Shimmering Moonlace")
+		Area.__init__(self, 3, [1, 0, 1, 0, 1, 0], "Void Gate", "Gum", "Shimmering Moonlace")
 		self.enemy1 = Enemy(1, [1], [5, 6], self)
 		self.enemy2 = Enemy(2, [1, 2], [6], self)
 		self.enemy3 = Enemy(3, [1, 2], [6], self)
@@ -54,7 +75,7 @@ class Area3(Area):
 		self.enemy5 = Enemy(5, [1, 2, 3, 4], [6], self)
 class Area4(Area):
 	def __init__(self):
-		Area.__init__(4, [1, 0, 1, 0, 1, 0], "Golden Chassis", "Silica", "Scale of the Infinity Wurm")
+		Area.__init__(self, 4, [1, 0, 1, 0, 1, 0], "Golden Chassis", "Silica", "Scale of the Infinity Wurm")
 		self.enemy1 = Enemy(1, [1], [5, 6], self)
 		self.enemy2 = Enemy(2, [1], [6], self)
 		self.enemy3 = Enemy(3, [1, 2], [6], self, True)
@@ -62,7 +83,7 @@ class Area4(Area):
 		self.enemy5 = Enemy(5, [1, 2, 3, 4], [6], self)
 class Area5(Area):
 	def __init__(self):
-		Area.__init__(5, [1, 0, 0, 1, 0, 0], "Scrying Lens", "Wax", "The Ancient Record")
+		Area.__init__(self, 5, [1, 0, 0, 1, 0, 0], "Scrying Lens", "Wax", "The Ancient Record")
 		self.enemy1 = Enemy(1, [1], [5, 6], self)
 		self.enemy2 = Enemy(2, [1], [6], self, True)
 		self.enemy3 = Enemy(3, [1, 2], [6], self, True)
@@ -70,7 +91,7 @@ class Area5(Area):
 		self.enemy5 = Enemy(5, [1, 2, 3, 4], [6], self, True)
 class Area6(Area):
 	def __init__(self):
-		Area.__init__(6, [1, 1, 0, 1, 0, 0], "Crystal Battery", "Lead", "The Molten Shard")
+		Area.__init__(self, 6, [1, 1, 0, 1, 0, 0], "Crystal Battery", "Lead", "The Molten Shard")
 		self.enemy1 = Enemy(1, [1], [5, 6], self)
 		self.enemy2 = Enemy(2, [1, 2], [5, 6], self)
 		self.enemy3 = Enemy(3, [1, 2, 3], [5, 6], self)
@@ -95,7 +116,7 @@ class GameBoard:
 		self.day = 0
 		self.end_day = 22 # when self.day = self.end_day - self.skull, game ends
 		self.eventdays = [1, 4, 7, 10, 13, 16, 19]
-		self.event = null
+		self.event = None
 		self.events = ["Fleeting visions", "Foul Water", "Good Forture", "Active Monsters"]
 		self.godhand = 0 # energy in god hand device
 		self.finalAct = 0
@@ -105,7 +126,7 @@ class GameBoard:
 		if self.day in self.eventdays:
 			self.event = random.choice(self.events)
 		else:
-			self.event = null
+			self.event = None
 	def take_damage(self, n):
 		self.hit = self.hit - n
 	def combat(self, enemy):
