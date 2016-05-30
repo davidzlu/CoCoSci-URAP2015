@@ -45,7 +45,7 @@ class Minigame:
 		return np.count_nonzero(self.board) == self.board.size
 
 	def play(self):
-		return
+		raise NotImplementedError
 
 	def check_final_range(self):
 		if self.check_full():
@@ -60,13 +60,13 @@ class Minigame:
 		given current state (self) and an action. Must be overwritten by
 		child classes.
 		"""
-		return
+		raise NotImplementedError
 
 	def next_states(self, action):
 		""" Returns all possible next states given current state and an action.
 		Must be overwritten by child class.
 		"""
-		return
+		raise NotImplementedError
 
 	def transition_prob(self, action, next_state):
 		""" Returns pobability of transitioning from current state to
@@ -76,7 +76,7 @@ class Minigame:
         # if nextState in nextPossible:
         #     return 1.0/float(len(nextPossible))
         # return 0.0
-        return
+        raise NotImplementedError
 
 	def legalActions(self, numrows, numcols):
 		"""Returns list of ways a pair of numbers can be placed on the board.

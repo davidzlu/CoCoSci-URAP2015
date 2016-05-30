@@ -23,7 +23,7 @@ class Features:
         estimated_entropy = 0.0
         # for game in self.results:
         #     game_states = game[0]
-        for state, action, _nextState in tpm.keys():
+        for state, action, _nextState in tpm.keys(): # Consider changing to cycle through self.results
             prob_vector = state.transition_prob_vector(action)
             log_vector = np.log(prob_vector)
             vector_ent = 0.0
