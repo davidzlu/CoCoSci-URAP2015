@@ -24,7 +24,7 @@ class Features:
         # for game in self.results:
         #     game_states = game[0]
         for state, action, _nextState in tpm.keys():
-            prob_vector = state.getMatrixRow(action)
+            prob_vector = state.transition_prob_vector(action)
             log_vector = np.log(prob_vector)
             vector_ent = 0.0
             for i in range(len(prob_vector)):

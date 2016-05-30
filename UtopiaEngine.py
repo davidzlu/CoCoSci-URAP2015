@@ -71,6 +71,9 @@ class Area6(Area):
 		self.enemy5 = Enemy(5, [1, 2, 3, 4], [6], self, True)
 
 class GameBoard:
+
+	tpm = {}
+
 	def __init__(self):
 		self.area1 = Area1()
 		self.area2 = Area2()
@@ -94,13 +97,22 @@ class GameBoard:
 		self.finalAct = 0
 		self.numConnected = 0
 		self.wastebasket = []
+
+	def transition_prob_matrix(self):
+		return self.tpm
+
+	def transition_prob_vector(self, action):
+		return
+
 	def eventCycle(self):
 		if self.day in self.eventdays:
 			self.event = random.choice(self.events)
 		else:
 			self.event = null
+
 	def take_damage(self, n):
 		self.hit = self.hit - n
+
 	def combat(self, enemy):
 		damage_taken = 0
 		self_dice = 0

@@ -121,8 +121,6 @@ class GameState(Game):
         elif self.phase == 0 or self.phase == 2: #states after rolling and placing
             for i in range(1, 7):
                 try:
-                    # Need to get all possible ways to pull pieces onto board
-                    # given that you know the formation
                     next_state = deepcopy(self)
                     next_state.dice1 = i
                     next_state.phase_two(i, action)
@@ -145,7 +143,7 @@ class GameState(Game):
             return 1.0/float(len(nextPossible))
         return 0.0
 
-    def getMatrixRow(self, action):
+    def transition_prob_vector(self, action):
         """Returns row of transition probability matrix, specified by curState (self) and action.
         """
         matrixRow = []

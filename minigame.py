@@ -1,6 +1,7 @@
 import random
 import numpy as np
 import ast
+from copy import deepcopy
 from itertools import permutations, combinations_with_replacement, combinations
 
 def create_mini_game(row, column):
@@ -55,6 +56,29 @@ class Minigame:
 		assert row < self.board.shape[0] and column < self.board.shape[1]
 		self.board[row][column] = num
 
+	def transition_prob_vector(self, action):
+		""" Method for finding transition probabilities of all next states
+		given current state (self) and an action. Must be overwritten by
+		child classes.
+		"""
+		return
+
+	def next_states(self, action):
+		""" Returns all possible next states given current state and an action.
+		Must be overwritten by child class.
+		"""
+		return
+
+	def transition_prob(self, action, next_state):
+		""" Returns pobability of transitioning from current state to
+		next_state by taking action.  Must be overwritten by child class.
+		"""
+        # nextPossible = self.next_states(action)
+        # if nextState in nextPossible:
+        #     return 1.0/float(len(nextPossible))
+        # return 0.0
+        return
+
 class Activation(Minigame):
 	def __init__(self):
 		"""create a 2*4 board"""
@@ -76,6 +100,15 @@ class Activation(Minigame):
 				elif diff < 1:
 					damage_take = damage_take + 1
 		return (energy_point, damage_take)
+
+	def transition_prob_vector(self, action):
+		return
+
+	def next_states(self, action):
+		return
+
+	def transition_prob(self, action, next_state):
+		return
 
 	def play(self, strategy, energy_point):
 		print("Activation started:")
@@ -117,6 +150,15 @@ class Connection(Minigame): #will need to add UtopiaEngine later
 		self.board = game_temp.board
 		self.roll = []
 		self.gamestate = gamestate #the bigger board
+
+	def transition_prob_vector(self, action):
+		return
+
+	def next_states(self, action):
+		return
+
+	def transition_prob(self, action, next_state):
+		return
 
 	def states(self): 
 		"""Returns each state as a set of 3 2x1 arrays."""
@@ -198,10 +240,7 @@ class Search(Minigame):
 		while not self.check_full():
 			print("Current board: ")
 			print(self.board)
-			roll1, roll2 = self.roll_dice_get_number(2)
-			space1, space2 = policy(self)
-			self.board[space1] = roll1
-			self.board[space2] = roll2
+			self = self.simulate_action(policy(self))
 
 		print("Current board: ")
 		print(self.board)
@@ -210,6 +249,13 @@ class Search(Minigame):
 		print("Your serach result: ", val1-val2)
 		return val1 - val2
 
+	def simulate_action(self, action):
+		next_state = deepcopy(self)
+		roll1, roll2 = self.roll_dice_get_number(2)
+		next_state.board[action[0]] = roll1
+		next_state.board[action[1]] = roll2
+		return next_state
+	
 	def legalActions(self):
 		"""Returns list of ways a pair of numbers can be placed on the board.
 			If no empty spaces, moves represented as list of form:
@@ -227,6 +273,20 @@ class Search(Minigame):
 		print("Actions: ", actions)
 		return actions
 
+	def next_states(self, action):
+		"""Returns list of next possible states given current state and action.
+		"""
+		states = []
+		if action in self.legalActions():
+
+		return states
+
+	def transition_prob_vector(self, action):
+		return
+
+	def transition_prob(self, action, next_state):
+		return
+
 
 class FinalActivation(Minigame):
 
@@ -240,4 +300,8 @@ class FinalActivation(Minigame):
 		else:
 			return False
 
+	def transition_prob_vector(self, action):
+		return
 
+	def next_states(self, action):
+		return
