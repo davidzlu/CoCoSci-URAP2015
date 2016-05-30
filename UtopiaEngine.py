@@ -6,6 +6,34 @@ from minigame import *
 possible_minigames = ["Search", "Activation", "Connection"]
 connection_comb = [["Scrying Lens", "Seal of Balance", "Silver", False],  ["Seal of Balance", "Hermetic Mirror", "Silica", False], ["Golden Chassis", "Seal of Balance", "Quartz", False], ["Hermetic Mirror", "Void Gate", "Wax", False], ["Void Gate", "Golden Chassis", "Gum", False], ["Golden Chassis", "Crystal Battery", "Lead", False]]
 
+def random_policy(options, minigame = False):
+	"""options needs to be a list, for example, a list of actions"""
+	if minigame:
+		return random.sample(options, 2)
+	else:
+		return random.choice(options)
+
+def human_player(options, minigame = False):
+    print("Your available moves are: ")
+    print(options)
+    if minigame: #make two choices
+    	moves = []
+    	response = input("Select the first spot where you'd like to place a number: ")
+    	my_move = ast.literal_eval(response)
+    	while my_move not in options:
+        	my_move = ast.literal_eval(input("Please enter a valid move: "))
+    	move1 = moves.append(my_move)
+    	response = input("Select the second spot where you'd like to place a number: ")
+    	my_move = ast.literal_eval(response)
+    	while my_move not in options:
+        	my_move = ast.literal_eval(input("Please enter a valid move: "))
+    	move2 = moves.append(my_move)
+    	return moves
+    my_move = input("Enter the choice you'd like to make: ")
+    if type(options[0]) is not str:
+    	my_move = ast.literal_eval(my_move)
+    return my_move
+
 class Enemy:
 	def __init__(self, level, attack, hit, area, spirit = False):
 		self.level = level
@@ -23,7 +51,7 @@ class Area:
 		self.treasure = treasure
 class Area1(Area):
 	def __init__(self):
-		Area.__init__(1, [1, 1, 0, 1, 0, 0], "Seal of Balance", "Silver", "Ice Plate")
+		Area.__init__(self, 1, [1, 1, 0, 1, 0, 0], "Seal of Balance", "Silver", "Ice Plate")
 		self.enemy1 = Enemy(1, [1], [5, 6], self)
 		self.enemy2 = Enemy(2, [1], [6], self)
 		self.enemy3 = Enemy(3, [1, 2], [6], self)
@@ -31,7 +59,7 @@ class Area1(Area):
 		self.enemy5 = Enemy(5, [1, 2, 3, 4], [6], self)
 class Area2(Area):
 	def __init__(self):
-		Area.__init__(2, [1, 0, 0, 1, 0, 0], "Hermetic Mirror", "Quartz", "Bracelet of Ios")
+		Area.__init__(self, 2, [1, 0, 0, 1, 0, 0], "Hermetic Mirror", "Quartz", "Bracelet of Ios")
 		self.enemy1 = Enemy(1, [1, 2], [5, 6], self)
 		self.enemy2 = Enemy(2, [1], [6], self)
 		self.enemy3 = Enemy(3, [1], [6], self)
@@ -39,7 +67,7 @@ class Area2(Area):
 		self.enemy5 = Enemy(5, [1, 2, 3, 4], [6], self, True)
 class Area3(Area):
 	def __init__(self):
-		Area.__init__(3, [1, 0, 1, 0, 1, 0], "Void Gate", "Gum", "Shimmering Moonlace")
+		Area.__init__(self, 3, [1, 0, 1, 0, 1, 0], "Void Gate", "Gum", "Shimmering Moonlace")
 		self.enemy1 = Enemy(1, [1], [5, 6], self)
 		self.enemy2 = Enemy(2, [1, 2], [6], self)
 		self.enemy3 = Enemy(3, [1, 2], [6], self)
@@ -47,7 +75,7 @@ class Area3(Area):
 		self.enemy5 = Enemy(5, [1, 2, 3, 4], [6], self)
 class Area4(Area):
 	def __init__(self):
-		Area.__init__(4, [1, 0, 1, 0, 1, 0], "Golden Chassis", "Silica", "Scale of the Infinity Wurm")
+		Area.__init__(self, 4, [1, 0, 1, 0, 1, 0], "Golden Chassis", "Silica", "Scale of the Infinity Wurm")
 		self.enemy1 = Enemy(1, [1], [5, 6], self)
 		self.enemy2 = Enemy(2, [1], [6], self)
 		self.enemy3 = Enemy(3, [1, 2], [6], self, True)
@@ -55,7 +83,7 @@ class Area4(Area):
 		self.enemy5 = Enemy(5, [1, 2, 3, 4], [6], self)
 class Area5(Area):
 	def __init__(self):
-		Area.__init__(5, [1, 0, 0, 1, 0, 0], "Scrying Lens", "Wax", "The Ancient Record")
+		Area.__init__(self, 5, [1, 0, 0, 1, 0, 0], "Scrying Lens", "Wax", "The Ancient Record")
 		self.enemy1 = Enemy(1, [1], [5, 6], self)
 		self.enemy2 = Enemy(2, [1], [6], self, True)
 		self.enemy3 = Enemy(3, [1, 2], [6], self, True)
@@ -63,7 +91,7 @@ class Area5(Area):
 		self.enemy5 = Enemy(5, [1, 2, 3, 4], [6], self, True)
 class Area6(Area):
 	def __init__(self):
-		Area.__init__(6, [1, 1, 0, 1, 0, 0], "Crystal Battery", "Lead", "The Molten Shard")
+		Area.__init__(self, 6, [1, 1, 0, 1, 0, 0], "Crystal Battery", "Lead", "The Molten Shard")
 		self.enemy1 = Enemy(1, [1], [5, 6], self)
 		self.enemy2 = Enemy(2, [1, 2], [5, 6], self)
 		self.enemy3 = Enemy(3, [1, 2, 3], [5, 6], self)
@@ -91,7 +119,7 @@ class GameBoard:
 		self.day = 0
 		self.end_day = 22 # when self.day = self.end_day - self.skull, game ends
 		self.eventdays = [1, 4, 7, 10, 13, 16, 19]
-		self.event = null
+		self.event = None
 		self.events = ["Fleeting visions", "Foul Water", "Good Forture", "Active Monsters"]
 		self.godhand = 0 # energy in god hand device
 		self.finalAct = 0
@@ -104,11 +132,14 @@ class GameBoard:
 	def transition_prob_vector(self, action):
 		return
 
+	def next_states(self, action):
+		return
+
 	def eventCycle(self):
 		if self.day in self.eventdays:
 			self.event = random.choice(self.events)
 		else:
-			self.event = null
+			self.event = None
 
 	def take_damage(self, n):
 		self.hit = self.hit - n
@@ -138,7 +169,7 @@ class GameBoard:
 		score += 10 * len(self.construct)
 		
 	def rest(self):
-		if "Void Gate" in self.construct && self.construct["Void Gate"] >= 999:
+		if "Void Gate" in self.construct and self.construct["Void Gate"] >= 999:
 			self.hit += 1.5
 		else:
 			self.hit += 1
@@ -211,7 +242,7 @@ class GameBoard:
 				if self.hit < 0: #run out of life
 					break
 				elif self.hit == 0: # rest till restore
-					if "Void Gate" in self.construct && self.construct["Void Gate"] >=999:
+					if "Void Gate" in self.construct and self.construct["Void Gate"] >=999:
 						self.rest()
 						self.rest()
 						self.rest()
@@ -225,7 +256,7 @@ class GameBoard:
 						self.rest()
 			elif action_to_take == "Activation": #activation
 				if len(self.construct) != 0: #no construct can be activated
-					construct_to_activate = strategy(self.construct)
+					construct_to_activate = strategy(list(self.construct.keys()))
 					if self.construct[construct_to_activate] >= 200 and self.construct[construct_to_activate] < 999: #haven't been activated and used up 2 chances
 						self.construct[construct_to_activate] = 999
 					elif self.construct[construct_to_activate] < 999:
@@ -237,13 +268,16 @@ class GameBoard:
 							self.construct[construct_to_activate] += 100
 					self.day += 1
 			elif action_to_take == "Connection":
-				construct_to_connect1 = strategy(self.construct)
-				construct_to_connect2 = strategy(self.construct)
-				component_to_connect = strategy(self.component)
+				if (len(self.construct) >= 2) and (len(self.component) != 0):
+					constructs = list(self.construct.keys())
+					construct_to_connect1 = strategy(constructs)
+					constructs.remove(construct_to_connect1)
+					construct_to_connect2 = strategy(constructs)
+					component_to_connect = strategy(list(self.component).keys())
 				connectable = False
 				setToConnect = []
 				for comb in connection_comb:
-					if construct_to_connect1 in comb and construct_to_connect2 in comb and component_to_connect = comb[2]:
+					if construct_to_connect1 in comb and construct_to_connect2 in comb and component_to_connect == comb[2]:
 						connectable = True
 						setToConnect = comb
 				if connectable:
@@ -256,7 +290,7 @@ class GameBoard:
 						if self.numConnected == 6:
 							possible_minigames.append("Final Activation")
 			elif action_to_take == "Final Activation":
-				hitptsToSpend = strategy(self.finalAct)
+				hitptsToSpend = strategy(list(range(self.hit + 1)))
 				self.hit += hitptsToSpend
 				self.finalAct -= hitptsToSpend
 				final_game = FinalActivation(self.finalAct)
