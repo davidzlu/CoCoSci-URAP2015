@@ -247,6 +247,9 @@ class Connection(Minigame):
 class Search(Minigame):
 	"""Class for search minigame.
 	"""
+
+	tpm = {}
+
 	def __init__(self):
 		Minigame.__init__(self, 2, 3)
 		self.roll1 = 0
@@ -294,10 +297,20 @@ class Search(Minigame):
 		return states
 
 	def transition_prob_vector(self, action):
-		return
+		vector = []
+		states = self.next_states(action)
+		for next_state in states:
+			vector.append( self.transition_prob(action, next_state) )
+		return vector
 
 	def transition_prob(self, action, next_state):
-		return
+		if (self, action, next_state) in Search.tpm.keys():
+			return Search.tpm[(self, action, next_state)]
+		states = set(self.next_states(action))
+		if next_state in states:
+			Search.tpm[(self, action, next_state)] = 1.0/long(len(states))
+			return 1.0/long(len(states))
+		return 0.0
 
 
 class FinalActivation(Minigame):
