@@ -219,6 +219,7 @@ class Features:
             total_number_each_turn.append(total_number)
         table = Table().with_columns(["round", np.arange(0, max_turns), "possible actions", [x / ngames for x in total_number_each_turn]])
         return table
+        # return [x / ngames for x in total_number_each_turn]
 
     def plot_rewards(self, ngames):
         rewards = []
@@ -232,8 +233,9 @@ class Features:
                 if i < len(roundResult[2]):
                     round_rewards += roundResult[2][i]
             rewards.append(round_rewards)
-        table = Table().with_columns(["round", np.arange(0, max_turns), "rewards", [x / ngames for x in rewards]])
-        return table
+        # table = Table().with_columns(["round", np.arange(0, max_turns), "rewards", [x / ngames for x in rewards]])
+        # return table
+        return [x / ngames for x in rewards]
 
     def clearResults(self):
         """
@@ -266,10 +268,18 @@ class Features:
         toWrite.close()
 
 
+
 if __name__ == '__main__':
-    ngames = 1000
+    ngames = 100
     psinst = Features(ps.PegSolitaire)
     psinst.generateGames(ps.random_policy, ngames)
+    list_move_to_next_reward = []
+    for i in range(0, 1000):
+        psinst = Features(ps.PegSolitaire)
+        psinst.generateGames(ps.random_policy, ngames)
+        list_move_to_next_reward.append(psinst.avgStepsToReward())
+        print(psinst.avgStepsToReward())
+    print(list_move_to_next_reward)
     # print(psinst.results[0][2])
     # print(psinst.plot_possible_actions(ngames))
     # print(psinst.plot_rewards(ngames))
@@ -290,6 +300,13 @@ if __name__ == '__main__':
     # jzActStd = jzinst.actionsStd()
     # ActMeans = (pActAvg, jzActAvg)
     # ActStddevs = (psinst.SEM(pActStd), jzinst.SEM(jzActStd))
+    # print(pActAvg)
+    # print(jzActAvg)
+    # print(pActStd)
+    # print(jzActStd)
+    # print(ActMeans)
+    # print(ActStddevs)
+
 
     # # Average Rewards
     # prewards = []
