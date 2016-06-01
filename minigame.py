@@ -22,16 +22,16 @@ def roll_dice(n):
 		result.append(roll)
 	return result
 
-def randomPolicy(state):
+def random_policy(state):
 	""" Generates next legal action for agent to take.
 		Arguments:
 			state: The current state for which an action will be generated.
 	"""
-	legalMoves = state.legalActions()
+	legalMoves = state.legal_actions()
 	return random.choice(legalMoves)
 
 class Minigame:
-	"""a class for the minigames for Utopia Engine"""
+	"""An abstract class for the minigames of Utopia Engine"""
 	def __init__(self, row, column):
 		"""initial state for minigame"""
 		self.board = create_mini_game(row, column)
@@ -55,33 +55,54 @@ class Minigame:
 		assert row < self.board.shape[0] and column < self.board.shape[1]
 		self.board[row][column] = num
 
+	def transition_prob_matrix(self):
+		return self.tpm
+
 	def transition_prob_vector(self, action):
 		""" Method for finding transition probabilities of all next states
-		given current state (self) and an action. Must be overwritten by
-		child classes.
+		given current state (self) and an action.
 		"""
-		raise NotImplementedError
-
-	def next_states(self, action):
-		""" Returns all possible next states given current state and an action.
-		Must be overwritten by child class.
-		"""
-		raise NotImplementedError
+		vector = []
+		states = self.next_states(action)
+		for next_state in states:
+			vector.append( self.transition_prob(action, next_state) )
+		return vector
 
 	def transition_prob(self, action, next_state):
 		""" Returns pobability of transitioning from current state to
-		next_state by taking action.  Must be overwritten by child class.
+		next_state by taking action.
 		"""
-		# nextPossible = self.next_states(action)
-		# if nextState in nextPossible:
-		#	 return 1.0/float(len(nextPossible))
-		# return 0.0
-		raise NotImplementedError
+		if (self, action, next_state) in self.tpm:
+			return self.tpm[(self, action, next_state)]
+		states = self.next_states(action)
+		if next_state in states:
+			self.tpm[(self, action, next_state)] = 1.0/long(len(states))
+			return 1.0/long(len(states))
+		return 0.0
 
-	def legalActions(self, numrows, numcols):
+	def next_states(self, action, numrows, numcols):
+		""" Returns all possible next states given current state and an action.
+		"""
+		states = []
+		if action in self.legal_actions(numrows, numcols):
+			for roll1 in range(1, 7):
+				for roll2 in range(1, 7):
+					states.append( self.simulate_action(action, roll1, roll2) )
+		return states
+
+	def simulate_action(self, action, roll1, roll2):
+		"""Takes in a legal action and returns a copy of the state after taking that action.
+		   Does not change current state.
+		"""
+		next_state = deepcopy(self)
+		next_state.board[action[0]] = roll1
+		next_state.board[action[1]] = roll2
+		return next_state
+
+	def legal_actions(self, numrows, numcols):
 		"""Returns list of ways a pair of numbers can be placed on the board.
-			If no empty spaces, moves represented as list of form:
-				[(row, column) where 1st number goes, (row, column) where 2nd number goes]
+			If no empty spaces, moves represented as tuple of form:
+				((row, column) where 1st number goes, (row, column) where 2nd number goes)
 		"""
 		emptySpaces = []
 		for row in range(numrows):
@@ -91,9 +112,15 @@ class Minigame:
 
 		# List of all pairs of spaces with repeats
 		# e.g. permutations([1, 2, 3], 2) returns [(1, 2), (1, 3), (2, 1), (2, 3), (3, 1), (3, 2)]
-		actions = list(permutations(emptySpaces, 2))
+		actions = tuple(permutations(emptySpaces, 2))
 		print("Actions: ", actions)
 		return actions
+
+	# def __hash__(self):
+	# 	return
+
+	# def __eq__(self, other):
+	# 	return
 
 
 class Activation(Minigame):
@@ -119,23 +146,10 @@ class Activation(Minigame):
 		return (energy_point, damage_take)
 
 	def next_states(self, action):
-		return
+		return Minigame.next_states(self, action, 2, 4)
 
-	def transition_prob_vector(self, action):
-		vector = []
-		states = self.next_states(action)
-		for next_state in states:
-			vector.append( self.transition_prob(action, next_state) )
-		return vector
-
-	def transition_prob(self, action, next_state):
-		if (self, action, next_state) in Search.tpm:
-			return Search.tpm[(self, action, next_state)]
-		states = set(self.next_states(action))
-		if next_state in states:
-			Search.tpm[(self, action, next_state)] = 1.0/long(len(states))
-			return 1.0/long(len(states))
-		return 0.0
+	def legal_actions(self, action):
+		return Minigame.legal_actions(self, 2, 4)
 
 	def play(self, strategy, energy_point):
 		print("Activation started:")
@@ -143,7 +157,7 @@ class Activation(Minigame):
 			numbers = self.roll_dice_get_number(2)
 			print("These are numbers you can put in the board:")
 			print(numbers)
-			moves = strategy(self.legalActions(2, 4), True)
+			moves = strategy(self.legal_actions(2, 4), True)
 			self.put_number(numbers[0], moves[0][0], moves[0][1])
 			self.put_number(numbers[1], moves[1][0], moves[1][1])
 			print("This is the current state of the board:")
@@ -156,10 +170,10 @@ class Activation(Minigame):
 					numbers = self.roll_dice_get_number()
 					print("These are numbers you can put in the board:")
 					print(numbers)
-					moves = strategy(self.legalActions(2, 4), True)
+					moves = strategy(self.legal_actions(2, 4), True)
 					self.put_number(numbers[0], moves[0][0], moves[0][1])
 			self.put_number(numbers[1], moves[1][0], moves[1][1])
-		damage_taken = self.check_final_range[1]
+		damage_taken = self.check_final_range()[1]
 		energy_point = energy_point + self.check_final_range()[0]
 		if energy_point % 100 >= 4:
 			return 999, damage_taken
@@ -180,22 +194,6 @@ class Connection(Minigame):
 
 	def next_states(self, action):
 		return
-
-	def transition_prob_vector(self, action):
-		vector = []
-		states = self.next_states(action)
-		for next_state in states:
-			vector.append( self.transition_prob(action, next_state) )
-		return vector
-
-	def transition_prob(self, action, next_state):
-		if (self, action, next_state) in Search.tpm:
-			return Search.tpm[(self, action, next_state)]
-		states = set(self.next_states(action))
-		if next_state in states:
-			Search.tpm[(self, action, next_state)] = 1.0/long(len(states))
-			return 1.0/long(len(states))
-		return 0.0
 
 	def states(self): 
 		"""Returns each state as a set of 3 2x1 arrays."""
@@ -225,7 +223,7 @@ class Connection(Minigame):
 		return np.hsplit(board, 3)
 		
 	def roll_dice_get_number(self):
-		self.roll = Minigame.roll_dice_get_number(2)
+		self.roll = Minigame.roll_dice_get_number(self, 2)
 		return self.roll
 
 	def toss(self, num):
@@ -243,7 +241,7 @@ class Connection(Minigame):
 				decision = strategy(['keep', 'toss'])
 				if decision is 'toss':
 					self.toss(number)
-			moves = strategy(self.legalActions(2, 3), True)
+			moves = strategy(self.legal_actions(2, 3), True)
 			for move in moves:
 				num = strategy(result)
 				result.remove(num) #prevents the number from being used again
@@ -272,8 +270,6 @@ class Search(Minigame):
 
 	def __init__(self):
 		Minigame.__init__(self, 2, 3)
-		self.roll1 = 0
-		self.roll2 = 0
 
 	def play(self, policy):
 		"""Play through one search round. Returns final difference after filling in board.
@@ -283,8 +279,8 @@ class Search(Minigame):
 		while not self.check_full():
 			print("Current board: ")
 			print(self.board)
-			self.roll1, self.roll2 = self.roll_dice_get_number(2)
-			self = self.simulate_action(policy(self.legalActions(), True))
+			roll1, roll2 = self.roll_dice_get_number(2)
+			self = self.simulate_action(policy(self.legal_actions(), True))
 
 		print("Current board: ")
 		print(self.board)
@@ -293,45 +289,13 @@ class Search(Minigame):
 		print("Your search result: ", val1-val2)
 		return val1 - val2
 
-	def simulate_action(self, action):
-		"""Takes in a legal action and returns a copy of the state after taking that action.
-		   Does not change current state.
-		"""
-		next_state = deepcopy(self)
-		next_state.board[action[0]] = self.roll1
-		next_state.board[action[1]] = self.roll2
-		return next_state
-	
-	def legalActions(self):
-		return self.legalActions(2, 3)
-
 	def next_states(self, action):
 		"""Returns list of next possible states given current state and action.
 		"""
-		states = []
-		possible_state = deepcopy(self)
-		if action in self.legalActions():
-			for possible_state.roll1 in range(1, 7):
-				for possible_state.roll2 in range(1, 7):
-					states.append( possible_state.simulate_action(action) )
-		return states
+		return Minigame.next_states(self, action, 2, 3)
 
-	def transition_prob_vector(self, action):
-		vector = []
-		states = self.next_states(action)
-		for next_state in states:
-			vector.append( self.transition_prob(action, next_state) )
-		return vector
-
-	def transition_prob(self, action, next_state):
-		if (self, action, next_state) in Search.tpm:
-			return Search.tpm[(self, action, next_state)]
-		states = set(self.next_states(action))
-		if next_state in states:
-			Search.tpm[(self, action, next_state)] = 1.0/long(len(states))
-			return 1.0/long(len(states))
-		return 0.0
-
+	def legal_actions(self):
+		return Minigame.legal_actions(self, 2, 3)
 
 class FinalActivation(Minigame):
 
