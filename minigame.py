@@ -72,11 +72,11 @@ class Minigame:
 		""" Returns pobability of transitioning from current state to
 		next_state by taking action.  Must be overwritten by child class.
 		"""
-        # nextPossible = self.next_states(action)
-        # if nextState in nextPossible:
-        #     return 1.0/float(len(nextPossible))
-        # return 0.0
-        raise NotImplementedError
+		# nextPossible = self.next_states(action)
+		# if nextState in nextPossible:
+		#	 return 1.0/float(len(nextPossible))
+		# return 0.0
+		raise NotImplementedError
 
 	def legalActions(self, numrows, numcols):
 		"""Returns list of ways a pair of numbers can be placed on the board.
@@ -97,12 +97,12 @@ class Minigame:
 
 
 class Activation(Minigame):
+
+	tpm = {}
+
 	def __init__(self):
 		"""create a 2*4 board"""
 		Minigame.__init__(self, 2, 4)
-	
-	def roll_dice_get_number(self):
-		Minigame.roll_dice_get_number(2)
 	
 	def check_final_range(self):
 		energy_point = 0
@@ -118,19 +118,29 @@ class Activation(Minigame):
 					damage_take = damage_take + 1
 		return (energy_point, damage_take)
 
-	def transition_prob_vector(self, action):
-		return
-
 	def next_states(self, action):
 		return
 
+	def transition_prob_vector(self, action):
+		vector = []
+		states = self.next_states(action)
+		for next_state in states:
+			vector.append( self.transition_prob(action, next_state) )
+		return vector
+
 	def transition_prob(self, action, next_state):
-		return
+		if (self, action, next_state) in Search.tpm:
+			return Search.tpm[(self, action, next_state)]
+		states = set(self.next_states(action))
+		if next_state in states:
+			Search.tpm[(self, action, next_state)] = 1.0/long(len(states))
+			return 1.0/long(len(states))
+		return 0.0
 
 	def play(self, strategy, energy_point):
 		print("Activation started:")
 		while not self.check_full():
-			numbers = self.roll_dice_get_number()
+			numbers = self.roll_dice_get_number(2)
 			print("These are numbers you can put in the board:")
 			print(numbers)
 			moves = strategy(self.legalActions(2, 4), True)
@@ -168,14 +178,24 @@ class Connection(Minigame):
 		self.roll = []
 		self.gamestate = gamestate #the bigger board
 
-	def transition_prob_vector(self, action):
-		return
-
 	def next_states(self, action):
 		return
 
+	def transition_prob_vector(self, action):
+		vector = []
+		states = self.next_states(action)
+		for next_state in states:
+			vector.append( self.transition_prob(action, next_state) )
+		return vector
+
 	def transition_prob(self, action, next_state):
-		return
+		if (self, action, next_state) in Search.tpm:
+			return Search.tpm[(self, action, next_state)]
+		states = set(self.next_states(action))
+		if next_state in states:
+			Search.tpm[(self, action, next_state)] = 1.0/long(len(states))
+			return 1.0/long(len(states))
+		return 0.0
 
 	def states(self): 
 		"""Returns each state as a set of 3 2x1 arrays."""
@@ -304,7 +324,7 @@ class Search(Minigame):
 		return vector
 
 	def transition_prob(self, action, next_state):
-		if (self, action, next_state) in Search.tpm.keys():
+		if (self, action, next_state) in Search.tpm:
 			return Search.tpm[(self, action, next_state)]
 		states = set(self.next_states(action))
 		if next_state in states:
