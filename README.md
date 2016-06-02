@@ -24,6 +24,12 @@ A model of a 2x2 game of Tic-Tac-Toe is also included in this repository as a bo
 Besides downloading the relevant files for the game, you will also need NumPy ver1.9 or later.
 It is recommended that you download it as part of the [Anaconda](https://www.continuum.io/downloads) package to ensure that further instructions work for you.
 
+The UC Berkeley python library [datascience](https://github.com/data-8/datascience) is also necessary in order to run `Features.py`.
+Once you have Anaconda installed, go ahead and run
+```
+pip install datascience
+```
+
 ## Playing a Game
 
 To run any file in interactive mode, use the command `python -i` followed by the name of the file.
