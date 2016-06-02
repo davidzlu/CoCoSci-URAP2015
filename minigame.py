@@ -148,7 +148,7 @@ class Activation(Minigame):
 	def next_states(self, action):
 		return Minigame.next_states(self, action, 2, 4)
 
-	def legal_actions(self, action):
+	def legal_actions(self):
 		return Minigame.legal_actions(self, 2, 4)
 
 	def play(self, strategy, energy_point):
@@ -187,13 +187,18 @@ class Connection(Minigame):
 		of this class."""
 
 	def __init__(self, gamestate):
-		game_temp = Minigame(2, 3)
-		self.board = game_temp.board
+		Minigame.__init__(self, 2, 3)
 		self.roll = []
 		self.gamestate = gamestate #the bigger board
 
 	def next_states(self, action):
-		return
+		return Minigame.next_states(self, action, 2, 3)
+
+	def legal_actions(self):
+		actions = Minigame.legal_actions(self, 2, 3)
+		actions.append('keep')
+		if len(gamestate.wastebasket) < 10:
+			actions.append('toss')
 
 	def states(self): 
 		"""Returns each state as a set of 3 2x1 arrays."""
@@ -214,7 +219,6 @@ class Connection(Minigame):
 			for position in positions:
 				unique_moves.append(n, position)
 		return list(combinations(unique_moves, 2))
-
 
 	def state2board(self, state):
 		return np.hstack((state[0], state[1], state[2]))
