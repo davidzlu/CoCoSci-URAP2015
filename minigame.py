@@ -186,6 +186,8 @@ class Connection(Minigame):
 		sufficient components available before creating an instance
 		of this class."""
 
+	tpm = {}
+
 	def __init__(self, gamestate):
 		Minigame.__init__(self, 2, 3)
 		self.roll = []
@@ -199,6 +201,7 @@ class Connection(Minigame):
 		actions.append('keep')
 		if len(gamestate.wastebasket) < 10:
 			actions.append('toss')
+		return actions
 
 	def states(self): 
 		"""Returns each state as a set of 3 2x1 arrays."""
@@ -239,18 +242,28 @@ class Connection(Minigame):
 		return self.roll
 
 	def play(self, strategy):
+		statesVisited = [] # Sequence of states visited during a game
+		actionsTaken = [] # Sequential actions taken during a game
+		rewardsGained = [] # Sequence of rewards obtained during a game
+		legalActions = []
+
 		while not check_full():
+			statesVisited.append(deepcopy(self))
 			result = self.roll_dice_get_number()
 			for number in result:
 				decision = strategy(['keep', 'toss'])
+				actionsTaken.append(decision)
 				if decision is 'toss':
+					statesVisited.append(deepcopy(self))
 					self.toss(number)
 			moves = strategy(self.legal_actions(2, 3), True)
+			actionsTaken.append(moves)
 			for move in moves:
 				num = strategy(result)
 				result.remove(num) #prevents the number from being used again
 				row = move[0]
 				col = move[1]
+
 		state = board2state(self.board)
 		link = 0
 		for pair in state:
@@ -258,13 +271,15 @@ class Connection(Minigame):
 			if diff < 0:
 				gamestate.hit -= 1
 				decision = strategy(['continue', 'stop']) #determines whether to spend another component
+				actionsTaken.append(decision)
 				if decision == 'continue':
 					link += 2
 				else:
 					return -1
+				statesVisited.append(deepcopy(self))
 			else:
 				link += diff
-		return link
+		return link, [statesVisited, actionsTaken, rewardsGained, legalActions]
 
 class Search(Minigame):
 	"""Class for search minigame.
@@ -276,22 +291,30 @@ class Search(Minigame):
 		Minigame.__init__(self, 2, 3)
 
 	def play(self, policy):
-		"""Play through one search round. Returns final difference after filling in board.
+		"""Play through one search round. Returns final difference after filling in board, along
+			with list of form [statesVisited, actionsTaken, rewardsGained, legalActions].
 			Arguments:
 				policy: a function that takes in the current state and returns a legal action
 		"""
+		statesVisited = [] # Sequence of states visited during a game
+		actionsTaken = [] # Sequential actions taken during a game
+		rewardsGained = [] # Sequence of rewards obtained during a game
+		legalActions = []
 		while not self.check_full():
 			print("Current board: ")
 			print(self.board)
+			statesVisited.append(deepcopy(self))
 			roll1, roll2 = self.roll_dice_get_number(2)
-			self = self.simulate_action(policy(self.legal_actions(), True))
+			action = policy(self.legal_actions(), True)
+			actionsTaken.append(action)
+			self = self.simulate_action()
 
 		print("Current board: ")
 		print(self.board)
 		val1 = self.board[0][0]*100 + self.board[0][1]*10 + self.board[0][2]
 		val2 = self.board[1][0]*100 + self.board[1][1]*10 + self.board[1][2]
 		print("Your search result: ", val1-val2)
-		return val1 - val2
+		return val1 - val2, [statesVisited, actionsTaken, rewardsGained, legalActions]
 
 	def next_states(self, action):
 		"""Returns list of next possible states given current state and action.
