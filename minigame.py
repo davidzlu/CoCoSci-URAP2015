@@ -326,6 +326,8 @@ class Search(Minigame):
 
 class FinalActivation(Minigame):
 
+	tpm = {}
+
 	def __init__(self, finalActivationDifficulty):
 		self.actNum = finalActivationNumber
 
@@ -336,8 +338,8 @@ class FinalActivation(Minigame):
 		else:
 			return False
 
-	def transition_prob_vector(self, action):
+	def next_states(self, action):
 		return
 
-	def next_states(self, action):
+	def legal_actions(self, action):
 		return

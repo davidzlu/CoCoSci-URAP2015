@@ -6,7 +6,7 @@ from copy import deepcopy
 
 possible_minigames = ["Search", "Activation", "Connection"]
 
-#List of valid combinations of constructs and components
+#List of valid combinations of constructs and components, and boolean marking if they have been connected.
 connection_comb = [["Scrying Lens", "Seal of Balance", "Silver", False], \
 				   ["Seal of Balance", "Hermetic Mirror", "Silica", False], \
 				   ["Golden Chassis", "Seal of Balance", "Quartz", False], \
@@ -218,6 +218,21 @@ class GameBoard:
 		component_to_connect = strategy(list(self.component).keys())
 		return construct_to_connect1, construct_to_connect2, component_to_connect
 
+	def valid_connection(self, construct1, construct2, component):
+		"""Helper function for play. Manages the check for a valid combination of constructs
+		   and components.
+		"""
+		connectable = False
+		setToConnect = []
+		for comb in connection_comb:
+			if construct1 in comb and construct2 in comb and component == comb[2]:
+				connectable = True
+				setToConnect = comb
+				connection_comb.remove(comb)
+				connection_comb.remove([comb[1], comb[0], comb[2]])
+		return connectable, setToConnect
+
+
 	def play(self, strategy):
 		statesVisited = [deepcopy(self)] # Sequence of states visited during a game
 		actionsTaken = [] # Sequential actions taken during a game
@@ -347,17 +362,11 @@ class GameBoard:
 			elif action_to_take == "Connection":
 				if self.can_connect():
 					construct_to_connect1, construct_to_connect2, component_to_connect = self.get_constructs_and_components_to_connect()
-				connectable = False
-				setToConnect = []
-				for comb in connection_comb:
-					if construct_to_connect1 in comb and construct_to_connect2 in comb and component_to_connect == comb[2]:
-						connectable = True
-						setToConnect = comb
-						connection_comb.remove(comb)
-						connection_comb.remove([comb[1], comb[0], comb[2]])
+				connectable, setToConnect = self.valid_connection(construct_to_connect1, construct_to_connect2, component_to_connect)
 				if connectable:
 					connection_game = Connection(self)
-					link_num = connection_game.play(strategy)
+					link_num, results = connection_game.play(strategy)
+					self.merge_results(statesVisited, actionsTaken, rewardsGained, legalActions, results)
 					if link_num >= 0:
 						self.finalAct += link_num
 						setToConnect[3] = True #these components are connected
@@ -367,6 +376,7 @@ class GameBoard:
 							possible_minigames = ["Final Activation"]
 			elif action_to_take == "Final Activation":
 				hitptsToSpend = strategy(list(range(self.hit + 1)))
+				actionsTaken.append(hitptsToSpend)
 				self.hit += hitptsToSpend
 				self.finalAct -= hitptsToSpend
 				final_game = FinalActivation(self.finalAct)
