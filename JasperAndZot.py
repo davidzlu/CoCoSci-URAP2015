@@ -926,7 +926,7 @@ class GameState(Game):
 
     def play(self, strategy):
         """the functon that runs the process of playing the game."""
-        statesVisited = [] # Sequence of states visited during a game
+        statesVisited = [deepcopy(self)] # Sequence of states visited during a game
         actionsTaken = [] # Sequential actions taken during a game
         rewardsGained = [] # Sequence of rewards obtained during a game
         legalActions = []
