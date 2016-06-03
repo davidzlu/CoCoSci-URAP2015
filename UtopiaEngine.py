@@ -137,6 +137,7 @@ class GameBoard:
 		self.finalAct = 0
 		self.numConnected = 0
 		self.wastebasket = []
+		self.activationStarted = False
 
 	def transition_prob_matrix(self):
 		return self.tpm
@@ -231,6 +232,16 @@ class GameBoard:
 				connection_comb.remove(comb)
 				connection_comb.remove([comb[1], comb[0], comb[2]])
 		return connectable, setToConnect
+
+	def start_final_activation(self, actionsTaken):
+		"""Helper function for play. Takes care of starting final activation.
+		"""
+		if not self.activationStarted:
+			hitptsToSpend = strategy(list(range(self.hit + 1)))
+			actionsTaken.append(hitptsToSpend)
+			self.hit -= hitptsToSpend
+			self.finalAct -= hitptsToSpend
+			self.activationStarted = True
 
 
 	def play(self, strategy):
@@ -375,20 +386,18 @@ class GameBoard:
 						if self.numConnected == 6:
 							possible_minigames = ["Final Activation"]
 			elif action_to_take == "Final Activation":
-				hitptsToSpend = strategy(list(range(self.hit + 1)))
-				actionsTaken.append(hitptsToSpend)
-				self.hit += hitptsToSpend
-				self.finalAct -= hitptsToSpend
+				self.start_final_activation(actionsTaken)
 				final_game = FinalActivation(self.finalAct)
-				result = final_game.play(strategy)
-				if result == True:
+				activated, results = final_game.play(strategy)
+				self.merge_results(statesVisited, actionsTaken, rewardsGained, legalActions, results)
+				if activated:
 					print("You've activated the Utopia Engine and saved the world!")
 					self.score += 50
 					self.score += (self.end_day - self.skull - self.day) * 5
 					break
 				else:
-					self.day = self.day + 1
-					self.hit = self.hit + 1
+					self.day += 1
+					self.hit -= 1
 
 			statesVisited.append(deepcopy(self))
 			

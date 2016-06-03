@@ -332,6 +332,10 @@ class FinalActivation(Minigame):
 		self.actNum = finalActivationNumber
 
 	def play(self, policy):
+		statesVisited = [] # Sequence of states visited during a game
+		actionsTaken = [] # Sequential actions taken during a game
+		rewardsGained = [] # Sequence of rewards obtained during a game
+		legalActions = []
 		playerSum = np.sum(roll_dice(2))
 		if playerSum >= self.actNum:
 			return True
@@ -339,7 +343,7 @@ class FinalActivation(Minigame):
 			return False
 
 	def next_states(self, action):
-		return
+		return 
 
-	def legal_actions(self, action):
-		return
+	def legal_actions(self):
+		return 'roll'
