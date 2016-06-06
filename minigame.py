@@ -152,14 +152,21 @@ class Activation(Minigame):
 		return Minigame.legal_actions(self, 2, 4)
 
 	def play(self, strategy, energy_point):
+		statesVisited = [deepcopy(self)] # Sequence of states visited during a game
+		actionsTaken = [] # Sequential actions taken during a game
+		rewardsGained = [] # Sequence of rewards obtained during a game
+		legalActions = []
+
 		print("Activation started:")
 		while not self.check_full():
 			numbers = self.roll_dice_get_number(2)
 			print("These are numbers you can put in the board:")
 			print(numbers)
 			moves = strategy(self.legal_actions(2, 4), True)
+			actionsTaken.append(moves)
 			self.put_number(numbers[0], moves[0][0], moves[0][1])
 			self.put_number(numbers[1], moves[1][0], moves[1][1])
+			statesVisited.append(deepcopy(self))
 			print("This is the current state of the board:")
 			print(self.board)
 			for i in range(0, 4):
@@ -176,9 +183,9 @@ class Activation(Minigame):
 		damage_taken = self.check_final_range()[1]
 		energy_point = energy_point + self.check_final_range()[0]
 		if energy_point % 100 >= 4:
-			return 999, damage_taken
+			return [999, damage_taken]
 		else:
-			return energy_point, damage_taken
+			return [energy_point, damage_taken]
 
 class Connection(Minigame): 
 	"""A class that simulates the Connection part of the game
@@ -330,17 +337,22 @@ class FinalActivation(Minigame):
 
 	def __init__(self, finalActivationDifficulty):
 		self.actNum = finalActivationNumber
+		self.activated = False
 
 	def play(self, policy):
-		statesVisited = [] # Sequence of states visited during a game
+		statesVisited = [deepcopy(self)] # Sequence of states visited during a game
 		actionsTaken = [] # Sequential actions taken during a game
 		rewardsGained = [] # Sequence of rewards obtained during a game
 		legalActions = []
 		playerSum = np.sum(roll_dice(2))
+		actionsTaken.append('roll')
 		if playerSum >= self.actNum:
-			return True
+			self.activated = True
+			statesVisited.append(deepcopy(self))
+			return True, [statesVisited, actionsTaken, rewardsGained, legalActions]
 		else:
-			return False
+			statesVisited.append(deepcopy(self))
+			return False, [statesVisited, actionsTaken, rewardsGained, legalActions]
 
 	def next_states(self, action):
 		return 

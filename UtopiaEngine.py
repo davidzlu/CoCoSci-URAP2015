@@ -249,6 +249,8 @@ class GameBoard:
 		actionsTaken = [] # Sequential actions taken during a game
 		rewardsGained = [] # Sequence of rewards obtained during a game
 		legalActions = []
+		self.activationStarted = False
+
 		while self.day < self.end_day - self.skull:
 			action_to_take = strategy(possible_minigames)
 			actionsTaken.append(action_to_take)
@@ -400,7 +402,8 @@ class GameBoard:
 					self.hit -= 1
 
 			statesVisited.append(deepcopy(self))
-			
+		
+		return statesVisited, actionsTaken, rewardsGained, legalActions
 
 
 
