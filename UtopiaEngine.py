@@ -138,6 +138,7 @@ class GameBoard:
 		self.numConnected = 0
 		self.wastebasket = []
 		self.activationStarted = False
+		self.score = 36 # unused equipment = 10 * 3, hitpoint = 6 * 1
 
 	def transition_prob_matrix(self):
 		return self.tpm
@@ -147,10 +148,6 @@ class GameBoard:
 
 	def next_states(self, action):
 		return
-
-	def take_damage(self, n):
-		self.hit = self.hit - n
-		self.score = 36 # unused equipment = 10 * 3, hitpoint = 6 * 1
 
 	def eventCycle(self):
 		if self.day in self.eventdays:

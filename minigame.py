@@ -151,13 +151,22 @@ class Activation(Minigame):
 	def legal_actions(self):
 		return Minigame.legal_actions(self, 2, 4)
 
+	def check_reroll(self):
+		"""Helper function for play. Checks if reroll necessary. If yes, resets boxes to 0,
+		   otherwise does nothing.
+		"""
+		for i in range(0, 4):
+			if self.board[0][i] - self.board[1][i] == 0:
+				self.board[0][i] = 0
+				self.board[1][i] = 0
+
 	def play(self, strategy, energy_point):
 		statesVisited = [deepcopy(self)] # Sequence of states visited during a game
 		actionsTaken = [] # Sequential actions taken during a game
 		rewardsGained = [] # Sequence of rewards obtained during a game
 		legalActions = []
-
 		print("Activation started:")
+		
 		while not self.check_full():
 			numbers = self.roll_dice_get_number(2)
 			print("These are numbers you can put in the board:")
@@ -167,25 +176,16 @@ class Activation(Minigame):
 			self.put_number(numbers[0], moves[0][0], moves[0][1])
 			self.put_number(numbers[1], moves[1][0], moves[1][1])
 			statesVisited.append(deepcopy(self))
+			self.check_reroll()
 			print("This is the current state of the board:")
 			print(self.board)
-			for i in range(0, 4):
-				if self.board[0][i] - self.board(1, i) == 0:
-					self.board[0][i] = 0
-					self.board[1][i] = 0
-					print("difference = 0: reroll")
-					numbers = self.roll_dice_get_number()
-					print("These are numbers you can put in the board:")
-					print(numbers)
-					moves = strategy(self.legal_actions(2, 4), True)
-					self.put_number(numbers[0], moves[0][0], moves[0][1])
-			self.put_number(numbers[1], moves[1][0], moves[1][1])
+			
 		damage_taken = self.check_final_range()[1]
 		energy_point = energy_point + self.check_final_range()[0]
 		if energy_point % 100 >= 4:
-			return [999, damage_taken]
+			return [999, damage_taken], [statesVisited, actionsTaken, rewardsGained, legalActions]
 		else:
-			return [energy_point, damage_taken]
+			return [energy_point, damage_taken], [statesVisited, actionsTaken, rewardsGained, legalActions]
 
 class Connection(Minigame): 
 	"""A class that simulates the Connection part of the game
