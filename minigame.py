@@ -331,7 +331,7 @@ class Search(Minigame):
 	def legal_actions(self):
 		return Minigame.legal_actions(self, 2, 3)
 
-class FinalActivation(Minigame):
+class FinalActivation:
 
 	tpm = {}
 
@@ -355,7 +355,33 @@ class FinalActivation(Minigame):
 			return False, [statesVisited, actionsTaken, rewardsGained, legalActions]
 
 	def next_states(self, action):
-		return 
+		states = [deepcopy(self)]
+		if not self.activated:
+			activated_state = deepcopy(self)
+			activated_state.activated = True
+			states.append(activated_state)
+		return states
 
 	def legal_actions(self):
 		return 'roll'
+
+	def transition_prob_matrix(self):
+		return self.tpm
+
+	def transition_prob_vector(self, action):
+		""" Method for finding transition probabilities of all next states
+		given current state (self) and an action.
+		"""
+		vector = []
+		states = self.next_states(action)
+		for next_state in states:
+			vector.append( self.transition_prob(action, next_state) )
+		return vector
+
+	def transition_prob(self, action, next_state):
+		""" Returns pobability of transitioning from current state to
+		next_state by taking action.
+		"""
+		if (self, action, next_state) in self.tpm:
+			return self.tpm[(self, action, next_state)]
+		
