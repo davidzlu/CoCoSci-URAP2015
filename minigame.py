@@ -386,9 +386,30 @@ class FinalActivation:
 		"""
 		if (self, action, next_state) in self.tpm:
 			return self.tpm[(self, action, next_state)]
+		prob_succeed_first_roll = dice_prob_distr(self.actNum)
 		prob_fail = 1 - prob_succeed_first_roll
 		prob_succeed = 1 - prob_fail**(self.rolls)
 		self.tpm[(self, action, next_state)] = prob_succeed
 		return prob_succeed
 
-		
+	def dice_prob_distr(target_roll):
+		"""Helper function for transition_prob. Returns probability of rolling two dice
+		   and getting a result greater than or equal to target_roll.
+		"""
+		dice_prob_table = {2:1.0/36.0
+						   3:2.0/36.0
+						   4:3.0/36.0
+						   5:4.0/36.0
+						   6:5.0/36.0
+						   7:6.0/36.0
+						   8:5.0/36.0
+						   9:4.0/36.0
+						   10:3.0/36.0
+						   11:2.0/36.0
+						   12:1.0/36.0}
+
+		query_prob = 0.0
+		while target_roll < 13:
+			query_prob += dice_prob_table[target_roll]
+			target_roll += 1
+		return query_prob
