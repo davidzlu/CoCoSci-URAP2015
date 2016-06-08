@@ -335,8 +335,9 @@ class FinalActivation:
 
 	tpm = {}
 
-	def __init__(self, finalActivationDifficulty):
+	def __init__(self, finalActivationDifficulty, hitpoints):
 		self.actNum = finalActivationNumber
+		self.rolls = hitpoints + 1
 		self.activated = False
 
 	def play(self, policy):
@@ -351,6 +352,7 @@ class FinalActivation:
 			statesVisited.append(deepcopy(self))
 			return True, [statesVisited, actionsTaken, rewardsGained, legalActions]
 		else:
+			self.hitpoints -= 1
 			statesVisited.append(deepcopy(self))
 			return False, [statesVisited, actionsTaken, rewardsGained, legalActions]
 
@@ -384,4 +386,9 @@ class FinalActivation:
 		"""
 		if (self, action, next_state) in self.tpm:
 			return self.tpm[(self, action, next_state)]
+		prob_fail = 1 - prob_succeed_first_roll
+		prob_succeed = 1 - prob_fail**(self.rolls)
+		self.tpm[(self, action, next_state)] = prob_succeed
+		return prob_succeed
+
 		

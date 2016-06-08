@@ -231,7 +231,8 @@ class GameBoard:
 		return connectable, setToConnect
 
 	def start_final_activation(self, actionsTaken):
-		"""Helper function for play. Takes care of starting final activation.
+		"""Helper function for play. Takes care of starting final activation. Adjusting hitpoints
+		and final activation difficulty done here.
 		"""
 		if not self.activationStarted:
 			hitptsToSpend = strategy(list(range(self.hit + 1)))
@@ -386,7 +387,7 @@ class GameBoard:
 							possible_minigames = ["Final Activation"]
 			elif action_to_take == "Final Activation":
 				self.start_final_activation(actionsTaken)
-				final_game = FinalActivation(self.finalAct)
+				final_game = FinalActivation(self.finalAct, self.hit)
 				activated, results = final_game.play(strategy)
 				self.merge_results(statesVisited, actionsTaken, rewardsGained, legalActions, results)
 				if activated:
