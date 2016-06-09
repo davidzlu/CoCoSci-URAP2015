@@ -2,9 +2,17 @@ import random
 import numpy as np
 import ast
 from minigame import *
+from copy import deepcopy
 
 possible_minigames = ["Search", "Activation", "Connection"]
-connection_comb = [["Scrying Lens", "Seal of Balance", "Silver", False],  ["Seal of Balance", "Hermetic Mirror", "Silica", False], ["Golden Chassis", "Seal of Balance", "Quartz", False], ["Hermetic Mirror", "Void Gate", "Wax", False], ["Void Gate", "Golden Chassis", "Gum", False], ["Golden Chassis", "Crystal Battery", "Lead", False]]
+
+#List of valid combinations of constructs and components, and boolean marking if they have been connected.
+connection_comb = [["Scrying Lens", "Seal of Balance", "Silver", False], \
+				   ["Seal of Balance", "Hermetic Mirror", "Silica", False], \
+				   ["Golden Chassis", "Seal of Balance", "Quartz", False], \
+				   ["Hermetic Mirror", "Void Gate", "Wax", False], \
+				   ["Void Gate", "Golden Chassis", "Gum", False], \
+				   ["Golden Chassis", "Crystal Battery", "Lead", False]]
 
 def random_policy(options, minigame = False):
 	"""options needs to be a list, for example, a list of actions"""
@@ -49,6 +57,12 @@ class Area:
 		self.construct = construct
 		self.component = component
 		self.treasure = treasure
+		self.event = None
+		self.events = ["Fleeting visions", "Foul Water", "Good Forture", "Active Monsters"]
+		
+	def eventCycle(self):
+		self.event = random.choice(None, random.choice(self.events))
+
 class Area1(Area):
 	def __init__(self):
 		Area.__init__(self, 1, [1, 1, 0, 1, 0, 0], "Seal of Balance", "Silver", "Ice Plate")
@@ -99,6 +113,9 @@ class Area6(Area):
 		self.enemy5 = Enemy(5, [1, 2, 3, 4], [6], self, True)
 
 class GameBoard:
+
+	tpm = {}
+
 	def __init__(self):
 		self.area1 = Area1()
 		self.area2 = Area2()
@@ -116,19 +133,35 @@ class GameBoard:
 		self.day = 0
 		self.end_day = 22 # when self.day = self.end_day - self.skull, game ends
 		self.eventdays = [1, 4, 7, 10, 13, 16, 19]
-		self.event = None
-		self.events = ["Fleeting visions", "Foul Water", "Good Forture", "Active Monsters"]
 		self.godhand = 0 # energy in god hand device
 		self.finalAct = 0
 		self.numConnected = 0
 		self.wastebasket = []
+		self.activationStarted = False
+		self.score = 36 # unused equipment = 10 * 3, hitpoint = 6 * 1
+
+	def transition_prob_matrix(self):
+		return self.tpm
+
+	def transition_prob_vector(self, action):
+		return
+
+	def next_states(self, action):
+		return
+
 	def eventCycle(self):
 		if self.day in self.eventdays:
-			self.event = random.choice(self.events)
-		else:
-			self.event = None
+			self.area1.eventCycle()
+			self.area2.eventCycle()
+			self.area3.eventCycle()
+			self.area4.eventCycle()
+			self.area5.eventCycle()
+			self.area6.eventCycle()
+
 	def take_damage(self, n):
 		self.hit = self.hit - n
+		self.score = self.score - n
+
 	def combat(self, enemy):
 		damage_taken = 0
 		self_dice = 0
@@ -155,15 +188,69 @@ class GameBoard:
 		
 	def rest(self):
 		if "Void Gate" in self.construct and self.construct["Void Gate"] >= 999:
-			self.hit += 1.5
+			self.hit += 2
 		else:
 			self.hit += 1
 		self.day = self.day + 1
-		
+
+	def merge_results(statesVisited, actionsTaken, rewardsGained, legalActions, results):
+		"""Helper function for play. Appends results from minigame to lists tracking all results.
+		"""
+		statesVisited += results[0]
+		actionsTaken += results[1]
+		rewardsGained += results[2]
+		legalActions += results[3]
+
+	def can_connect(self):
+		"""Helper function for play, returns True if at least 2 constructs and at least 1 component
+		"""
+		return (len(self.construct) >= 2) and (len(self.component) != 0)
+
+	def get_constructs_and_components_to_connect(self):
+		"""Helper function for play. Returns 2 constructs and 1 component for Connection.
+		"""
+		constructs = list(self.construct.keys())
+		construct_to_connect1 = strategy(constructs)
+		constructs.remove(construct_to_connect1)
+		construct_to_connect2 = strategy(constructs)
+		component_to_connect = strategy(list(self.component).keys())
+		return construct_to_connect1, construct_to_connect2, component_to_connect
+
+	def valid_connection(self, construct1, construct2, component):
+		"""Helper function for play. Manages the check for a valid combination of constructs
+		   and components.
+		"""
+		connectable = False
+		setToConnect = []
+		for comb in connection_comb:
+			if construct1 in comb and construct2 in comb and component == comb[2]:
+				connectable = True
+				setToConnect = comb
+				connection_comb.remove(comb)
+				connection_comb.remove([comb[1], comb[0], comb[2]])
+		return connectable, setToConnect
+
+	def start_final_activation(self, actionsTaken):
+		"""Helper function for play. Takes care of starting final activation.
+		"""
+		if not self.activationStarted:
+			hitptsToSpend = strategy(list(range(self.hit + 1)))
+			actionsTaken.append(hitptsToSpend)
+			self.hit -= hitptsToSpend
+			self.finalAct -= hitptsToSpend
+			self.activationStarted = True
+
+
 	def play(self, strategy):
+		statesVisited = [deepcopy(self)] # Sequence of states visited during a game
+		actionsTaken = [] # Sequential actions taken during a game
+		rewardsGained = [] # Sequence of rewards obtained during a game
+		legalActions = []
+		self.activationStarted = False
+
 		while self.day < self.end_day - self.skull:
-			self.eventCycle()
 			action_to_take = strategy(possible_minigames)
+			actionsTaken.append(action_to_take)
 			if action_to_take == "Search":
 				search_game = Search()
 				search_area = strategy(self.possible_areas)
@@ -171,8 +258,20 @@ class GameBoard:
 					self.day += 1
 				else:
 					self.day += search_area.daytracker.pop()
-				outcome = search_game.play(strategy)
-				if outcome >= 0 and outcome <= 10: # find construct
+				outcome, results = search_game.play(strategy)
+				merge_results(statesVisited, actionsTaken, rewardsGained, legalActions, results)
+				if outcome == 0: # find construct and activate: natural zero
+					self.score += 20
+					if search_area.construct is None:
+						if search_area.component in self.component:
+							self.component[search_area.component] += 2
+						else:
+							self.component[search_area.component] = 2
+					else:
+						self.construct[search_area.construct] = 999 # automatically activate
+						self.score += 15
+						search_area.construct = None
+				elif outcome >= 1 and outcome <= 10: # find construct
 					if search_area.construct is None:
 						if search_area.component in self.component:
 							self.component[search_area.component] += 2
@@ -180,6 +279,7 @@ class GameBoard:
 							self.component[search_area.component] = 2
 					else:
 						self.construct[search_area.construct] = 0
+						self.score += 10
 						search_area.construct = None
 				elif outcome >= 11 and outcome <= 99: # find component
 					if search_area.component in self.component:
@@ -224,11 +324,11 @@ class GameBoard:
 					if get_item_or_not <= 5:
 						if search_area.treasure not in self.treasure:
 							self.treasure.append(search_area.treasure)
+							self.score += 10
 				if self.hit < 0: #run out of life
 					break
 				elif self.hit == 0: # rest till restore
 					if "Void Gate" in self.construct and self.construct["Void Gate"] >=999:
-						self.rest()
 						self.rest()
 						self.rest()
 						self.rest()
@@ -242,51 +342,65 @@ class GameBoard:
 			elif action_to_take == "Activation": #activation
 				if len(self.construct) != 0: #no construct can be activated
 					construct_to_activate = strategy(list(self.construct.keys()))
-					if self.construct[construct_to_activate] >= 200 and self.construct[construct_to_activate] < 999: #haven't been activated and used up 2 chances
-						self.construct[construct_to_activate] = 999
-					elif self.construct[construct_to_activate] < 999:
+					# elif self.construct[construct_to_activate] >= 200 and self.construct[construct_to_activate] < 999: #haven't been activated and used up 2 chances
+					# 	self.construct[construct_to_activate] = 999
+					# elif self.construct[construct_to_activate] < 999:
+					# 	activation_game = Activation()
+					# 	outcome = activation_game.play(strategy, self.construct[construct_to_activate])
+					# 	self.take_damage(outcome[1])
+					# 	self.construct[construct_to_activate] = outcome[0]
+					# 	if outcome[0] != 999:
+					# 		self.construct[construct_to_activate] += 100
+					if self.construct[construct_to_activate] = 0:
+						self.day += 1
 						activation_game = Activation()
-						outcome = activation_game.play(strategy, self.construct[construct_to_activate])
-						self.take_damage(outcome[1])
+						outcome, results = activation_game.play(strategy, self.construct[construct_to_activate])
 						self.construct[construct_to_activate] = outcome[0]
-						if outcome[0] != 999:
-							self.construct[construct_to_activate] += 100
-					self.day += 1
+						self.take_damage(outcome[1])
+						merge_results(statesVisited, actionsTaken, rewardsGained, legalActions, results)
+						if outcome[0] < 4:
+							self.day += 1
+							activation_game2 = Activation()
+							outcome2 = activation_game2.play(strategy, self.construct[construct_to_activate])
+							self.construct[construct_to_activate] += outcome2[0]
+							self.take_damage(outcome2[1])
+							merge_results(statesVisited, actionsTaken, rewardsGained, legalActions, results)
+						if self.construct[construct_to_activate] < 4:
+							self.day += 1
+						self.construct[construct_to_activate] = 999
+						self.score += 5 # activated
 			elif action_to_take == "Connection":
-				if (len(self.construct) >= 2) and (len(self.component) != 0):
-					constructs = list(self.construct.keys())
-					construct_to_connect1 = strategy(constructs)
-					constructs.remove(construct_to_connect1)
-					construct_to_connect2 = strategy(constructs)
-					component_to_connect = strategy(list(self.component).keys())
-				connectable = False
-				setToConnect = []
-				for comb in connection_comb:
-					if construct_to_connect1 in comb and construct_to_connect2 in comb and component_to_connect == comb[2]:
-						connectable = True
-						setToConnect = comb
+				if self.can_connect():
+					construct_to_connect1, construct_to_connect2, component_to_connect = self.get_constructs_and_components_to_connect()
+				connectable, setToConnect = self.valid_connection(construct_to_connect1, construct_to_connect2, component_to_connect)
 				if connectable:
 					connection_game = Connection(self)
-					link_num = connection_game.play(strategy)
+					link_num, results = connection_game.play(strategy)
+					self.merge_results(statesVisited, actionsTaken, rewardsGained, legalActions, results)
 					if link_num >= 0:
 						self.finalAct += link_num
 						setToConnect[3] = True #these components are connected
 						self.numConnected += 1
+						self.score += 5
 						if self.numConnected == 6:
-							possible_minigames.append("Final Activation")
+							possible_minigames = ["Final Activation"]
 			elif action_to_take == "Final Activation":
-				hitptsToSpend = strategy(list(range(self.hit + 1)))
-				self.hit += hitptsToSpend
-				self.finalAct -= hitptsToSpend
+				self.start_final_activation(actionsTaken)
 				final_game = FinalActivation(self.finalAct)
-				result = final_game.play(strategy)
-				if result == True:
+				activated, results = final_game.play(strategy)
+				self.merge_results(statesVisited, actionsTaken, rewardsGained, legalActions, results)
+				if activated:
 					print("You've activated the Utopia Engine and saved the world!")
-					#give reward
+					self.score += 50
+					self.score += (self.end_day - self.skull - self.day) * 5
 					break
 				else:
-					self.day = self.day + 1
-					self.hit = self.hit + 1
+					self.day += 1
+					self.hit -= 1
+
+			statesVisited.append(deepcopy(self))
+		
+		return statesVisited, actionsTaken, rewardsGained, legalActions
 
 
 

@@ -15,15 +15,16 @@ class Features:
 
     def entropy(self):
         """
-        Returns entropy of outcome distribution.
+        Returns average over entropy of outcome distribution for every (state, action) pair
+        in the transition probability matrix.
         https://en.wikipedia.org/wiki/Entropy_%28information_theory%29#Definition
         """
         tpm = self.game().transition_prob_matrix()
         estimated_entropy = 0.0
         # for game in self.results:
         #     game_states = game[0]
-        for state, action, _nextState in tpm.keys():
-            prob_vector = state.getMatrixRow(action)
+        for state, action, _next_state in tpm.keys(): # Consider changing to cycle through self.results
+            prob_vector = state.transition_prob_vector(action)
             log_vector = np.log(prob_vector)
             vector_ent = 0.0
             for i in range(len(prob_vector)):
@@ -233,6 +234,7 @@ class Features:
             total_number_each_turn.append(total_number)
         table = Table().with_columns(["round", np.arange(0, max_turns), "possible actions", [x / ngames for x in total_number_each_turn]])
         return table
+        # return [x / ngames for x in total_number_each_turn]
 
     def plot_rewards(self, ngames):
         rewards = []
@@ -246,8 +248,9 @@ class Features:
                 if i < len(roundResult[2]):
                     round_rewards += roundResult[2][i]
             rewards.append(round_rewards)
-        table = Table().with_columns(["round", np.arange(0, max_turns), "rewards", [x / ngames for x in rewards]])
-        return table
+        # table = Table().with_columns(["round", np.arange(0, max_turns), "rewards", [x / ngames for x in rewards]])
+        # return table
+        return [x / ngames for x in rewards]
 
     def clearResults(self):
         """
@@ -280,10 +283,18 @@ class Features:
         toWrite.close()
 
 
+
 if __name__ == '__main__':
-    ngames = 1000
+    ngames = 100
     psinst = Features(ps.PegSolitaire)
     psinst.generateGames(ps.random_policy, ngames)
+    list_move_to_next_reward = []
+    for i in range(0, 1000):
+        psinst = Features(ps.PegSolitaire)
+        psinst.generateGames(ps.random_policy, ngames)
+        list_move_to_next_reward.append(psinst.avgStepsToReward())
+        print(psinst.avgStepsToReward())
+    print(list_move_to_next_reward)
     # print(psinst.results[0][2])
     # print(psinst.plot_possible_actions(ngames))
     # print(psinst.plot_rewards(ngames))
@@ -304,6 +315,13 @@ if __name__ == '__main__':
     # jzActStd = jzinst.actionsStd()
     # ActMeans = (pActAvg, jzActAvg)
     # ActStddevs = (psinst.SEM(pActStd), jzinst.SEM(jzActStd))
+    # print(pActAvg)
+    # print(jzActAvg)
+    # print(pActStd)
+    # print(jzActStd)
+    # print(ActMeans)
+    # print(ActStddevs)
+
 
     # # Average Rewards
     # prewards = []
