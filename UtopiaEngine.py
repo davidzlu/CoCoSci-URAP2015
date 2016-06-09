@@ -247,7 +247,9 @@ class GameBoard:
 		rewardsGained = [] # Sequence of rewards obtained during a game
 		legalActions = []
 		self.activationStarted = False
-
+		global possible_minigames
+		global connection_comb
+		
 		while self.day < self.end_day - self.skull:
 			action_to_take = strategy(possible_minigames)
 			actionsTaken.append(action_to_take)
@@ -351,7 +353,7 @@ class GameBoard:
 					# 	self.construct[construct_to_activate] = outcome[0]
 					# 	if outcome[0] != 999:
 					# 		self.construct[construct_to_activate] += 100
-					if self.construct[construct_to_activate] = 0:
+					if self.construct[construct_to_activate] == 0:
 						self.day += 1
 						activation_game = Activation()
 						outcome, results = activation_game.play(strategy, self.construct[construct_to_activate])
