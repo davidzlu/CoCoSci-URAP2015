@@ -261,7 +261,43 @@ class GameBoard:
 				else:
 					self.day += search_area.daytracker.pop()
 				outcome, results = search_game.play(strategy)
-				merge_results(statesVisited, actionsTaken, rewardsGained, legalActions, results)
+				self.merge_results
+        actionsTaken = [] # Sequential actions taken during a game
+        rewardsGained = [] # Sequence of rewards obtained during a game
+        gs = GameState()
+        print("The game has started")
+        print(self.board)
+        while not self.checkWin() and not self.checkLose():
+            if self.phase == 1:
+                self.descend() # phase 1
+                print(self.phase)
+            elif self.phase == 2:
+                self.diceRoll() # roll dice for phase 2
+                mymove2 = strategy() #select move in possible moves
+                self.phase_two(self.dice1, mymove2)
+                self.waveTransition()
+                actionsTaken.append(mymove2)
+                print(self.phase)
+            elif self.phase == 3:
+                mymove3 = strategy() #select move for phase 3
+                prevScore = self.score
+                self.move_and_shoot(mymove3) #execute phase 3
+                actionsTaken.append(mymove3)
+                rewardsGained.append(self.score - prevScore)
+                print(self.phase)
+            elif self.phase == 4:
+                mymove4 = strategy()
+                prevScore = self.score
+                self.phase_four(mymove4)
+                self.waveTransition()
+                actionsTaken.append(mymove4)
+                rewardsGained.append(self.score - prevScore)
+                print(self.phase)
+            print("The current state is:")
+            print(self.board)
+            statesVisited.append(self.copy())
+            self.phase = (self.phase % 4) + 1
+        return (statesVisited, actionsTaken, rewardsGained)(statesVisited, actionsTaken, rewardsGained, legalActions, results)
 				if outcome == 0: # find construct and activate: natural zero
 					self.score += 20
 					if search_area.construct is None:
@@ -359,14 +395,86 @@ class GameBoard:
 						outcome, results = activation_game.play(strategy, self.construct[construct_to_activate])
 						self.construct[construct_to_activate] = outcome[0]
 						self.take_damage(outcome[1])
-						merge_results(statesVisited, actionsTaken, rewardsGained, legalActions, results)
+						self.merge_results
+        actionsTaken = [] # Sequential actions taken during a game
+        rewardsGained = [] # Sequence of rewards obtained during a game
+        gs = GameState()
+        print("The game has started")
+        print(self.board)
+        while not self.checkWin() and not self.checkLose():
+            if self.phase == 1:
+                self.descend() # phase 1
+                print(self.phase)
+            elif self.phase == 2:
+                self.diceRoll() # roll dice for phase 2
+                mymove2 = strategy() #select move in possible moves
+                self.phase_two(self.dice1, mymove2)
+                self.waveTransition()
+                actionsTaken.append(mymove2)
+                print(self.phase)
+            elif self.phase == 3:
+                mymove3 = strategy() #select move for phase 3
+                prevScore = self.score
+                self.move_and_shoot(mymove3) #execute phase 3
+                actionsTaken.append(mymove3)
+                rewardsGained.append(self.score - prevScore)
+                print(self.phase)
+            elif self.phase == 4:
+                mymove4 = strategy()
+                prevScore = self.score
+                self.phase_four(mymove4)
+                self.waveTransition()
+                actionsTaken.append(mymove4)
+                rewardsGained.append(self.score - prevScore)
+                print(self.phase)
+            print("The current state is:")
+            print(self.board)
+            statesVisited.append(self.copy())
+            self.phase = (self.phase % 4) + 1
+        return (statesVisited, actionsTaken, rewardsGained)(statesVisited, actionsTaken, rewardsGained, legalActions, results)
 						if outcome[0] < 4:
 							self.day += 1
 							activation_game2 = Activation()
 							outcome2 = activation_game2.play(strategy, self.construct[construct_to_activate])
 							self.construct[construct_to_activate] += outcome2[0]
 							self.take_damage(outcome2[1])
-							merge_results(statesVisited, actionsTaken, rewardsGained, legalActions, results)
+							self.merge_results
+        actionsTaken = [] # Sequential actions taken during a game
+        rewardsGained = [] # Sequence of rewards obtained during a game
+        gs = GameState()
+        print("The game has started")
+        print(self.board)
+        while not self.checkWin() and not self.checkLose():
+            if self.phase == 1:
+                self.descend() # phase 1
+                print(self.phase)
+            elif self.phase == 2:
+                self.diceRoll() # roll dice for phase 2
+                mymove2 = strategy() #select move in possible moves
+                self.phase_two(self.dice1, mymove2)
+                self.waveTransition()
+                actionsTaken.append(mymove2)
+                print(self.phase)
+            elif self.phase == 3:
+                mymove3 = strategy() #select move for phase 3
+                prevScore = self.score
+                self.move_and_shoot(mymove3) #execute phase 3
+                actionsTaken.append(mymove3)
+                rewardsGained.append(self.score - prevScore)
+                print(self.phase)
+            elif self.phase == 4:
+                mymove4 = strategy()
+                prevScore = self.score
+                self.phase_four(mymove4)
+                self.waveTransition()
+                actionsTaken.append(mymove4)
+                rewardsGained.append(self.score - prevScore)
+                print(self.phase)
+            print("The current state is:")
+            print(self.board)
+            statesVisited.append(self.copy())
+            self.phase = (self.phase % 4) + 1
+        return (statesVisited, actionsTaken, rewardsGained)(statesVisited, actionsTaken, rewardsGained, legalActions, results)
 						if self.construct[construct_to_activate] < 4:
 							self.day += 1
 						self.construct[construct_to_activate] = 999
@@ -374,23 +482,95 @@ class GameBoard:
 			elif action_to_take == "Connection":
 				if self.can_connect():
 					construct_to_connect1, construct_to_connect2, component_to_connect = self.get_constructs_and_components_to_connect()
-				connectable, setToConnect = self.valid_connection(construct_to_connect1, construct_to_connect2, component_to_connect)
-				if connectable:
-					connection_game = Connection(self)
-					link_num, results = connection_game.play(strategy)
-					self.merge_results(statesVisited, actionsTaken, rewardsGained, legalActions, results)
-					if link_num >= 0:
-						self.finalAct += link_num
-						setToConnect[3] = True #these components are connected
-						self.numConnected += 1
-						self.score += 5
-						if self.numConnected == 6:
-							possible_minigames = ["Final Activation"]
+					connectable, setToConnect = self.valid_connection(construct_to_connect1, construct_to_connect2, component_to_connect)
+					if connectable:
+						connection_game = Connection(self)
+						link_num, results = connection_game.play(strategy)
+						self.self.merge_results
+        actionsTaken = [] # Sequential actions taken during a game
+        rewardsGained = [] # Sequence of rewards obtained during a game
+        gs = GameState()
+        print("The game has started")
+        print(self.board)
+        while not self.checkWin() and not self.checkLose():
+            if self.phase == 1:
+                self.descend() # phase 1
+                print(self.phase)
+            elif self.phase == 2:
+                self.diceRoll() # roll dice for phase 2
+                mymove2 = strategy() #select move in possible moves
+                self.phase_two(self.dice1, mymove2)
+                self.waveTransition()
+                actionsTaken.append(mymove2)
+                print(self.phase)
+            elif self.phase == 3:
+                mymove3 = strategy() #select move for phase 3
+                prevScore = self.score
+                self.move_and_shoot(mymove3) #execute phase 3
+                actionsTaken.append(mymove3)
+                rewardsGained.append(self.score - prevScore)
+                print(self.phase)
+            elif self.phase == 4:
+                mymove4 = strategy()
+                prevScore = self.score
+                self.phase_four(mymove4)
+                self.waveTransition()
+                actionsTaken.append(mymove4)
+                rewardsGained.append(self.score - prevScore)
+                print(self.phase)
+            print("The current state is:")
+            print(self.board)
+            statesVisited.append(self.copy())
+            self.phase = (self.phase % 4) + 1
+        return (statesVisited, actionsTaken, rewardsGained)(statesVisited, actionsTaken, rewardsGained, legalActions, results)
+						if link_num >= 0:
+							self.finalAct += link_num
+							setToConnect[3] = True #these components are connected
+							self.numConnected += 1
+							self.score += 5
+							if self.numConnected == 6:
+								possible_minigames = ["Final Activation"]
 			elif action_to_take == "Final Activation":
 				self.start_final_activation(actionsTaken)
 				final_game = FinalActivation(self.finalAct)
 				activated, results = final_game.play(strategy)
-				self.merge_results(statesVisited, actionsTaken, rewardsGained, legalActions, results)
+				self.self.merge_results
+        actionsTaken = [] # Sequential actions taken during a game
+        rewardsGained = [] # Sequence of rewards obtained during a game
+        gs = GameState()
+        print("The game has started")
+        print(self.board)
+        while not self.checkWin() and not self.checkLose():
+            if self.phase == 1:
+                self.descend() # phase 1
+                print(self.phase)
+            elif self.phase == 2:
+                self.diceRoll() # roll dice for phase 2
+                mymove2 = strategy() #select move in possible moves
+                self.phase_two(self.dice1, mymove2)
+                self.waveTransition()
+                actionsTaken.append(mymove2)
+                print(self.phase)
+            elif self.phase == 3:
+                mymove3 = strategy() #select move for phase 3
+                prevScore = self.score
+                self.move_and_shoot(mymove3) #execute phase 3
+                actionsTaken.append(mymove3)
+                rewardsGained.append(self.score - prevScore)
+                print(self.phase)
+            elif self.phase == 4:
+                mymove4 = strategy()
+                prevScore = self.score
+                self.phase_four(mymove4)
+                self.waveTransition()
+                actionsTaken.append(mymove4)
+                rewardsGained.append(self.score - prevScore)
+                print(self.phase)
+            print("The current state is:")
+            print(self.board)
+            statesVisited.append(self.copy())
+            self.phase = (self.phase % 4) + 1
+        return (statesVisited, actionsTaken, rewardsGained)(statesVisited, actionsTaken, rewardsGained, legalActions, results)
 				if activated:
 					print("You've activated the Utopia Engine and saved the world!")
 					self.score += 50
@@ -407,4 +587,6 @@ class GameBoard:
 
 
 
-					
+if __name__ == '__main__':
+	ue = GameBoard()
+	sts, act, rwd, lAct = ue.play(random_policy)					

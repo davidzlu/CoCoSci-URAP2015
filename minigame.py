@@ -312,7 +312,7 @@ class Search(Minigame):
 			print(self.board)
 			statesVisited.append(deepcopy(self))
 			roll1, roll2 = self.roll_dice_get_number(2)
-			action = policy(self.legal_actions(), True)
+			action = policy(self.legal_actions(), False)
 			actionsTaken.append(action)
 			self = self.simulate_action(action, roll1, roll2)
 
