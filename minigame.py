@@ -314,7 +314,7 @@ class Search(Minigame):
 			roll1, roll2 = self.roll_dice_get_number(2)
 			action = policy(self.legal_actions(), True)
 			actionsTaken.append(action)
-			self = self.simulate_action()
+			self = self.simulate_action(action, roll1, roll2)
 
 		print("Current board: ")
 		print(self.board)
