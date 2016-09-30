@@ -3,16 +3,18 @@ import numpy as np
 import ast
 from copy import deepcopy
 from itertools import permutations, combinations_with_replacement, combinations
+import unittest
+from UtopiaEngine import *
 
 def create_mini_game(row, column):
 	"""create empty board for minigames"""
 	board = np.zeros((row, column))
 	return board.astype(int)
 
-def create_mini_game(row, column):
-	"""create empty board for minigames"""
-	board = np.zeros([row, column])
-	return board
+# def create_mini_game(row, column):
+# 	"""create empty board for minigames"""
+# 	board = np.zeros([row, column])
+# 	return board
 
 def roll_dice(n):
 	"""roll n dices at once"""
@@ -22,13 +24,16 @@ def roll_dice(n):
 		result.append(roll)
 	return result
 
-def random_policy(state):
+def randomPolicy(actions, TF):
+# def random_policy(state):
 	""" Generates next legal action for agent to take.
 		Arguments:
 			state: The current state for which an action will be generated.
 	"""
-	legalMoves = state.legal_actions()
-	return random.choice(legalMoves)
+	# legalMoves = state.legalActions()
+	return random.choice(actions)
+	# legalMoves = state.legal_actions()
+	# return random.choice(legalMoves)
 
 class Minigame:
 	"""An abstract class for the minigames of Utopia Engine"""
@@ -42,7 +47,14 @@ class Minigame:
 
 	def check_full(self):
 		"""check if the minigame board is full"""
-		return np.count_nonzero(self.board) == self.board.size
+		numrows = self.board.shape[0]
+		numcols = self.board.shape[1]
+		for row in range(numrows):
+			for col in range(numcols):
+				if self.board[(row, col)] == 0:
+					return False
+		return True
+		# return np.count_nonzero(self.board) == self.board.size
 
 	def play(self):
 		raise NotImplementedError
@@ -131,12 +143,15 @@ class Activation(Minigame):
 		"""create a 2*4 board"""
 		Minigame.__init__(self, 2, 4)
 	
+	# def roll_dice_get_number(self):
+	# 	Minigame.roll_dice_get_number(2)
+	
 	def check_final_range(self):
 		energy_point = 0
 		damage_take = 0
 		if self.check_full():
 			for i in range(0, 4):
-				diff = self.board(0, i) - self.board(1, i)
+				diff = self.board[0][i] - self.board[1][i]
 				if diff == 5:
 					energy_point = energy_point + 2
 				elif diff == 4:
@@ -167,11 +182,13 @@ class Activation(Minigame):
 		legalActions = []
 		print("Activation started:")
 		
-		while not self.check_full():
+		while not self.check_full() or len(self.legal_actions()) < 2:
 			numbers = self.roll_dice_get_number(2)
 			print("These are numbers you can put in the board:")
 			print(numbers)
-			moves = strategy(self.legal_actions(2, 4), True)
+			moves = strategy(self.legal_actions(), True)
+			print("actions chosen:")
+			print(moves)
 			actionsTaken.append(moves)
 			self.put_number(numbers[0], moves[0][0], moves[0][1])
 			self.put_number(numbers[1], moves[1][0], moves[1][1])
@@ -179,7 +196,18 @@ class Activation(Minigame):
 			self.check_reroll()
 			print("This is the current state of the board:")
 			print(self.board)
-			
+			for i in range(0, 4):
+				if self.board[0][i] - self.board[1][i] == 0 and self.board[0][i] != 0:
+					self.put_number(0, 0, i)
+					self.put_number(0, 1, i)
+					print("difference = 0: reset")
+					# numbers = self.roll_dice_get_number(2)
+					# print("These are numbers you can put in the board:")
+					# print(numbers)
+					# moves = strategy(self.legalActions(2, 4), True)
+					# print("actions chosen:")
+					# print(moves)
+					# self.put_number(numbers[0], moves[0][0], moves[0][1])
 		damage_taken = self.check_final_range()[1]
 		energy_point = energy_point + self.check_final_range()[0]
 		if energy_point % 100 >= 4:
@@ -254,7 +282,7 @@ class Connection(Minigame):
 		rewardsGained = [] # Sequence of rewards obtained during a game
 		legalActions = []
 
-		while not check_full():
+		while not self.check_full():
 			statesVisited.append(deepcopy(self))
 			result = self.roll_dice_get_number()
 			for number in result:
@@ -413,3 +441,40 @@ class FinalActivation:
 			query_prob += dice_prob_table[target_roll]
 			target_roll += 1
 		return query_prob
+
+class TestMethods(unittest.TestCase):
+
+	def test_activation(self):
+		for i in range(0, 100):
+			activation = Activation()
+			result = activation.play(randomPolicy, 0)
+			self.assertTrue(result[0][0] <= 999 and result[0][0] >= 0 or result[0][0] in range(0, 5))
+
+	def test_connection(self):
+		for i in range(0, 100):
+			gameboard = GameBoard()
+			connection = Connection(gameboard)
+			result = connection.play(randomPolicy)
+			self.assertTrue(result < 7)
+
+	def test_check_full(self):
+		test = Minigame(2, 4)
+		test.put_number(1, 0, 0)
+		test.put_number(1, 0, 1)
+		test.put_number(1, 0, 2)
+		test.put_number(1, 0, 3)
+		test.put_number(1, 1, 0)
+		test.put_number(1, 1, 1)
+		test.put_number(1, 1, 2)
+		test.put_number(1, 1, 3)
+		self.assertTrue(test.check_full())
+		test.put_number(0, 0, 0)
+		test.put_number(0, 1, 0)
+		self.assertTrue(not test.check_full())
+		test.put_number(1, 0, 0)
+		test.put_number(1, 1, 0)
+		self.assertTrue(test.check_full())
+
+
+if __name__ == '__main__':
+	unittest.main()
