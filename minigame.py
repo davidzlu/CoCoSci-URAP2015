@@ -11,10 +11,10 @@ def create_mini_game(row, column):
 	board = np.zeros((row, column))
 	return board.astype(int)
 
-def create_mini_game(row, column):
-	"""create empty board for minigames"""
-	board = np.zeros([row, column])
-	return board
+# def create_mini_game(row, column):
+# 	"""create empty board for minigames"""
+# 	board = np.zeros([row, column])
+# 	return board
 
 def roll_dice(n):
 	"""roll n dices at once"""
@@ -182,11 +182,11 @@ class Activation(Minigame):
 		legalActions = []
 		print("Activation started:")
 		
-		while not self.check_full():
+		while not self.check_full() or len(self.legal_actions()) < 2:
 			numbers = self.roll_dice_get_number(2)
 			print("These are numbers you can put in the board:")
 			print(numbers)
-			moves = strategy(self.legalActions(2, 4), True)
+			moves = strategy(self.legal_actions(), True)
 			print("actions chosen:")
 			print(moves)
 			actionsTaken.append(moves)
@@ -198,8 +198,8 @@ class Activation(Minigame):
 			print(self.board)
 			for i in range(0, 4):
 				if self.board[0][i] - self.board[1][i] == 0 and self.board[0][i] != 0:
-					self.board[0][i] = 0
-					self.board[1][i] = 0
+					self.put_number(0, 0, i)
+					self.put_number(0, 1, i)
 					print("difference = 0: reset")
 					# numbers = self.roll_dice_get_number(2)
 					# print("These are numbers you can put in the board:")
@@ -208,7 +208,6 @@ class Activation(Minigame):
 					# print("actions chosen:")
 					# print(moves)
 					# self.put_number(numbers[0], moves[0][0], moves[0][1])
-			self.put_number(numbers[1], moves[1][0], moves[1][1])
 		damage_taken = self.check_final_range()[1]
 		energy_point = energy_point + self.check_final_range()[0]
 		if energy_point % 100 >= 4:
@@ -283,7 +282,7 @@ class Connection(Minigame):
 		rewardsGained = [] # Sequence of rewards obtained during a game
 		legalActions = []
 
-		while not check_full():
+		while not self.check_full():
 			statesVisited.append(deepcopy(self))
 			result = self.roll_dice_get_number()
 			for number in result:
@@ -389,7 +388,7 @@ class TestMethods(unittest.TestCase):
 		for i in range(0, 100):
 			activation = Activation()
 			result = activation.play(randomPolicy, 0)
-			self.assertTrue(result[0] <= 999 and result[0] >= 0 or result[0] in range(0, 5))
+			self.assertTrue(result[0][0] <= 999 and result[0][0] >= 0 or result[0][0] in range(0, 5))
 
 	def test_connection(self):
 		for i in range(0, 100):
@@ -397,6 +396,25 @@ class TestMethods(unittest.TestCase):
 			connection = Connection(gameboard)
 			result = connection.play(randomPolicy)
 			self.assertTrue(result < 7)
+
+	def test_check_full(self):
+		test = Minigame(2, 4)
+		test.put_number(1, 0, 0)
+		test.put_number(1, 0, 1)
+		test.put_number(1, 0, 2)
+		test.put_number(1, 0, 3)
+		test.put_number(1, 1, 0)
+		test.put_number(1, 1, 1)
+		test.put_number(1, 1, 2)
+		test.put_number(1, 1, 3)
+		self.assertTrue(test.check_full())
+		test.put_number(0, 0, 0)
+		test.put_number(0, 1, 0)
+		self.assertTrue(not test.check_full())
+		test.put_number(1, 0, 0)
+		test.put_number(1, 1, 0)
+		self.assertTrue(test.check_full())
+
 
 if __name__ == '__main__':
 	unittest.main()
