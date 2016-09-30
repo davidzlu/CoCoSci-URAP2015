@@ -2,6 +2,8 @@ import random
 import numpy as np
 import ast
 from itertools import permutations, combinations_with_replacement, combinations
+import unittest
+from UtopiaEngine import *
 
 def create_mini_game(row, column):
 	"""create empty board for minigames"""
@@ -22,13 +24,13 @@ def roll_dice(n):
 		result.append(roll)
 	return result
 
-def randomPolicy(state):
+def randomPolicy(actions, TF):
 	""" Generates next legal action for agent to take.
 		Arguments:
 			state: The current state for which an action will be generated.
 	"""
-	legalMoves = state.legalActions()
-	return random.choice(legalMoves)
+	# legalMoves = state.legalActions()
+	return random.choice(actions)
 
 class Minigame:
 	"""a class for the minigames for Utopia Engine"""
@@ -42,7 +44,14 @@ class Minigame:
 
 	def check_full(self):
 		"""check if the minigame board is full"""
-		return np.count_nonzero(self.board) == self.board.size
+		numrows = self.board.shape[0]
+		numcols = self.board.shape[1]
+		for row in range(numrows):
+			for col in range(numcols):
+				if self.board[(row, col)] == 0:
+					return False
+		return True
+		# return np.count_nonzero(self.board) == self.board.size
 
 	def play(self):
 		return
@@ -77,15 +86,15 @@ class Activation(Minigame):
 		"""create a 2*4 board"""
 		Minigame.__init__(self, 2, 4)
 	
-	def roll_dice_get_number(self):
-		Minigame.roll_dice_get_number(2)
+	# def roll_dice_get_number(self):
+	# 	Minigame.roll_dice_get_number(2)
 	
 	def check_final_range(self):
 		energy_point = 0
 		damage_take = 0
 		if self.check_full():
 			for i in range(0, 4):
-				diff = self.board(0, i) - self.board(1, i)
+				diff = self.board[0][i] - self.board[1][i]
 				if diff == 5:
 					energy_point = energy_point + 2
 				elif diff == 4:
@@ -97,26 +106,30 @@ class Activation(Minigame):
 	def play(self, strategy, energy_point):
 		print("Activation started:")
 		while not self.check_full():
-			numbers = self.roll_dice_get_number()
+			numbers = self.roll_dice_get_number(2)
 			print("These are numbers you can put in the board:")
 			print(numbers)
 			moves = strategy(self.legalActions(2, 4), True)
+			print("actions chosen:")
+			print(moves)
 			self.put_number(numbers[0], moves[0][0], moves[0][1])
 			self.put_number(numbers[1], moves[1][0], moves[1][1])
 			print("This is the current state of the board:")
 			print(self.board)
 			for i in range(0, 4):
-				if self.board[0][i] - self.board(1, i) == 0:
+				if self.board[0][i] - self.board[1][i] == 0 and self.board[0][i] != 0:
 					self.board[0][i] = 0
 					self.board[1][i] = 0
-					print("difference = 0: reroll")
-					numbers = self.roll_dice_get_number()
-					print("These are numbers you can put in the board:")
-					print(numbers)
-					moves = strategy(self.legalActions(2, 4), True)
-					self.put_number(numbers[0], moves[0][0], moves[0][1])
+					print("difference = 0: reset")
+					# numbers = self.roll_dice_get_number(2)
+					# print("These are numbers you can put in the board:")
+					# print(numbers)
+					# moves = strategy(self.legalActions(2, 4), True)
+					# print("actions chosen:")
+					# print(moves)
+					# self.put_number(numbers[0], moves[0][0], moves[0][1])
 			self.put_number(numbers[1], moves[1][0], moves[1][1])
-		damage_taken = self.check_final_range[1]
+		damage_taken = self.check_final_range()[1]
 		energy_point = energy_point + self.check_final_range()[0]
 		if energy_point % 100 >= 4:
 			return 999, damage_taken
@@ -244,5 +257,23 @@ class FinalActivation(Minigame):
 			return True
 		else:
 			return False
+
+class TestMethods(unittest.TestCase):
+
+	def test_activation(self):
+		for i in range(0, 100):
+			activation = Activation()
+			result = activation.play(randomPolicy, 0)
+			self.assertTrue(result[0] <= 999 and result[0] >= 0 or result[0] in range(0, 5))
+
+	def test_connection(self):
+		for i in range(0, 100):
+			gameboard = GameBoard()
+			connection = Connection(gameboard)
+			result = connection.play(randomPolicy)
+			self.assertTrue(result < 7)
+
+if __name__ == '__main__':
+	unittest.main()
 
 
