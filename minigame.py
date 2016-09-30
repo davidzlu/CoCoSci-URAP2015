@@ -6,6 +6,7 @@ from itertools import permutations, combinations_with_replacement, combinations
 import unittest
 from UtopiaEngine import *
 
+
 def create_mini_game(row, column):
     """create empty board for minigames"""
     board = np.zeros((row, column))
@@ -25,6 +26,7 @@ def roll_dice(n):
         result.append(roll)
     return result
 
+
 def randomPolicy(actions, TF):
 # def random_policy(state):
     """ Generates next legal action for agent to take.
@@ -35,6 +37,7 @@ def randomPolicy(actions, TF):
     return random.choice(actions)
     # legalMoves = state.legal_actions()
     # return random.choice(legalMoves)
+
 
 class Minigame:
     """An abstract class for the minigames of Utopia Engine"""
@@ -226,7 +229,7 @@ class Connection(Minigame):
     def __init__(self, gamestate):
         Minigame.__init__(self, 2, 3)
         self.roll = []
-        self.gamestate = gamestate #the bigger board
+        self.gamestate = gamestate  # the bigger board
 
     def next_states(self, action):
         return Minigame.next_states(self, action, 2, 3)
@@ -234,7 +237,7 @@ class Connection(Minigame):
     def legal_actions(self):
         actions = Minigame.legal_actions(self, 2, 3)
         actions.append('keep')
-        if len(gamestate.wastebasket) < 10:
+        if len(self.gamestate.wastebasket) < 10:
             actions.append('toss')
         return actions
 
@@ -269,8 +272,8 @@ class Connection(Minigame):
         return self.roll
 
     def toss(self, num):
-        if (len(gamestate.wastebasket) < 10):
-            gamestate.wastebasket.append(num)
+        if (len(self.gamestate.wastebasket) < 10):
+            self.gamestate.wastebasket.append(num)
             self.roll.remove(num)
             new_num = Minigame.roll_dice_get_number(1)
             self.roll.append(new_num)
@@ -299,12 +302,12 @@ class Connection(Minigame):
                 row = move[0]
                 col = move[1]
 
-        state = board2state(self.board)
+        state = self.board2state(self.board)
         link = 0
         for pair in state:
             diff = np.subtract(pair[0], pair[1])[0]
             if diff < 0:
-                gamestate.hit -= 1
+                self.gamestate.hit -= 1
                 decision = strategy(['continue', 'stop']) #determines whether to spend another component
                 actionsTaken.append(decision)
                 if decision == 'continue':
@@ -414,27 +417,27 @@ class FinalActivation:
         """
         if (self, action, next_state) in self.tpm:
             return self.tpm[(self, action, next_state)]
-        prob_succeed_first_roll = dice_prob_distr(self.actNum)
+        prob_succeed_first_roll = self.dice_prob_distr(self.actNum)
         prob_fail = 1 - prob_succeed_first_roll
-        prob_succeed = 1 - prob_fail**(self.rolls)
+        prob_succeed = 1 - prob_fail**self.rolls
         self.tpm[(self, action, next_state)] = prob_succeed
         return prob_succeed
 
-    def dice_prob_distr(target_roll):
+    def dice_prob_distr(self, target_roll):
         """Helper function for transition_prob. Returns probability of rolling two dice
            and getting a result greater than or equal to target_roll.
         """
-        dice_prob_table = {2:1.0/36.0, \
-                           3:2.0/36.0, \
-                           4:3.0/36.0, \
-                           5:4.0/36.0, \
-                           6:5.0/36.0, \
-                           7:6.0/36.0, \
-                           8:5.0/36.0, \
-                           9:4.0/36.0, \
-                           10:3.0/36.0, \
-                           11:2.0/36.0, \
-                           12:1.0/36.0}
+        dice_prob_table = {2: 1.0/36.0,
+                           3: 2.0/36.0,
+                           4: 3.0/36.0,
+                           5: 4.0/36.0,
+                           6: 5.0/36.0,
+                           7: 6.0/36.0,
+                           8: 5.0/36.0,
+                           9: 4.0/36.0,
+                           10: 3.0/36.0,
+                           11: 2.0/36.0,
+                           12: 1.0/36.0}
 
         query_prob = 0.0
         while target_roll < 13:
@@ -442,13 +445,14 @@ class FinalActivation:
             target_roll += 1
         return query_prob
 
+
 class TestMethods(unittest.TestCase):
 
     def test_activation(self):
         for i in range(0, 100):
             activation = Activation()
             result = activation.play(randomPolicy, 0)
-            self.assertTrue(result[0][0] <= 999 and result[0][0] >= 0 or result[0][0] in range(0, 5))
+            self.assertTrue(0 <= result[0][0] <= 999 or result[0][0] in range(0, 5))
 
     def test_connection(self):
         for i in range(0, 100):
