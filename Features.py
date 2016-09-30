@@ -51,7 +51,7 @@ class Features:
 
     def avg(self, featureVects):
         """Takes in a list of lists, where each list represents a game and the values
-        in that list are the values per time step that you want the stddev of
+        in that list are the values per time step that you want the average of
         e.g. average possible moves, rewards gained
 
         Returns the weighted mean for all samples"""
@@ -133,6 +133,20 @@ class Features:
         for target in self.results:
             total_acts = total_acts + len(target[1])
         return float(total_acts) / (len(self.results))
+
+    def stepsToReward(self):
+        steps_to_reward = []
+        for game in self.results:
+            rewards = game[2]
+            steps = 0.0
+            substeps = []
+            for reward in rewards:
+                steps += 1.0
+                if reward != 0:
+                    substeps.append(steps)
+                    steps = 0.0
+            steps_to_reward.append(substeps)
+        return steps_to_reward
 
     def avgStepsToReward(self):
         """
