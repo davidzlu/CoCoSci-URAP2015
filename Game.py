@@ -23,6 +23,15 @@ class Game(object):
         """Returns probability of transitioning from curState to nextState given action.
         """
         raise NotImplementedError("Must override")
+
+    def transition_prob_vector(self, action):
+        raise NotImplementedError("Must override")
+
+    def transition_prob(self, action, next_state):
+        raise NotImplementedError("Must override")
+
+    def reward(self, action):
+        raise NotImplementedError("Must override")
         
     @abstractmethod
     def isWinState(self):

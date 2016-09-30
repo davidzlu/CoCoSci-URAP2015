@@ -3,16 +3,19 @@ import numpy as np
 import ast
 from copy import deepcopy
 from itertools import permutations, combinations_with_replacement, combinations
+import unittest
+from UtopiaEngine import *
 
 def create_mini_game(row, column):
     """create empty board for minigames"""
     board = np.zeros((row, column))
     return board.astype(int)
 
-def create_mini_game(row, column):
-    """create empty board for minigames"""
-    board = np.zeros([row, column])
-    return board
+# def create_mini_game(row, column):
+# 	"""create empty board for minigames"""
+# 	board = np.zeros([row, column])
+# 	return board
+
 
 def roll_dice(n):
     """roll n dices at once"""
@@ -22,13 +25,16 @@ def roll_dice(n):
         result.append(roll)
     return result
 
-def random_policy(state):
+def randomPolicy(actions, TF):
+# def random_policy(state):
     """ Generates next legal action for agent to take.
         Arguments:
             state: The current state for which an action will be generated.
     """
-    legalMoves = state.legal_actions()
-    return random.choice(legalMoves)
+    # legalMoves = state.legalActions()
+    return random.choice(actions)
+    # legalMoves = state.legal_actions()
+    # return random.choice(legalMoves)
 
 class Minigame:
     """An abstract class for the minigames of Utopia Engine"""
@@ -42,7 +48,14 @@ class Minigame:
 
     def check_full(self):
         """check if the minigame board is full"""
-        return np.count_nonzero(self.board) == self.board.size
+        numrows = self.board.shape[0]
+        numcols = self.board.shape[1]
+        for row in range(numrows):
+            for col in range(numcols):
+                if self.board[(row, col)] == 0:
+                    return False
+        return True
+        # return np.count_nonzero(self.board) == self.board.size
 
     def play(self):
         raise NotImplementedError
@@ -124,19 +137,21 @@ class Minigame:
 
 
 class Activation(Minigame):
-
     tpm = {}
 
     def __init__(self):
         """create a 2*4 board"""
         Minigame.__init__(self, 2, 4)
 
+    # def roll_dice_get_number(self):
+    # 	Minigame.roll_dice_get_number(2)
+
     def check_final_range(self):
         energy_point = 0
         damage_take = 0
         if self.check_full():
             for i in range(0, 4):
-                diff = self.board(0, i) - self.board(1, i)
+                diff = self.board[0][i] - self.board[1][i]
                 if diff == 5:
                     energy_point = energy_point + 2
                 elif diff == 4:
@@ -167,11 +182,13 @@ class Activation(Minigame):
         legalActions = []
         print("Activation started:")
 
-        while not self.check_full():
+        while not self.check_full() or len(self.legal_actions()) < 2:
             numbers = self.roll_dice_get_number(2)
             print("These are numbers you can put in the board:")
             print(numbers)
-            moves = strategy(self.legal_actions(2, 4), True)
+            moves = strategy(self.legal_actions(), True)
+            print("actions chosen:")
+            print(moves)
             actionsTaken.append(moves)
             self.put_number(numbers[0], moves[0][0], moves[0][1])
             self.put_number(numbers[1], moves[1][0], moves[1][1])
@@ -179,7 +196,18 @@ class Activation(Minigame):
             self.check_reroll()
             print("This is the current state of the board:")
             print(self.board)
-
+            for i in range(0, 4):
+                if self.board[0][i] - self.board[1][i] == 0 and self.board[0][i] != 0:
+                    self.put_number(0, 0, i)
+                    self.put_number(0, 1, i)
+                    print("difference = 0: reset")
+                    # numbers = self.roll_dice_get_number(2)
+                    # print("These are numbers you can put in the board:")
+                    # print(numbers)
+                    # moves = strategy(self.legalActions(2, 4), True)
+                    # print("actions chosen:")
+                    # print(moves)
+                    # self.put_number(numbers[0], moves[0][0], moves[0][1])
         damage_taken = self.check_final_range()[1]
         energy_point = energy_point + self.check_final_range()[0]
         if energy_point % 100 >= 4:
@@ -254,7 +282,7 @@ class Connection(Minigame):
         rewardsGained = [] # Sequence of rewards obtained during a game
         legalActions = []
 
-        while not check_full():
+        while not self.check_full():
             statesVisited.append(deepcopy(self))
             result = self.roll_dice_get_number()
             for number in result:
@@ -331,12 +359,13 @@ class Search(Minigame):
     def legal_actions(self):
         return Minigame.legal_actions(self, 2, 3)
 
-class FinalActivation(Minigame):
+class FinalActivation:
 
     tpm = {}
 
-    def __init__(self, finalActivationDifficulty):
+    def __init__(self, finalActivationDifficulty, hitpoints):
         self.actNum = finalActivationNumber
+        self.rolls = hitpoints + 1
         self.activated = False
 
     def play(self, policy):
@@ -351,11 +380,102 @@ class FinalActivation(Minigame):
             statesVisited.append(deepcopy(self))
             return True, [statesVisited, actionsTaken, rewardsGained, legalActions]
         else:
+            self.hitpoints -= 1
             statesVisited.append(deepcopy(self))
             return False, [statesVisited, actionsTaken, rewardsGained, legalActions]
 
     def next_states(self, action):
-        return
+        states = [deepcopy(self)]
+        if not self.activated:
+            activated_state = deepcopy(self)
+            activated_state.activated = True
+            states.append(activated_state)
+        return states
 
     def legal_actions(self):
         return 'roll'
+
+    def transition_prob_matrix(self):
+        return self.tpm
+
+    def transition_prob_vector(self, action):
+        """ Method for finding transition probabilities of all next states
+        given current state (self) and an action.
+        """
+        vector = []
+        states = self.next_states(action)
+        for next_state in states:
+            vector.append( self.transition_prob(action, next_state) )
+        return vector
+
+    def transition_prob(self, action, next_state):
+        """ Returns pobability of transitioning from current state to
+        next_state by taking action.
+        """
+        if (self, action, next_state) in self.tpm:
+            return self.tpm[(self, action, next_state)]
+        prob_succeed_first_roll = dice_prob_distr(self.actNum)
+        prob_fail = 1 - prob_succeed_first_roll
+        prob_succeed = 1 - prob_fail**(self.rolls)
+        self.tpm[(self, action, next_state)] = prob_succeed
+        return prob_succeed
+
+    def dice_prob_distr(target_roll):
+        """Helper function for transition_prob. Returns probability of rolling two dice
+           and getting a result greater than or equal to target_roll.
+        """
+        dice_prob_table = {2:1.0/36.0, \
+                           3:2.0/36.0, \
+                           4:3.0/36.0, \
+                           5:4.0/36.0, \
+                           6:5.0/36.0, \
+                           7:6.0/36.0, \
+                           8:5.0/36.0, \
+                           9:4.0/36.0, \
+                           10:3.0/36.0, \
+                           11:2.0/36.0, \
+                           12:1.0/36.0}
+
+        query_prob = 0.0
+        while target_roll < 13:
+            query_prob += dice_prob_table[target_roll]
+            target_roll += 1
+        return query_prob
+
+class TestMethods(unittest.TestCase):
+
+    def test_activation(self):
+        for i in range(0, 100):
+            activation = Activation()
+            result = activation.play(randomPolicy, 0)
+            self.assertTrue(result[0][0] <= 999 and result[0][0] >= 0 or result[0][0] in range(0, 5))
+
+    def test_connection(self):
+        for i in range(0, 100):
+            gameboard = GameBoard()
+            connection = Connection(gameboard)
+            result = connection.play(randomPolicy)
+            self.assertTrue(result < 7)
+
+    def test_check_full(self):
+        test = Minigame(2, 4)
+        test.put_number(1, 0, 0)
+        test.put_number(1, 0, 1)
+        test.put_number(1, 0, 2)
+        test.put_number(1, 0, 3)
+        test.put_number(1, 1, 0)
+        test.put_number(1, 1, 1)
+        test.put_number(1, 1, 2)
+        test.put_number(1, 1, 3)
+        self.assertTrue(test.check_full())
+        test.put_number(0, 0, 0)
+        test.put_number(0, 1, 0)
+        self.assertTrue(not test.check_full())
+        test.put_number(1, 0, 0)
+        test.put_number(1, 1, 0)
+        self.assertTrue(test.check_full())
+
+
+if __name__ == '__main__':
+    unittest.main()
+

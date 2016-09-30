@@ -79,7 +79,6 @@ class Features:
         std = np.std(means)
         return std
   
-
     def actionsStd(self): 
         means = []
         numGames = len(self.results)
@@ -233,8 +232,8 @@ class Features:
                     total_number += pATotal[i]
             total_number_each_turn.append(total_number)
         table = Table().with_columns(["round", np.arange(0, max_turns), "possible actions", [x / ngames for x in total_number_each_turn]])
-        return table
-        # return [x / ngames for x in total_number_each_turn]
+        # return table
+        return [x / ngames for x in total_number_each_turn]
 
     def plot_rewards(self, ngames):
         rewards = []
@@ -251,18 +250,6 @@ class Features:
         # table = Table().with_columns(["round", np.arange(0, max_turns), "rewards", [x / ngames for x in rewards]])
         # return table
         return [x / ngames for x in rewards]
-
-    def clearResults(self):
-        """
-        Deletes results from generated games by replacing self.results with empty list.
-        """
-        yesSet = {"Y", "y", "yes", "Yes"}
-        userConfirm = raw_input("Are you sure you want to clear the results? Y/N")
-        if userConfirm in yesSet:
-            self.results = []
-            print("Results cleared.")
-        else:
-            print("Results not cleared.")
 
     def generateFeatures(self, fileName):
         """
@@ -285,16 +272,14 @@ class Features:
 
 
 if __name__ == '__main__':
-    ngames = 100
-    psinst = Features(ps.PegSolitaire)
-    psinst.generateGames(ps.random_policy, ngames)
-    list_move_to_next_reward = []
-    for i in range(0, 1000):
-        psinst = Features(ps.PegSolitaire)
-        psinst.generateGames(ps.random_policy, ngames)
-        list_move_to_next_reward.append(psinst.avgStepsToReward())
-        print(psinst.avgStepsToReward())
-    print(list_move_to_next_reward)
+    ngames = 1
+    # psinst = Features(ps.PegSolitaire)
+    # psinst.generateGames(ps.random_policy, ngames)
+    # list_moves = []
+    # for target in psinst.results:
+    #     list_moves.append(len(target[1]))
+    # print(list_moves)
+    
     # print(psinst.results[0][2])
     # print(psinst.plot_possible_actions(ngames))
     # print(psinst.plot_rewards(ngames))
@@ -302,6 +287,14 @@ if __name__ == '__main__':
 
     # jzinst = Features(jz.GameState)
     # jzinst.generateGames(jzinst.random_policy, ngames)
+    # print(np.average(psinst.plot_possible_actions(ngames)), np.average(jzinst.plot_possible_actions(ngames)))
+    # print(np.std(psinst.plot_possible_actions(ngames)), np.std(jzinst.plot_possible_actions(ngames)))
+    list_moves = []
+    for i in range(0, 1000):
+        psinst = Features(ps.PegSolitaire)
+        psinst.generateGames(ps.random_policy, ngames)
+        list_moves.append(psinst.avgStepsToReward())
+    print(list_moves)
     # print(jzinst.plot_possible_actions(ngames))
     # print(jzinst.plot_rewards(ngames))
     # jzinst.generateFeatures("jz1")
