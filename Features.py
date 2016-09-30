@@ -79,7 +79,6 @@ class Features:
         std = np.std(means)
         return std
   
-
     def actionsStd(self): 
         means = []
         numGames = len(self.results)
@@ -237,18 +236,6 @@ class Features:
         # table = Table().with_columns(["round", np.arange(0, max_turns), "rewards", [x / ngames for x in rewards]])
         # return table
         return [x / ngames for x in rewards]
-
-    def clearResults(self):
-        """
-        Deletes results from generated games by replacing self.results with empty list.
-        """
-        yesSet = {"Y", "y", "yes", "Yes"}
-        userConfirm = raw_input("Are you sure you want to clear the results? Y/N")
-        if userConfirm in yesSet:
-            self.results = []
-            print("Results cleared.")
-        else:
-            print("Results not cleared.")
 
     def generateFeatures(self, fileName):
         """

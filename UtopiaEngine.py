@@ -144,7 +144,7 @@ class GameBoard:
 		return self.tpm
 
 	def transition_prob_vector(self, action):
-		return
+		return 
 
 	def next_states(self, action):
 		return
@@ -240,7 +240,6 @@ class GameBoard:
 			self.hit -= hitptsToSpend
 			self.finalAct -= hitptsToSpend
 			self.activationStarted = True
-
 
 	def play(self, strategy):
 		statesVisited = [deepcopy(self)] # Sequence of states visited during a game
@@ -352,7 +351,7 @@ class GameBoard:
 					# 	self.construct[construct_to_activate] = outcome[0]
 					# 	if outcome[0] != 999:
 					# 		self.construct[construct_to_activate] += 100
-					if self.construct[construct_to_activate] = 0:
+					if self.construct[construct_to_activate] == 0:
 						self.day += 1
 						activation_game = Activation()
 						outcome, results = activation_game.play(strategy, self.construct[construct_to_activate])

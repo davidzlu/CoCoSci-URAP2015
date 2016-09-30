@@ -396,16 +396,16 @@ class FinalActivation:
 		"""Helper function for transition_prob. Returns probability of rolling two dice
 		   and getting a result greater than or equal to target_roll.
 		"""
-		dice_prob_table = {2:1.0/36.0
-						   3:2.0/36.0
-						   4:3.0/36.0
-						   5:4.0/36.0
-						   6:5.0/36.0
-						   7:6.0/36.0
-						   8:5.0/36.0
-						   9:4.0/36.0
-						   10:3.0/36.0
-						   11:2.0/36.0
+		dice_prob_table = {2:1.0/36.0, \
+						   3:2.0/36.0, \
+						   4:3.0/36.0, \
+						   5:4.0/36.0, \
+						   6:5.0/36.0, \
+						   7:6.0/36.0, \
+						   8:5.0/36.0, \
+						   9:4.0/36.0, \
+						   10:3.0/36.0, \
+						   11:2.0/36.0, \
 						   12:1.0/36.0}
 
 		query_prob = 0.0
