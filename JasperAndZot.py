@@ -964,9 +964,9 @@ class GameState(Game):
                 self.phase_four(mymove4)
                 actionsTaken.append(mymove4)
                 rewardsGained.append(self.score - prevScore)
-            print("Current phase:", self.phase)
-            print("The current state is:")
-            print(self.board)
+            # print("Current phase:", self.phase)
+            # print("The current state is:")
+            # print(self.board)
             statesVisited.append(deepcopy(self))
             self.phase = (self.phase % 4) + 1
 
