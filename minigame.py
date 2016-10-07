@@ -27,7 +27,7 @@ def roll_dice(n):
     return result
 
 
-def randomPolicy(actions, TF):
+def randomPolicy(actions):
 # def random_policy(state):
     """ Generates next legal action for agent to take.
         Arguments:
@@ -189,7 +189,7 @@ class Activation(Minigame):
             numbers = self.roll_dice_get_number(2)
             print("These are numbers you can put in the board:")
             print(numbers)
-            moves = strategy(self.legal_actions(), True)
+            moves = strategy(self.legal_actions())
             print("actions chosen:")
             print(moves)
             actionsTaken.append(moves)
@@ -294,7 +294,7 @@ class Connection(Minigame):
                 if decision is 'toss':
                     statesVisited.append(deepcopy(self))
                     self.toss(number)
-            moves = strategy(self.legal_actions(2, 3), True)
+            moves = strategy(self.legal_actions(2, 3))
             actionsTaken.append(moves)
             for move in moves:
                 num = strategy(result)
@@ -343,7 +343,7 @@ class Search(Minigame):
             print(self.board)
             statesVisited.append(deepcopy(self))
             roll1, roll2 = self.roll_dice_get_number(2)
-            action = policy(self.legal_actions(), False)
+            action = policy(self.legal_actions())
             actionsTaken.append(action)
             self = self.simulate_action(action, roll1, roll2)
 
