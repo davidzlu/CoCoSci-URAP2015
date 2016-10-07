@@ -25,5 +25,26 @@ class Iraq:
         self.eval = [(0, 6), (7, 9), (10, 12), (13, 19), (20, 100)]
 
 
+class Libya84:
+    # Special Note: Remove 2 "No Enemy" Pop-Ups
+
+    def __init__(self):
+        self.year = 1984
+        self.setup_vp = 33
+        self.terrain_nums = [2, 3, 5, 6, 8, 10, 12, 14, 15, 17]
+        # Eval has ranges for Dismal, Poor, Adequate, Good, Great
+        # Hypothetical upper bound was set on Great
+        self.eval = [(0, 10), (11, 13), (14, 17), (18, 25), (26, 100)]
+
+
+class Libya11:
+    #double check numbers with card
+    def __init__(self):
+        self.year = 2011
+        self.setup_vp = 31
+        self.terrain_nums = [1, 3, 5, 6, 8, 10, 12, 14, 15, 17]
+        # Eval has ranges for Dismal, Poor, Adequate, Good, Great
+        # Hypothetical upper bound was set on Great
+        self.eval = [(0, 6), (7, 9), (10, 12), (13, 19), (20, 100)]
 
 
