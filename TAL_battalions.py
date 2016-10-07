@@ -12,6 +12,7 @@ def get_enemy_units(list_unittype_num):
 			enemy_unit.append(element[0])
 	return enemy_unit
 
+"""battalion information on cards"""
 class MobileHQ:
 	def __init__(self):
 		self.vp = 2
@@ -28,6 +29,12 @@ class InfantryForce:
 		self.units = get_enemy_units([["AAA", 4], ["APC", 5], ["Commands", 2], ["Infantry", 10], ["Truck", 4]])
 		self.half_value = 20
 		self.destroy_value = 5
+
+
+
+
+
+
 
 class TestMethods(unittest.TestCase):
 	def test_get_enemy_units_mobile_HQ(self):
