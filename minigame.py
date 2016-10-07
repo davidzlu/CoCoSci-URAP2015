@@ -204,6 +204,7 @@ class Activation(Minigame):
                     self.put_number(0, 0, i)
                     self.put_number(0, 1, i)
                     print("difference = 0: reset")
+                    continue
                     # numbers = self.roll_dice_get_number(2)
                     # print("These are numbers you can put in the board:")
                     # print(numbers)
@@ -460,6 +461,11 @@ class TestMethods(unittest.TestCase):
             connection = Connection(gameboard)
             result = connection.play(randomPolicy)
             self.assertTrue(result < 7)
+    
+    def test_search(self):
+        for i in range(0, 100):
+            search = Search()
+            result = search.play(randomPolicy)
 
     def test_check_full(self):
         test = Minigame(2, 4)

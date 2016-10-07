@@ -19,6 +19,7 @@ class MobileHQ:
 		self.units = get_enemy_units([["AAA", 2], ["APC", 2], ["Commands", 4], ["SCUD", 2], ["SPA", 2], ["Truck", 2]])
 		self.half_value = 16
 		self.destroy_value = 5
+		"""TODO list: special note here"""
 
 
 class TestMethods(unittest.TestCase):
