@@ -4,6 +4,7 @@ Why do we need the outputs they give? What other class is accepting the
 results of the subclasses for this interface?
 """
 
+import random
 
 
 class DeckBuilding(object):
@@ -18,36 +19,58 @@ class DeckBuilding(object):
         self.friendly_units = []
         self.enemy_units = []
         self.phase = 0
-        
-    def create_board(self):
-        """Creates a board for the game. Most general version here.
-        May be overwritten by subclasses.
 
-        Idea 1: subclass passes in board layout, this method turns it into data structure (e.g. a list)
-          -lots of work passed down, not much reused
-        Idea 2: pass in rows, columns, and a "period" so every other row has x columns/rows while others have y columns/rows
-          -assumes all boards can be described periodically
-
-        
+    def setup_friendly_units(self, friendly_units):
         """
-
+        """
+        # pick up a piece (randomly?)
+        # simulate putting piece on board, get a simulated board
+        # check constraints on simulated board
+        # how to get the spots to try?
+        # How to loop through spots to try?
+        # if good, change actual board to simulated one
+        # else, try putting piece on another spot
         pass
 
-    def setup_friendly_units(self):
-        """
-        """
-        raise NotImplementedError
-
     def pick_piece_from_pile(self):
-        raise NotImplementedError
+        """
+        """
+        pass
 
     def setup_enemy_units(self):
+        """Determines what enemy units can appear during gameplay.
+
+        e.g. In Jasper and Zot, equivalent to filling a bag with all the 
+        enemy pieces.
+        """
+        # how to do battalion drawing in TAL?
+        # is this in initial set-up or in game loop? or both?
+        raise NotImplementedError
+
+    def place_enemy_units(self, units_to_place, constraints):
+        """Place an enemy unit on the board during gameplay.
+
+        e.g. In Jasper and Zot, equivalent to picking a piece from the bag
+        and putting it on the board.
+        """
+        # are all enemy units drawn in response to a roll?
+        for unit in units_to_place:
+            possible_placement = self.place_piece(unit)
+            if possible_placement.check_constraints(constraints):
+                #update
+
+    def place_piece(self, piece, policy=None):
         """
         """
         raise NotImplementedError
 
     def setup_environment(self):
-        """
+        """Creates a board for the game, along with variables related to spaces
+        on the board. Most general version here.
+        May be overwritten by subclasses.
+
+        Idea 1: subclass passes in board layout, this method turns it into data structure (e.g. a list)
+          -lots of work passed down, not much reused
         """
         raise NotImplementedError
 
@@ -58,8 +81,9 @@ class DeckBuilding(object):
         Parameters:
         pieces -- a list of pieces
         """
-        #TODO: write function
-        pass
+        shuffled_pieces = list(pieces)
+        random.shuffle(shuffled_pieces)
+        return shuffled_pieces
 
     def game_loop(self, stage_order):
         #TODO: is this needed? essentially same as play?
@@ -73,13 +97,11 @@ class DeckBuilding(object):
         lo -- lowest value in dice.
         hi -- highest value in dice.
         """
-        #TODO: write function
-        pass
+        return random.randint(lo, hi)
 
     def coin_flip(self):
         """Returns 0 or 1 with equal probability."""
-        #TODO: write function
-        pass
+        return self.dice_roll(0, 1)
 
     def transition_prob_matrix(self):
         """Returns this game's transition probability matrix."""
@@ -160,3 +182,15 @@ class DeckBuilding(object):
         """
         #TODO: figure out how much can be written here
         raise NotImplementedError
+
+    def check_constraints(self, constraints):
+        """Returns True if every contraint in constraints is satisfied.
+        False otherwise.
+
+        Parameters:
+        constraints -- a list? of methods that return a boolean
+        """
+        for rule in constraints:
+            if not self.rule():
+                return False
+        return True
