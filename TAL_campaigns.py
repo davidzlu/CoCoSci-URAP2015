@@ -11,9 +11,68 @@ def create_board(Campaign):
     for piece in piecenums:
         pieces.append(get_tile(piece)) #get piece will be found in the terrain file
     board = [list(pieces[0:3]), list(pieces[3:7]), list(pieces[7:])]
+    set_adjacent_tiles(board)
     return board
 
+def set_adjacent_tiles(tilelist):
+    p1 = tilelist[0][0]
+    p2 = tilelist[0][1]
+    p3 = tilelist[0][2]
+    p4 = tilelist[1][0]
+    p5 = tilelist[1][1]
+    p6 = tilelist[1][2]
+    p7 = tilelist[1][3]
+    p8 = tilelist[2][0]
+    p9 = tilelist[2][1]
+    p10 = tilelist[2][2]
 
+    p1.bnext = p2
+    p1.cnext = p5
+    p1.dnext = p4
+    
+    p2.bnext = p3
+    p2.cnext = p6
+    p2.dnext = p5
+    p2.enext = p1
+    
+    p3.cnext = p7
+    p3.dnext = p6
+    p3.enext = p2
+    
+    p4.anext = p1
+    p4.bnext = p5
+    p4.cnext = p8
+    
+    p5.anext = p2
+    p5.bnext = p6
+    p5.cnext = p9
+    p5.dnext = p8
+    p5.enext = p4
+    p5.fnext = p1
+
+    p6.anext = p3
+    p6.bnext = p7
+    p6.cnext = p10
+    p6.dnext = p9
+    p6.enext = p5
+    p6.fnext = p2
+
+    p7.dnext = p10
+    p7.enext = p6
+    p7.fnext = p3
+    
+    p8.anext = p5
+    p8.bnext = p9
+    p8.fnext = p4
+
+    p9.anext = p6
+    p9.bnext = p10
+    p9.enext = p8
+    p9.fnext = p5
+
+    p10.anext = p7
+    p10.enext = p9
+    p10.fnext = p6
 
 class Iraq:
     """Campaign information for Iraq"""
