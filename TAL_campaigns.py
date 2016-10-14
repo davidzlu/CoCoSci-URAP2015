@@ -126,6 +126,15 @@ class Constrait:
                     return False
         return False
 
+    def setup_constrait_batallion_cycle(self, battalion):
+        """check if the battalion cards that are selected is in sequence of:
+            assault, assault, support, command."""
+        check_list = ["A", "A", "S", "C"]
+        for i in range(0, len(battalion)):
+            if battalion[i].type[1] != check_list[i % 4]:
+                return False
+        return True
+
 class TestMethods(unittest.TestCase):
     def test_setup_constrait_battalion_VP(self):
         # case 1: total battalion vp < setup vp
@@ -145,6 +154,15 @@ class TestMethods(unittest.TestCase):
         test_battalion4 = [InfantryForce(), InfantryForce(), InfantryForce(), InfantryForce(), InfantryForce(), 
             InfantryForce(), InfantryForce()]
         self.assertTrue(not test_function(test_camp, test_battalion4))
+
+    def test_setup_constrait_battalion_cycle(self):
+        test_function = Constrait().setup_constrait_batallion_cycle
+        # case 1: succeed
+        test_battalion = [InfantryForce(), InfantryForce(), EngineerUnit(), HeadQuarters()]
+        self.assertTrue(test_function(test_battalion))
+        # case 2: failed
+        test_battalion2 = [InfantryForce(), InfantryForce(), HeadQuarters(), EngineerUnit()]
+        self.assertTrue(not test_function(test_battalion2))
 
 
 if __name__ == '__main__':
