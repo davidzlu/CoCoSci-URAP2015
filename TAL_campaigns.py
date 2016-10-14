@@ -9,7 +9,7 @@ def create_board(Campaign):
     piecenums = random.shuffle(Campaign.terrain_nums)
     pieces = []
     for piece in piecenums:
-        pieces.append(get_piece(piece)) #get piece will be found in the terrain file
+        pieces.append(get_tile(piece)) #get piece will be found in the terrain file
     board = [list(pieces[0:3]), list(pieces[3:7]), list(pieces[7:])]
     return board
 
