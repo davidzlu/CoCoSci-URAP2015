@@ -95,3 +95,19 @@ class AC_130:
 		self.weight = 0
 
 plane_pool = {A_10A: 4, AH_1: 3, F_16: 1, AH_64A: 8, AV_8B: 3, A_10C: 2, MQ_1: 2, RQ_1: 2, AH_64D: 4, AC_130: 1}
+
+def legal_actions(campaign):
+	possible_choices = []
+	for plane in plane_pool.keys():
+		if plane().year <= campaign.year and plane_pool[plane] > 0:
+			possible_choices.append(plane)
+	return possible_choices
+
+class TestMethods(unittest.TestCase):
+	def test_legal_actions(self):
+		test_campaign = Iraq()
+		for plane in legal_actions(test_campaign):
+			self.assertTrue(plane().year <= 1991)
+
+if __name__ == '__main__':
+    unittest.main()
