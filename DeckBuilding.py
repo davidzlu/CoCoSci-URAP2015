@@ -23,6 +23,10 @@ class DeckBuilding(object):
         self.enemy_unit= []
         self.phase = 0
         
+        self.states_visited = []
+        self.actions_taken = []
+        self.rewards_received = []
+        
     #################
     # SETUP METHODS #
     #################
@@ -49,10 +53,7 @@ class DeckBuilding(object):
         for unit in units_to_place:
             location = policy(unit) #TODO: figure out format of policies
             possible_placement = self.place_piece(unit, location, constraints)
-            if possible_placement:
-                #just keep going, nothing wrong
-                pass
-            else:
+            if not possible_placement:
                 #anything needed?
                 pass
             
@@ -81,14 +82,11 @@ class DeckBuilding(object):
         """
         for unit in units_to_place:
             roll = self.dice_roll(1, dice_sides)
-            location = self.roll_to_location(roll) #TODO: do a roll -> location lookup, 
+            location = self.roll_to_location(roll)
             #TODO: is there any other lookup involved? In Jasper and Zot, player can sometimes shift enemy tokens around
             # are all enemy units drawn in response to a roll? yes, or could later be addressed in constraints
             possible_placement = self.place_piece(unit, location, constraints)
-            if possible_placement:
-                #just keep going, nothing wrong
-                pass
-            else:
+            if not possible_placement:
                 #anything needed?
                 pass
                 
@@ -112,7 +110,6 @@ class DeckBuilding(object):
         piece -- an enemy or friendly piece in the game
         location -- a location object?
         """
-        #TODO: how to place pieces? should be in subclass. a location/tile/space interface?
         #one idea: a board interface, locations pick out spaces on boards
         #w/o board interface/this delegation, entire method needs to be implemented in subclass
         placed = self.board.place_piece(piece, location, constraints)
@@ -127,8 +124,6 @@ class DeckBuilding(object):
         on the board. Must be overwritten by subclasses.
         """
         raise NotImplementedError
-    
-    
 
 #     def shuffle(self, pieces):
 #         """Returns a shuffled version of pieces.
@@ -163,11 +158,93 @@ class DeckBuilding(object):
             return None
         pieces.shuffle()
         return pieces.pop()
+    
+    def play(self, policy, stage_order, constraints):
+        """Simulates a playthrough of the game using policy, returning a list (or maybe tuple)
+        of the form [[list of states visited],
+                     [list of actions taken], 
+                     [list of rewards received]].
 
-    def game_loop(self, stage_order):
-        #TODO: is this needed? essentially same as play?
-        #stage_order -- list of methods, called in order that game should progress
+        Parameters:
+        policy -- a function defining a policy for the agent.
+        """
+        #TODO: figure out how much can be written here
+        self.states_visited = []
+        self.actions_taken = []
+        self.rewards_received = []
+        #setup game
+        #setup initial state of board
+        while True:
+            while not self.round_setup_done():
+                self.round_setup()
+                while self.game_loop_done():
+                    self.game_loop(policy, stage_order, constraints)
+            if self.is_lose_state():
+                #TODO: Do lose state stuff
+                break
+            if self.is_win_state():
+                #TODO: Do win state stuff
+                break
+        
+        return [tuple(self.states_visited), tuple(self.actions_taken), tuple(self.rewards_received)]
+
+    def game_loop(self, policy, stage_order, constraints):
+        """Helper function for play. Implements stages of game loop. Goes through one iteration of the loop.
+        TODO: is this needed? essentially same as play?
+        
+        Parameters:
+        policy -- method that returns an action given current state
+        stage_order -- list? of methods, called in order that game should progress
+        constraints -- a dictionary? of boolean methods that must be called for a certain stage of the game loop
+        """
+        for stage_method in stage_order:
+            """
+            TODO: figure out what should happen for each round
+            TODO: should tracking state be implemented in subclass? what should stage_method return?
+            idea 1: all stage_methods return something. A state, action, and reward if it involves the agent.
+                None if the stage doesn't involve the agent. Then check what was returned.
+            idea 2: push state tracking down into stage_method implementation.
+            """
+            stage_method(self, policy, constraints[stage_method]) 
         pass
+    
+    def round_setup_done(self):
+        """Returns true if setup for a round is finshed. Otherwise returns false.
+        
+        ex1: in TAL, checks if setup for a mission is finished
+        ex2: in Jasper and Zot, checks if setting up next wave is done
+        
+        Parameters:
+        TODO: figure out parameters
+        """
+        raise NotImplementedError
+    
+    def game_loop_done(self):
+        """Returns true if the game loop should break. Otherwise returns false.
+        
+        ex1: in TAL, true if a mission is completely over and moving onto the next one, or if you lost or won
+        ex2: in Jasper and Zot, true if a wave has finished, or if you lost or won.
+        
+        Parameters:
+        TODO: figure out parameters
+        """
+        raise NotImplementedError
+    
+    def setup_round(self, policy):
+        """Convenience method that calls relevant setup methods for starting a new "round" in the game.
+        
+        ex1: in TAL, called before starting a new mission
+        ex2: in Jasper and Zot, called before starting a new wave
+        
+        Parameters:
+        policy -- a function that returns an action for selecting and placing pieces
+        TODO: figure out parameters
+        """
+        # self.setup_environment()
+        # self.setup_friendly_units(policy)
+        # self.setup_enemy_units()
+        # self.place
+        raise NotImplementedError
 
     def dice_roll(self, lo, hi):
         """Returns random integer in range [lo, hi].
@@ -220,18 +297,6 @@ class DeckBuilding(object):
         """
         #TODO: figure out how much can be written here
         raise NotImplementedError
-
-    def play(self, policy):
-        """Simulates a playthrough of the game using policy, returning a list
-        of the form [[list of states visited],
-                     [list of actions taken], 
-                     [list of rewards received]].
-
-        Parameters:
-        policy -- a function defining a policy for the agent.
-        """
-        #TODO: figure out how much can be written here
-        pass
 
     def legal_actions(self):
         """Returns list of all admissable actions the agent
