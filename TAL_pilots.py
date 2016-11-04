@@ -1,5 +1,5 @@
 # A Thunderbolt Apache Leader game file to interface with DeckBuilding.py
-
+from TAL_planes import *
 
 class Pilot:
     """Speed is 0 or 1 whether it is Slow or Fast.
@@ -24,7 +24,6 @@ class Pilot:
         self.status = status
         self.stress = stress
         self.stressScale = stressScale
-
 
 
 def get_pilot(name, skill):
@@ -69,18 +68,62 @@ def get_pilot(name, skill):
             return Pilot(name, skill, 100, "AH-64", "Apache", 0, 2, 2, 2, (12, 22))
 
 def get_pilot_types(aircrafttype):
-    if aircrafttype == "AH-1":
-        return ["Gator", "Grandpa", "Scuttle"]
-    elif aircrafttype == "A-10":
-        return ["Pirate", "Viper"]
-    elif aircrafttype == "AH-64":
-        return ["Hammer", "Judge", "Rock"]
+    if type(aircrafttype) is AH_1:
+        return ["Gator", "Grandpa", "Scuttle", "Freak"]
+    elif (type(aircrafttype) is A_10A) or (type(aircrafttype) is A_10C):
+        return ["Pirate", "Viper", "Gumby", "Halo", "Thor", "Rebel"]
+    elif (type(aircrafttype) is AH_64A) or (type(aircrafttype) is AH_64D):
+        return ["Hammer", "Judge", "Rock", "Montana", "Shadow", "Daddy-O", "Eagle",
+                "Tex", "Flash", "Cougar"]
+    elif type(aircrafttype) is F_16:
+        return ["Dart", "Mohawk"]
+    elif type(aircrafttype) is AC_130:
+        return ["Neon", "Zinger"]
+    elif type(aircrafttype) is AV_8B:
+        return ["Divot", "Genius", "Hack", "Pro"]
 
 
-def select_pilots(aircraftList):
+def select_pilots(aircraftList, strategy):
     pilotList = []
     for craft in aircraftList:
-        #get aircraft type to pass into get_pilot_types
-        #pass pilot name and "Average" into get_pilot and append to pilotList
-        pass
+        choices = get_pilot_types(craft)
+        # strategy(choices)
+        # following code is for human player
+        print(choices)
+        response = input("Select a pilot for your " + type(craft))
+        while response not in choices:
+            response = input("Please enter a valid choice: ")
+        pilot = get_pilot(response, "Average")
+        while pilot in pilotList:
+            print(choices)
+            response = input("You've already chosen that pilot for another aircraft."
+                             "Please choose a different one.: ")
+            pilot = get_pilot(response, "Average")
+        pilotList.append(pilot)
     return pilotList
+
+def promote_pilots(pilotList):
+    #This code currently only works for the setup portion
+    pilotList = []
+    #if these two numbers aren't equal, the difference will be the number of so points spent.
+    promotions = 0
+    demotions = 0
+    answers = ["y", "n", "promote", "demote"]
+    for pilot in pilotList:
+        response = input("Would you like to promote or demote this pilot? "
+                         "Answer with y or n: ")
+        while response not in answers:
+            response = input("Please answer with y or n: ")
+        if response == "y":
+            response = input("Please answer with either 'promote' or 'demote'."
+                             "If you've changed your mind, you may answer with 'n': ")
+            while response not in answers:
+                response = input("Please answer with 'promote' or 'demote' or 'n': ")
+            if response == "promote":
+                promotions += 1
+                pilot = get_pilot(pilot.name, "Skilled")
+            elif response == "demote":
+                demotions += 1
+                pilot = get_pilot(pilot.name, "Green")
+        pilotList.append(pilot)
+    return pilotList, promotions, demotions
