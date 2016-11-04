@@ -159,6 +159,10 @@ class DeckBuilding(object):
         pieces.shuffle()
         return pieces.pop()
     
+    ########################################
+    # Play, game loop, and related methods #
+    ########################################
+    
     def play(self, policy, stage_order, constraints):
         """Simulates a playthrough of the game using policy, returning a list (or maybe tuple)
         of the form [[list of states visited],
@@ -177,7 +181,7 @@ class DeckBuilding(object):
         while True:
             while not self.round_setup_done():
                 self.round_setup()
-                while self.game_loop_done():
+                while not self.game_loop_done():
                     self.game_loop(policy, stage_order, constraints)
             if self.is_lose_state():
                 #TODO: Do lose state stuff
@@ -245,6 +249,26 @@ class DeckBuilding(object):
         # self.setup_enemy_units()
         # self.place
         raise NotImplementedError
+    
+    def is_win_state(self):
+        """Returns True if self is a terminal state satisfying
+        win conditions and False otherwise.
+        Must be overwritten.
+        """
+        #TODO: figure out how much can be written here
+        raise NotImplementedError
+
+    def is_lose_state(self):
+        """Returns True if self is a terminal state satisfying
+        lose conditions and False otherwise.
+        Must be overwritten.
+        """
+        #TODO: figure out how much can be written here
+        raise NotImplementedError
+    
+    #######################
+    # Utility/MDP Methods #
+    #######################
 
     def dice_roll(self, lo, hi):
         """Returns random integer in range [lo, hi].
@@ -281,22 +305,6 @@ class DeckBuilding(object):
         """
         #TODO: figure out how much can be written here
         pass
-
-    def is_win_state(self):
-        """Returns True if self is a terminal state satisfying
-        win conditions and False otherwise.
-        Must be overwritten.
-        """
-        #TODO: figure out how much can be written here
-        raise NotImplementedError
-
-    def is_lose_state(self):
-        """Returns True if self is a terminal state satisfying
-        lose conditions and False otherwise.
-        Must be overwritten.
-        """
-        #TODO: figure out how much can be written here
-        raise NotImplementedError
 
     def legal_actions(self):
         """Returns list of all admissable actions the agent
