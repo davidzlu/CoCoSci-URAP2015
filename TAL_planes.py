@@ -103,6 +103,76 @@ def legal_actions(campaign):
 			possible_choices.append(plane)
 	return possible_choices
 
+class Weapon:
+	def __init__(self, weaponPoints, ordnancePoints, attackNumber, attackRange, altitudeAttacks, VB, independence):
+		self.weaponPoints = weaponPoints
+		self.ordnancePoints = ordnancePoints
+		self.attackNumber = attackNumber
+		self.attackRange = attackRange
+		# A tuple of number interval to specify the range
+		self.altitudeAttacks = altitudeAttacks
+		# a list specifying which height to attack, in form of [boolean, boolean] correspond to {high, low}
+		self.VB = VB
+		# Vehicle/building or not, in form of boolean
+		self.independence = independence
+		# independent or not, boolean
+		###for detailed discription see weapon section in rule book
+	def attack(self, target, dice_roll):
+		if dice_roll >= self.attackNumber:
+			return
+			# TODO: fill in this method to enable attack
+		return
+
+class VB_Weapon(Weapon):
+	def __init__(self, weaponPoints, ordnancePoints, attackNumber, attackRange, altitudeAttacks):
+		Weapon.__init__(self, weaponPoints, ordnancePoints, attackNumber, attackRange, altitudeAttacks, True, False)
+	
+	def attack(self, target, dice_roll):
+		if dice_roll >= self.attackNumber:
+			return
+			# TODO: fill in this method to enable attack
+		return
+
+class Independent_Weapon(Weapon):
+	def __init__(self, weaponPoints, ordnancePoints, attackNumber, attackRange, altitudeAttacks):
+		Weapon.__init__(self, weaponPoints, ordnancePoints, attackNumber, attackRange, altitudeAttacks, False, True)
+
+	def attack(self, target, dice_roll):
+		if dice_roll >= self.attackNumber:
+			return
+			# TODO: fill in this method to enable attack
+		return
+
+class Ordinary_Weapon(Weapon):
+	def __init__(self, weaponPoints, ordnancePoints, attackNumber, attackRange, altitudeAttacks):
+		Weapon.__init__(self, weaponPoints, ordnancePoints, attackNumber, attackRange, altitudeAttacks, False, False)
+
+	def attack(self, target, dice_roll):
+		if dice_roll >= self.attackNumber:
+			return
+			# TODO: fill in this method to enable attack
+		return
+
+class MK_83(Ordinary_Weapon):
+	def __init__(self):
+		Weapon.__init__(2, 0, 4, (0, 0), [True, True])
+
+class LAU_61(Ordinary_Weapon):
+	def __init__(self):
+		Weapon.__init__(2, 1, 4, (0, 1), [True, True])
+
+class AGM_114(VB_Weapon):
+	def __init__(self):
+		Weapon.__init__(1, 1, 4, (1, 2), [True, True])
+
+class GBU_12(Independent_Weapon):
+	def __init__(self):
+		Weapon.__init__(1, 1, 4, (0, 1), [True, False])
+
+class AGM_65(VB_Weapon):
+	def __init__(self):
+		Weapon.__init__(2, 1, 1, (1, 3), [True, True])
+
 class TestMethods(unittest.TestCase):
 	def test_legal_actions(self):
 		test_campaign = Iraq()
