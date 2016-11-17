@@ -131,6 +131,46 @@ def get_pilot(name, skill):
             return Pilot(name, skill, 9, "F-16", "Fighting Falcon", 0, 2, 2, 1, (8, 14))
         elif skill == "Ace":
             return Pilot(name, skill, 100, "F-16", "Fighting Falcon", 0, 3, 3, 1, (8, 13))
+    elif name == "Halo":
+        if skill == "Newbie":
+            return Pilot(name, skill, 4, "A-10", "Thunderbolt", 0, -1, 0, 0, (3, 4))
+        elif skill == "Green":
+            return Pilot(name, skill, 4, "A-10", "Thunderbolt", 0, -1, 0, 1, (5, 7))
+        elif skill == "Average":
+            return Pilot(name, skill, 6, "A-10", "Thunderbolt", 0, 0, 0, 1, (8, 13))
+        elif skill == "Skilled":
+            return Pilot(name, skill, 4, "A-10", "Thunderbolt", 0, 0, 0, 1, (9, 15))
+        elif skill == "Veteran":
+            return Pilot(name, skill, 4, "A-10", "Thunderbolt", 0, 1, 0, 2, (9, 16))
+        elif skill == "Ace":
+            return Pilot(name, skill, 100, "A-10", "Thunderbolt", 0, 2, 1, 2, (12, 21))
+    elif name == "Thor":
+        if skill == "Newbie":
+            return Pilot(name, skill, 3, "A-10", "Thunderbolt", 0, -1, -1, 0, (5, 6))
+        elif skill == "Green":
+            return Pilot(name, skill, 5, "A-10", "Thunderbolt", 0, 1, 0, 0, (5, 6))
+        elif skill == "Average":
+            return Pilot(name, skill, 6, "A-10", "Thunderbolt", 0, 2, 0, 0, (6, 9))
+        elif skill == "Skilled":
+            return Pilot(name, skill, 8, "A-10", "Thunderbolt", 0, 2, 0, 0, (7, 11))
+        elif skill == "Veteran":
+            return Pilot(name, skill, 10, "A-10", "Thunderbolt", 0, 3, 1, 0, (7, 11))
+        elif skill == "Ace":
+            return Pilot(name, skill, 100, "A-10", "Thunderbolt", 0, 3, 2, 1, (9, 15))
+    elif name == "Gumby":
+        if skill == "Newbie":
+            return Pilot(name, skill, 4, "A-10", "Thunderbolt", 0, -1, 0, 0, (3, 4))
+        elif skill == "Green":
+            return Pilot(name, skill, 4, "A-10", "Thunderbolt", 0, -1, 1, 0, (6, 8))
+        elif skill == "Average":
+            return Pilot(name, skill, 6, "A-10", "Thunderbolt", 0, 0, 2, 0, (6, 9))
+        elif skill == "Skilled":
+            return Pilot(name, skill, 6, "A-10", "Thunderbolt", 0, 0, 2, 1, (8, 12))
+        elif skill == "Veteran":
+            return Pilot(name, skill, 9, "A-10", "Thunderbolt", 1, 3, 1, 0, (8, 13))
+        elif skill == "Ace":
+            return Pilot(name, skill, 100, "A-10", "Thunderbolt", 0, 3, 2, 1, (9, 15))
+
 
 def get_pilot_types(aircrafttype):
     if type(aircrafttype) is AH_1:
