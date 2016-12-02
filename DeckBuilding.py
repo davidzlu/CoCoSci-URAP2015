@@ -135,10 +135,10 @@ class DeckBuilding(object):
     def start_random_event(self, possible_events):
         """Pick a random event from a list of possible events and apply its effects. 
         """
-        random.shuffle(possible_events)
-        event = possible_events.pop()
-        self.active_events.append(event)
-        event.execute()
+        event = self.pick_piece_from_pile(possible_events)
+        if event:
+            self.active_events.append(event)
+            event.execute()
         
     def end_random_event(self, event):
         """Removes event from list of active events.
@@ -169,6 +169,9 @@ class DeckBuilding(object):
             return None
         pieces.shuffle()
         return pieces.pop()
+    
+    def reset_board(self):
+        return
     
     ########################################
     # Play, game loop, and related methods #
@@ -245,9 +248,10 @@ class DeckBuilding(object):
         raise NotImplementedError
     
     def forfeit_turn(self):
-        """Have player skip the rest of the game loop
+        """Have player skip the rest of the game loop.
         """
-        pass
+        #if policy says forfeit turn, set game_loop_done to false somehow?
+        return False
     
     def turn_setup(self, policy):
         """Convenience method that calls relevant setup methods for starting a new "turn" in the game.
@@ -397,4 +401,14 @@ class Event(object):
     def end(self, state, *args):
         """When called ends all of the event's effects on the state.
         """
+        raise NotImplementedError
+    
+class constraint(object):
+    """Interface for constraints.
+    A constraint is a rule that an action must follow. If an action violates a constraint, the agent
+    cannot take the action. Constraints have a single method is_satisfied that checks a given state and
+    returns True if the rule is followed, otherwise it returns False.
+    """
+    
+    def is_satisfied(self, state):
         raise NotImplementedError
