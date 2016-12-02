@@ -290,7 +290,7 @@ class SectorMap:
         return list_of_battalions
 
     def get_all_enemies(self, campaign):
-        constraint = Constrait()
+        constraint = constraint()
         battalions = []
         while True:
             battalion_vp = 0
@@ -320,9 +320,9 @@ class TestMethods(unittest.TestCase):
         sm.setup_enemy_units()
         campaign = Iraq()
         enemy_list = sm.get_all_enemies(campaign)
-        c = Constrait()
-        self.assertTrue(c.setup_constrait_battalion_VP(campaign, enemy_list))
-        self.assertTrue(c.setup_constrait_batallion_cycle(enemy_list))
+        c = Constraint()
+        self.assertTrue(c.setup_constraint_battalion_VP(campaign, enemy_list))
+        self.assertTrue(c.setup_constraint_batallion_cycle(enemy_list))
 
 if __name__ == '__main__':
     unittest.main()
