@@ -6,11 +6,10 @@ results of the subclasses for this interface?
 
 import random
 
-
 class DeckBuilding(object):
     """Abstract class for all deck building games.
     """
-
+    policy = {} # Maps current state to an action
     tpm = {} # Maps (curState, action, nextState) to transition probability
 
     def __init__(self, setup_order):
@@ -21,11 +20,14 @@ class DeckBuilding(object):
         #assert type(self.board) == Board # if using Board interface, need this 
         self.friendly_units = []
         self.enemy_unit= []
-        self.phase = 0
+        self.turn = 0
+        self.possible_events = []
+        self.active_events = []
         
         self.states_visited = []
         self.actions_taken = []
         self.rewards_received = []
+        
         
     #################
     # SETUP METHODS #
@@ -124,17 +126,26 @@ class DeckBuilding(object):
         on the board. Must be overwritten by subclasses.
         """
         raise NotImplementedError
-
-#     def shuffle(self, pieces):
-#         """Returns a shuffled version of pieces.
-# 
-#         Probably used for setup functions
-#         Parameters:
-#         pieces -- a list of pieces
-#         """
-#         shuffled_pieces = list(pieces)
-#         random.shuffle(shuffled_pieces)
-#         return shuffled_pieces
+    
+    def setup_random_events(self):
+        """Create set of possible events that can occur during game.
+        """
+        raise NotImplementedError
+    
+    def start_random_event(self, possible_events):
+        """Pick a random event from a list of possible events and apply its effects. 
+        """
+        event = self.pick_piece_from_pile(possible_events)
+        if event:
+            self.active_events.append(event)
+            event.execute()
+        
+    def end_random_event(self, event):
+        """Removes event from list of active events.
+        """
+        if event in self.active_events:
+            self.active_events.remove(event)
+        return
 
     def check_constraints(self, constraints):
         """Returns True if every contraint in constraints is satisfied.
@@ -159,6 +170,9 @@ class DeckBuilding(object):
         pieces.shuffle()
         return pieces.pop()
     
+    def reset_board(self):
+        return
+    
     ########################################
     # Play, game loop, and related methods #
     ########################################
@@ -172,19 +186,18 @@ class DeckBuilding(object):
         Parameters:
         policy -- a function defining a policy for the agent.
         """
-        #TODO: figure out how much can be written here
         self.states_visited = []
         self.actions_taken = []
         self.rewards_received = []
-        #setup game
-        #setup initial state of board
+        #setup game, things like selecting pilots in TAL or picking Jasper's starting position
         while True:
-            while not self.round_setup_done():
-                self.round_setup()
-                while not self.game_loop_done():
-                    self.game_loop(policy, stage_order, constraints)
+            self.turn_setup()
+            while not self.game_loop_done():
+                self.turn += 1
+                self.game_loop(policy, stage_order, constraints)
             if self.is_lose_state():
                 #TODO: Do lose state stuff
+                self.states_visited.append(self)
                 break
             if self.is_win_state():
                 #TODO: Do win state stuff
@@ -194,7 +207,6 @@ class DeckBuilding(object):
 
     def game_loop(self, policy, stage_order, constraints):
         """Helper function for play. Implements stages of game loop. Goes through one iteration of the loop.
-        TODO: is this needed? essentially same as play?
         
         Parameters:
         policy -- method that returns an action given current state
@@ -209,11 +221,12 @@ class DeckBuilding(object):
                 None if the stage doesn't involve the agent. Then check what was returned.
             idea 2: push state tracking down into stage_method implementation.
             """
+            #TODO: how to implement effects of events?
             stage_method(self, policy, constraints[stage_method]) 
         pass
     
-    def round_setup_done(self):
-        """Returns true if setup for a round is finshed. Otherwise returns false.
+    def turn_setup_done(self):
+        """Returns true if setup for a turn is finshed. Otherwise returns false.
         
         ex1: in TAL, checks if setup for a mission is finished
         ex2: in Jasper and Zot, checks if setting up next wave is done
@@ -234,8 +247,14 @@ class DeckBuilding(object):
         """
         raise NotImplementedError
     
-    def setup_round(self, policy):
-        """Convenience method that calls relevant setup methods for starting a new "round" in the game.
+    def forfeit_turn(self):
+        """Have player skip the rest of the game loop.
+        """
+        #if policy says forfeit turn, set game_loop_done to false somehow?
+        return False
+    
+    def turn_setup(self, policy):
+        """Convenience method that calls relevant setup methods for starting a new "turn" in the game.
         
         ex1: in TAL, called before starting a new mission
         ex2: in Jasper and Zot, called before starting a new wave
@@ -304,7 +323,9 @@ class DeckBuilding(object):
         next_state -- destination state after taking action in current state.
         """
         #TODO: figure out how much can be written here
-        pass
+        if (self, action, next_state) in self.tpm:
+            return self.tpm[(self, action, next_state)]
+        return -1
 
     def legal_actions(self):
         """Returns list of all admissable actions the agent
@@ -334,6 +355,11 @@ class DeckBuilding(object):
         """
         #TODO: figure out how much can be written here
         raise NotImplementedError
+
+    def get_state(self):
+        """Turns self into a tuple representing current state in the game.
+        """
+        pass
     
     
 class Board(object):
@@ -341,7 +367,6 @@ class Board(object):
     May be simpler without this interface. Currently using it to track what methods would be nice to have
     when doing DeckBuilding setups. 
     """
-    
     def can_put_piece(self, piece, location, constraints):
         """Returns true if piece is placed at location on the board and all constraints are satisfied.
         Returns false otherwise.
@@ -363,4 +388,27 @@ class Board(object):
         """
         raise NotImplementedError
     
+class Event(object):
+    """Interface for random events.
+    Events are functions that modify the state of the board when called, but do not cause state transitions.
+    """
+    def execute(self, state, *args):
+        """When called executes the event's effects on the state with all args. If event has continuing effects,
+        they should remain even after execute has returned.
+        """
+        raise NotImplementedError
     
+    def end(self, state, *args):
+        """When called ends all of the event's effects on the state.
+        """
+        raise NotImplementedError
+    
+class constraint(object):
+    """Interface for constraints.
+    A constraint is a rule that an action must follow. If an action violates a constraint, the agent
+    cannot take the action. Constraints have a single method is_satisfied that checks a given state and
+    returns True if the rule is followed, otherwise it returns False.
+    """
+    
+    def is_satisfied(self, state):
+        raise NotImplementedError

@@ -12,7 +12,7 @@ class EmailFromHome:
 	"""actively pay 1 SO reduce 2 stress for all pilots"""
 	def __init__(self):
 		self.type = "active"
-	def execute(situation, boolean):
+	def execute(self, situation, boolean):
 		if boolean:
 			situation.SOpoints -= 1
 			# TODO: all pilots reduce 2 stress
@@ -21,7 +21,7 @@ class EnemyReinforcement:
 	"""pay 1 SO or add 1 random battalion to enemy rear"""
 	def __init__(self):
 		self.type = "active"
-	def execute(situation, boolean):
+	def execute(self, situation, boolean):
 		if boolean:
 			situation.SOpoints -= 1
 		else:

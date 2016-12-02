@@ -1,0 +1,6 @@
+Results from 10000 games
+Entropy 119766.592779
+possibleActions 20
+winToFinal 0.0104
+loseToFinal 0.9896
+movesToFinal 27.9569
