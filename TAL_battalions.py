@@ -321,8 +321,8 @@ class TestMethods(unittest.TestCase):
         campaign = Iraq()
         enemy_list = sm.get_all_enemies(campaign)
         c = Constraint()
-        self.assertTrue(c.setup_constrait_battalion_VP(campaign, enemy_list))
-        self.assertTrue(c.setup_constrait_batallion_cycle(enemy_list))
+        self.assertTrue(c.setup_constraint_battalion_VP(campaign, enemy_list))
+        self.assertTrue(c.setup_constraint_batallion_cycle(enemy_list))
 
 if __name__ == '__main__':
     unittest.main()
