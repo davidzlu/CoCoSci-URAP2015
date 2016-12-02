@@ -2,6 +2,7 @@ import random
 from TAL_terrain import *
 from TAL_battalions import *
 from TAL_situation import *
+from TAL_pilots import *
 import unittest
 
 class A_10A:
@@ -103,6 +104,24 @@ def legal_actions(campaign):
 			possible_choices.append(plane)
 	return possible_choices
 
+def get_all_planes(campaign, situation, pick_strategy, determine_strategy):
+	planes = []
+	to_pick_or_not = True
+	while to_pick_or_not:
+		planes_so = 0
+		if planes != None:
+			planes_so = sum([p.so for p in planes])
+		if planes_so >= situation.SOpoints:
+			break
+		plane = pick_strategy(legal_actions(campaign))
+		planes.append(plane())
+		"""TODO: implement methods to determine continue pick plane or not """
+		to_pick_or_not = determine_strategy([True, False])
+	return planes
+
+def random_strategy(possible_choices):
+	return random.choice(possible_choices)
+
 class Weapon:
 	def __init__(self, weaponPoints, ordnancePoints, attackNumber, attackRange, altitudeAttacks, VB, independence):
 		self.weaponPoints = weaponPoints
@@ -178,6 +197,14 @@ class TestMethods(unittest.TestCase):
 		test_campaign = Iraq()
 		for plane in legal_actions(test_campaign):
 			self.assertTrue(plane().year <= 1991)
+
+	def test_get_all_planes(self):
+		test_campaign = Iraq()
+		test_situation = Surge()
+		sample = get_all_planes(test_campaign, test_situation, random_strategy, random_strategy)
+		for plane in sample:
+			self.assertTrue(plane.year <= 1991)
+		self.assertTrue(sum([p.so for p in sample]) <= 38)
 
 if __name__ == '__main__':
     unittest.main()

@@ -1,5 +1,9 @@
 # A Thunderbolt Apache Leader game file to interface with DeckBuilding.py
 from TAL_planes import *
+from TAL_terrain import *
+from TAL_battalions import *
+from TAL_situation import *
+import unittest
 
 class Pilot:
     """Speed is 0 or 1 whether it is Slow or Fast.
@@ -347,10 +351,10 @@ def select_pilots(aircraftList, strategy):
     pilotList = []
     for craft in aircraftList:
         choices = get_pilot_types(craft)
-        # strategy(choices)
+        # pilot = strategy(choices)
         # following code is for human player
         print(choices)
-        response = input("Select a pilot for your " + type(craft))
+        response = input("Select a pilot for your " + str(type(craft)))
         while response not in choices:
             response = input("Please enter a valid choice: ")
         pilot = get_pilot(response, "Average")
@@ -387,3 +391,20 @@ def promote_pilots(pilotList):
                 pilot = get_pilot(pilot.name, "Green")
         pilotList.append(pilot)
     return pilotList, promotions, demotions
+
+def get_plane_pilot(campaign, situation, pick_strategy, determine_strategy):
+    aircrafts = get_all_planes(campaign, situation, pick_strategy, determine_strategy)
+    pilots = select_pilots(aircrafts, pick_strategy)
+    return aircrafts, pilots
+
+class TestMethods(unittest.TestCase):
+    def test_get_plane_pilot(self):
+        test_campaign = Iraq()
+        test_situation = Surge()
+        sample = get_plane_pilot(test_campaign, test_situation, random_strategy, random_strategy)
+        for plane in sample[0]:
+            self.assertTrue(plane.year <= 1991)
+        self.assertTrue(sum([p.so for p in sample[0]]) <= 38)
+
+if __name__ == '__main__':
+    unittest.main()

@@ -258,14 +258,14 @@ class SectorMap:
     def place_piece(self, piece, location, constraints=None):
         location.append(piece)
 
-    def put_piece(self, piece, constraints=None):
+    def place_piece(self, piece, constraints=None):
         for place in self.places:
             if self.can_put_piece(piece, place):
                 self.place_piece(piece, place)
 
-    def put_all_enemy_units(self, list_of_battalions):
+    def place_all_enemy_units(self, list_of_battalions):
         for battalion in list_of_battalions:
-            self.put_piece(battalion)
+            self.place_piece(battalion)
 
     def setup_enemy_units(self):
         self.potential_enemies = {"C": [MobileHQ(), HeadQuarters(), ReconInForce(), ScoutGroup(), ForwardBase(), \
@@ -290,7 +290,6 @@ class SectorMap:
         return list_of_battalions
 
     def get_all_enemies(self, campaign):
-        constraint = Constraint()
         battalions = []
         while True:
             battalion_vp = 0
@@ -300,6 +299,11 @@ class SectorMap:
                 break
             battalions = self.get_next_unit(battalions)
         return battalions
+
+    def place_enemy_units(self, campaign):
+        """the method to call for placing all enemy units"""
+        battalions = self.get_all_enemies(campaign)
+        self.place_all_enemy_units(battalions)
 
 
 
