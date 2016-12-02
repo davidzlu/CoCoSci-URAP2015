@@ -255,13 +255,14 @@ class SectorMap:
             return True
         return False
 
-    def place_piece(self, piece, location, constraints=None):
-        location.append(piece)
+    # def place_piece(self, piece, location, constraints=None):
+    #     location.append(piece)
 
     def place_piece(self, piece, constraints=None):
         for place in self.places:
             if self.can_put_piece(piece, place):
-                self.place_piece(piece, place)
+              #  self.place_piece(piece, place)
+                self.place.append(piece)
 
     def place_all_enemy_units(self, list_of_battalions):
         for battalion in list_of_battalions:
