@@ -1,0 +1,6 @@
+Results from 100 games
+Entropy 1177.59693719
+possibleActions 18
+winToFinal 0.0
+loseToFinal 1.0
+movesToFinal 27.9

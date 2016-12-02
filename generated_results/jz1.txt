@@ -1,0 +1,7 @@
+Results from 1000 games
+Entropy 0.221364174908
+possibleActions 21
+winToFinal 0.008
+loseToFinal 0.992
+movesToFinal 27.925
+avgStepsToReward 4.67759146341

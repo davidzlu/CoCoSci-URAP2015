@@ -1,0 +1,6 @@
+Results from 5001 games
+Entropy 60032.8264738
+possibleActions 18
+winToFinal 0.00999800039992
+loseToFinal 0.9900019996
+movesToFinal 28.1065786843
