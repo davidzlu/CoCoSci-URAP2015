@@ -51,9 +51,9 @@ class Tile:
     *piece refers to whether there is a piece on the side labeled *
     *next refers to which tile is adjacent to the current tile on that side"""
 
-    def __init__(self, a, b, c, d, e, f, center=None,
-                 apiece=None, bpiece=None, cpiece=None, dpiece=None, epiece=None, fpiece=None,
-                 anext=None, bnext=None, cnext=None, dnext=None, enext=None, fnext=None):
+    def __init__(self, a, b, c, d, e, f, center=[],
+                 apiece=[], bpiece=[], cpiece=[], dpiece=[], epiece=[], fpiece=[],
+                 anext=[], bnext=[], cnext=[], dnext=[], enext=[], fnext=[]):
         self.a = a
         self.b = b
         self.c = c
