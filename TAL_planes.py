@@ -2,6 +2,7 @@ import random
 from TAL_terrain import *
 from TAL_battalions import *
 from TAL_situation import *
+from TAL_pilots import *
 import unittest
 
 class A_10A:
@@ -102,6 +103,9 @@ def legal_actions(campaign):
 		if plane().year <= campaign.year and plane_pool[plane] > 0:
 			possible_choices.append(plane)
 	return possible_choices
+
+def get_all_planes(campaign, situation):
+	pass
 
 class Weapon:
 	def __init__(self, weaponPoints, ordnancePoints, attackNumber, attackRange, altitudeAttacks, VB, independence):
