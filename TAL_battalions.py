@@ -290,7 +290,6 @@ class SectorMap:
         return list_of_battalions
 
     def get_all_enemies(self, campaign):
-        constraint = Constraint()
         battalions = []
         while True:
             battalion_vp = 0
