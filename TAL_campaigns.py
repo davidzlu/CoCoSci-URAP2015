@@ -3,6 +3,7 @@ import random
 from TAL_terrain import *
 from TAL_battalions import *
 from TAL_situation import *
+from DeckBuilding import * 
 import unittest
 
 def create_board(Campaign):

@@ -242,6 +242,8 @@ class SectorMap:
         self.frear = []
         self.airbase = []
         self.scouts = 0
+        self.places = [self.erear, self.etransit, self.frontline, self.ftransit, self.frear, self.airbase]
+        self.potential_enemies = {}
 
     def can_put_piece(self, piece, location, constraints=None):
         # if special note, place piece somewhere else
@@ -255,6 +257,49 @@ class SectorMap:
 
     def place_piece(self, piece, location, constraints=None):
         location.append(piece)
+
+    def put_piece(self, piece, constraints=None):
+        for place in self.places:
+            if self.can_put_piece(piece, place):
+                self.place_piece(piece, place)
+
+    def put_all_enemy_units(self, list_of_battalions):
+        for battalion in list_of_battalions:
+            self.put_piece(battalion)
+
+    def setup_enemy_units(self):
+        self.potential_enemies = {"C": [MobileHQ(), HeadQuarters(), ReconInForce(), ScoutGroup(), ForwardBase(), \
+        CommandUnit()], \
+        "A": [InfantryForce(), AirDefenseUnit(), TankLeader(), Dismounted(), FastAssault(), Mechanized(), \
+        TankForce(), TankSpearhead(), ScoutForce(), MixedForce(), MountedInfantry(), InfantryFormation()], \
+        "S": [EngineerUnit(), FuelDepot(), SupplyDepot(), Reserves(), Convoy(), Bombardment(), ArtilleryUnit()]}
+
+    def get_next_unit(self, list_of_battalions):
+        next = None
+        if len(list_of_battalions) in range(0, 2):
+            next = random.choice(self.potential_enemies["A"])
+        elif list_of_battalions[-1].type[1] == "A" and list_of_battalions[-2].type[1] == "A":
+            next = random.choice(self.potential_enemies["S"])
+        elif list_of_battalions[-1].type[1] == "S":
+            next = random.choice(self.potential_enemies["C"])
+        elif list_of_battalions[-1].type[1] == "A" and list_of_battalions[-2].type[1] == "C":
+            next = random.choice(self.potential_enemies["A"])
+        elif list_of_battalions[-1].type[1] == "C" and list_of_battalions[-2].type[1] == "S":
+            next = random.choice(self.potential_enemies["A"])
+        list_of_battalions.append(next)
+        return list_of_battalions
+
+    def get_all_enemies(self, campaign):
+        constraint = Constrait()
+        battalions = []
+        while True:
+            battalion_vp = 0
+            if battalions != None:
+                battalion_vp = sum([b.vp for b in battalions])
+            if battalion_vp >= campaign.setup_vp:
+                break
+            battalions = self.get_next_unit(battalions)
+        return battalions
 
 
 
@@ -270,6 +315,14 @@ class TestMethods(unittest.TestCase):
         #self.assertTrue(sm.erear == [""])
         #print(sm.erear)
 
+    def test_get_all_enemies(self):
+        sm = SectorMap()
+        sm.setup_enemy_units()
+        campaign = Iraq()
+        enemy_list = sm.get_all_enemies(campaign)
+        c = Constrait()
+        self.assertTrue(c.setup_constrait_battalion_VP(campaign, enemy_list))
+        self.assertTrue(c.setup_constrait_batallion_cycle(enemy_list))
 
 if __name__ == '__main__':
     unittest.main()
