@@ -1,9 +1,3 @@
-"""TODO: FIGURE OUT WHAT THIS INTERFAE IS LINKING.
-What will be the subclasses. What information should they return.
-Why do we need the outputs they give? What other class is accepting the 
-results of the subclasses for this interface?
-"""
-
 import random
 
 class DeckBuilding(object):
@@ -12,7 +6,7 @@ class DeckBuilding(object):
     policy = {} # Maps current state to an action
     tpm = {} # Maps (curState, action, nextState) to transition probability
 
-    def __init__(self, setup_order):
+    def __init__(self):
         #TODO: what instance variables are needed for all games?
         #setup_order -- a list of methods, call each in order to setup board
         #could use same idea for play/game_loop function, or whatever does game loop
@@ -190,6 +184,7 @@ class DeckBuilding(object):
         self.actions_taken = []
         self.rewards_received = []
         #setup game, things like selecting pilots in TAL or picking Jasper's starting position
+        
         while True:
             self.turn_setup()
             while not self.game_loop_done():
@@ -222,7 +217,7 @@ class DeckBuilding(object):
             idea 2: push state tracking down into stage_method implementation.
             """
             #TODO: how to implement effects of events?
-            stage_method(self, policy, constraints[stage_method]) 
+            stage_method(self, policy, constraints[stage_method])
         pass
     
     def turn_setup_done(self):
@@ -401,14 +396,4 @@ class Event(object):
     def end(self, state, *args):
         """When called ends all of the event's effects on the state.
         """
-        raise NotImplementedError
-    
-class constraint(object):
-    """Interface for constraints.
-    A constraint is a rule that an action must follow. If an action violates a constraint, the agent
-    cannot take the action. Constraints have a single method is_satisfied that checks a given state and
-    returns True if the rule is followed, otherwise it returns False.
-    """
-    
-    def is_satisfied(self, state):
         raise NotImplementedError
