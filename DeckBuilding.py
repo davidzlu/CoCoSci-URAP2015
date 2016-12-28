@@ -16,6 +16,7 @@ class DeckBuilding(object):
         #TODO: what instance variables are needed for all games?
         #setup_order -- a list of methods, call each in order to setup board
         #could use same idea for play/game_loop function, or whatever does game loop
+        self.game = None
         self.board = None
         #assert type(self.board) == Board # if using Board interface, need this 
         self.friendly_units = []
