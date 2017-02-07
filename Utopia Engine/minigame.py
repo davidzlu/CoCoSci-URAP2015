@@ -60,7 +60,7 @@ class Minigame:
         return True
         # return np.count_nonzero(self.board) == self.board.size
 
-    def play(self):
+    def play(self, policy):
         raise NotImplementedError
 
     def check_final_range(self):
@@ -92,8 +92,8 @@ class Minigame:
             return self.tpm[(self, action, next_state)]
         states = self.next_states(action)
         if next_state in states:
-            self.tpm[(self, action, next_state)] = 1.0/long(len(states))
-            return 1.0/long(len(states))
+            self.tpm[(self, action, next_state)] = 1.0/np.long(len(states))
+            return 1.0 / np.long(len(states))
         return 0.0
 
     def next_states(self, action, numrows, numcols):
@@ -190,8 +190,8 @@ class Activation(Minigame):
             print("These are numbers you can put in the board:")
             print(numbers)
             moves = strategy(self.legal_actions())
-            print("actions chosen:")
-            print(moves)
+            # print("actions chosen:")
+            # print(moves)
             actionsTaken.append(moves)
             self.put_number(numbers[0], moves[0][0], moves[0][1])
             self.put_number(numbers[1], moves[1][0], moves[1][1])
@@ -355,12 +355,12 @@ class Search(Minigame):
         print("Your search result: ", val1-val2)
         return val1 - val2, [statesVisited, actionsTaken, rewardsGained, legalActions]
 
-    def next_states(self, action):
+    def next_states(self, action, rows=2, cols=3):
         """Returns list of next possible states given current state and action.
         """
         return Minigame.next_states(self, action, 2, 3)
 
-    def legal_actions(self):
+    def legal_actions(self, rows=2, cols=3):
         return Minigame.legal_actions(self, 2, 3)
 
 class FinalActivation:
@@ -368,7 +368,7 @@ class FinalActivation:
     tpm = {}
 
     def __init__(self, finalActivationDifficulty, hitpoints):
-        self.actNum = finalActivationNumber
+        self.actNum = finalActivationDifficulty
         self.rolls = hitpoints + 1
         self.activated = False
 

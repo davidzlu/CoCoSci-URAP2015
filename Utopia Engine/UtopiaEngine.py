@@ -1,5 +1,4 @@
 import random
-import numpy as np
 import ast
 from minigame import *
 from copy import deepcopy
@@ -139,7 +138,8 @@ class GameBoard:
         self.area4 = Area4()
         self.area5 = Area5()
         self.area6 = Area6()
-        self.possible_areas = [self.area1, self.area2, self.area3, self.area4, self.area5, self.area6]
+        self.possible_areas = {'Area 1': self.area1, 'Area 2': self.area2, 'Area 3': self.area3,
+                               'Area 4': self.area4, 'Area 5' : self.area5, 'Area 6' : self.area6}
         self.tools = ["Dowsing Rod", "Paralysis Wand", "Focus Charm"]
         self.construct = {}  # dictionary: key->name of construct, value->activation pts
         self.treasure = []
@@ -272,7 +272,8 @@ class GameBoard:
             actions_taken.append(action_to_take)
             if action_to_take == "Search":
                 search_game = Search()
-                search_area = strategy(self.possible_areas)
+                search_area = strategy(sorted(self.possible_areas.keys()))
+                search_area = self.possible_areas[search_area]
                 if len(search_area.daytracker) == 0:
                     self.day += 1
                 else:
@@ -307,7 +308,7 @@ class GameBoard:
                         self.component[search_area.component] = 1
                 elif outcome in range(100, 200) or outcome in range(-100, 0):  # combat lv1
                     self.combat(search_area.enemy1)
-                    get_item_or_not = roll_dice(1)
+                    get_item_or_not = roll_dice(1)[0]
                     if get_item_or_not <= 1:
                         if search_area.component in self.component:
                             self.component[search_area.component] += 1
@@ -315,7 +316,7 @@ class GameBoard:
                             self.component[search_area.component] = 1
                 elif outcome in range(200, 300) or outcome in range(-200, -100):  # combat lv2
                     self.combat(search_area.enemy2)
-                    get_item_or_not = roll_dice(1)
+                    get_item_or_not = roll_dice(1)[0]
                     if get_item_or_not <= 2:
                         if search_area.component in self.component:
                             self.component[search_area.component] += 1
@@ -323,7 +324,7 @@ class GameBoard:
                             self.component[search_area.component] = 1
                 elif outcome in range(300, 400) or outcome in range(-300, -200):  # combat lv3
                     self.combat(search_area.enemy3)
-                    get_item_or_not = roll_dice(1)
+                    get_item_or_not = roll_dice(1)[0]
                     if get_item_or_not <= 3:
                         if search_area.component in self.component:
                             self.component[search_area.component] += 1
@@ -331,7 +332,7 @@ class GameBoard:
                             self.component[search_area.component] = 1
                 elif outcome in range(400, 500) or outcome in range(-400, -300):  # combat lv4
                     self.combat(search_area.enemy4)
-                    get_item_or_not = roll_dice(1)
+                    get_item_or_not = roll_dice(1)[0]
                     if get_item_or_not <= 4:
                         if search_area.component in self.component:
                             self.component[search_area.component] += 1
@@ -339,7 +340,7 @@ class GameBoard:
                             self.component[search_area.component] = 1
                 elif outcome in range(500, 556) or outcome in range(-555, -400):  # combat lv5
                     self.combat(search_area.enemy5)
-                    get_item_or_not = roll_dice(1)
+                    get_item_or_not = roll_dice(1)[0]
                     if get_item_or_not <= 5:
                         if search_area.treasure not in self.treasure:
                             self.treasure.append(search_area.treasure)
@@ -428,4 +429,4 @@ class GameBoard:
 
 if __name__ == '__main__':
     ue = GameBoard()
-    sts, act, rwd, lAct = ue.play(random_policy)
+    #sts, act, rwd, lAct = ue.play(random_policy)
