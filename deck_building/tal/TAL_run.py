@@ -17,52 +17,22 @@ class TALInstance(DeckBuilding.DeckBuilding):
         self.sm = self.setup_environment()
         print("Finished placing battalions")
         
-        self.pilots = []
+        print("Selecting aircraft")
         self.planes = []
+        self.scouts = 0
+        print("Done selecting aircraft")
         
+        print("Selecting pilots")
+        self.pilots = []
+        print("Done selecting pilots")
         #get_all_planes
         #get_plane_pilot
         #
-    
-    ##################
-    # GETTER METHODS #
-    ##################   
-    
-    def get_campaign_year(self):
-        return self.campaign.year
-    
-    def get_campaign_vp(self):
-        return self.campaign.setup_vp
-    
-    def get_campaign_terrain(self):
-        return self.campaign.terrain_nums
-    
-    def get_campaign_eval(self):
-        return self.campaign.eval
-    
-    def get_campaign_special(self):
-        return None
-        #return self.campaign.special
-        
-    def get_situation_so_points(self):
-        return self.situation.SOpoints
-    
-    def get_situation_days(self):
-        return self.situation.days
-        
-    def get_situation_daily_so(self):
-        return self.situation.dailySO
-    
-    def get_situation_rules(self):
-        return None
-        #return self.situation.rules
-    
-    
 
     def setup_environment(self):
         sm = batt.SectorMap()
         self.total_vp = sm.get_all_enemies(self.campaign)
-        #TODO: any adjustment needed after initla placement?
+        #TODO: adjustment needed after initla placement
         return sm
     
     def setup_enemy_units(self, game):

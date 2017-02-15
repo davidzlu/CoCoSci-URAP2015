@@ -10,8 +10,38 @@ def get_enemy_units(list_unittype_num):
             enemy_unit.append(element[0])
     return enemy_unit
 
+class Battalion:
+    """Abstract class for battalions.
+    """
+    def __init__(self):
+        self.vp = 0
+        self.type = ()
+        self.units = []
+        self.half_value = 0
+        self.destroy_value = 0
+        self.special = None #Field for special instructions for this battalion
+        
+    def get_vp(self):
+        return self.vp
+    
+    def get_type(self):
+        return self.type
+    
+    def get_units(self):
+        return self.units
+    
+    def get_half_value(self):
+        return self.half_value
+    
+    def get_destroy_value(self):
+        return self.destroy_value
+    
+    def get_special(self):
+        return self.special
+        
+
 """battalion information on cards"""
-class MobileHQ:
+class MobileHQ(Battalion):
     def __init__(self):
         self.vp = 2
         self.type = (3, "C")
@@ -20,7 +50,7 @@ class MobileHQ:
         self.destroy_value = 5
         """TODO list: special note here"""
 
-class InfantryForce:
+class InfantryForce(Battalion):
     def __init__(self):
         self.vp = 5
         self.type = (1, "A")
@@ -28,7 +58,7 @@ class InfantryForce:
         self.half_value = 20
         self.destroy_value = 5
 
-class HeadQuarters:
+class HeadQuarters(Battalion):
     def __init__(self):
         self.vp = 4
         self.type = (5, "C")
@@ -38,7 +68,7 @@ class HeadQuarters:
         self.destroy_value = 7
         """TODO list: special note here"""
 
-class ReconInForce:
+class ReconInForce(Battalion):
     def __init__(self):
         self.vp = 1
         self.type = (4, "C")
@@ -47,7 +77,7 @@ class ReconInForce:
         self.destroy_value = 2
         """TODO list: special note here"""
 
-class ScoutGroup:
+class ScoutGroup(Battalion):
     def __init__(self):
         self.vp = 3
         self.type = (2, "C")
@@ -56,7 +86,7 @@ class ScoutGroup:
         self.destroy_value = 2
         """TODO list: special note here"""
 
-class EngineerUnit:
+class EngineerUnit(Battalion):
     def __init__(self):
         self.vp = 2
         self.type = (6, "S")
@@ -65,7 +95,7 @@ class EngineerUnit:
         self.destroy_value = 2
         """TODO list: special note here"""
 
-class FuelDepot:
+class FuelDepot(Battalion):
     def __init__(self):
         self.vp = 4
         self.type = (5, "S")
@@ -74,7 +104,7 @@ class FuelDepot:
         self.destroy_value = 4
         """TODO list: special note here"""
 
-class SupplyDepot:
+class SupplyDepot(Battalion):
     def __init__(self):
         self.vp = 3
         self.type = (4, "S")
@@ -83,7 +113,7 @@ class SupplyDepot:
         self.destroy_value = 6
         """TODO list: special note here"""
 
-class Reserves:
+class Reserves(Battalion):
     def __init__(self):
         self.vp = 1
         self.type = (7, "S")
@@ -92,7 +122,7 @@ class Reserves:
         self.destroy_value = 3
         """TODO list: special note here"""
 
-class Convoy:
+class Convoy(Battalion):
     def __init__(self):
         self.vp = 1
         self.type = (2, "S")
@@ -101,7 +131,7 @@ class Convoy:
         self.destroy_value = 2
         """TODO list: special note here"""
 
-class AirDefenseUnit:
+class AirDefenseUnit(Battalion):
     def __init__(self):
         self.vp = 4
         self.type = (12, "A")
@@ -110,7 +140,7 @@ class AirDefenseUnit:
         self.destroy_value = 2
         """TODO list: special note here"""
 
-class TankLeader:
+class TankLeader(Battalion):
     def __init__(self):
         self.vp = 4
         self.type = (11, "A")
@@ -119,7 +149,7 @@ class TankLeader:
         self.destroy_value = 4
         """TODO list: special note here"""
 
-class Dismounted:
+class Dismounted(Battalion):
     def __init__(self):
         self.vp = 2
         self.type = (7, "A")
@@ -128,7 +158,7 @@ class Dismounted:
         self.destroy_value = 3
         """TODO list: special note here"""
 
-class FastAssault:
+class FastAssault(Battalion):
     def __init__(self):
         self.vp = 3
         self.type = (9, "A")
@@ -137,7 +167,7 @@ class FastAssault:
         self.destroy_value = 2
         """TODO list: special note here"""
 
-class Mechanized:
+class Mechanized(Battalion):
     def __init__(self):
         self.vp = 3
         self.type = (3, "A")
@@ -145,7 +175,7 @@ class Mechanized:
         self.half_value = 10
         self.destroy_value = 2
 
-class TankForce:
+class TankForce(Battalion):
     def __init__(self):
         self.vp = 5
         self.type = (2, "A")
@@ -153,7 +183,7 @@ class TankForce:
         self.half_value = 22
         self.destroy_value = 5
 
-class TankSpearhead:
+class TankSpearhead(Battalion):
     def __init__(self):
         self.vp = 6
         self.type = (6, "A")
@@ -162,7 +192,7 @@ class TankSpearhead:
         self.destroy_value = 5
         """TODO list: special note here"""
 
-class ScoutForce:
+class ScoutForce(Battalion):
     def __init__(self):
         self.vp = 2
         self.type = (8, "A")
@@ -170,7 +200,7 @@ class ScoutForce:
         self.half_value = 8
         self.destroy_value = 2
 
-class MixedForce:
+class MixedForce(Battalion):
     def __init__(self):
         self.vp = 3
         self.type = (4, "A")
@@ -178,7 +208,7 @@ class MixedForce:
         self.half_value = 18
         self.destroy_value = 5
 
-class Bombardment:
+class Bombardment(Battalion):
     def __init__(self):
         self.vp = 4
         self.type = (3, "S")
@@ -187,7 +217,7 @@ class Bombardment:
         self.destroy_value = 6
         """TODO list: special note here"""
 
-class ForwardBase:
+class ForwardBase(Battalion):
     def __init__(self):
         self.vp = 3
         self.type = (6, "C")
@@ -196,7 +226,7 @@ class ForwardBase:
         self.destroy_value = 3
         """TODO list: special note here"""
 
-class MountedInfantry:
+class MountedInfantry(Battalion):
     def __init__(self):
         self.vp = 4
         self.type = (5, "A")
@@ -205,7 +235,7 @@ class MountedInfantry:
         self.destroy_value = 4
         """TODO list: special note here"""
 
-class CommandUnit:
+class CommandUnit(Battalion):
     def __init__(self):
         self.vp = 5
         self.type = (1, "C")
@@ -214,7 +244,7 @@ class CommandUnit:
         self.destroy_value = 5
         """TODO list: special note here"""
 
-class ArtilleryUnit:
+class ArtilleryUnit(Battalion):
     def __init__(self):
         self.vp = 6
         self.type = (1, "S")
@@ -223,7 +253,7 @@ class ArtilleryUnit:
         self.destroy_value = 5
         """TODO list: special note here"""
 
-class InfantryFormation:
+class InfantryFormation(Battalion):
     def __init__(self):
         self.vp = 2
         self.type = (10, "A")
