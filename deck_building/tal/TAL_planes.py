@@ -1,9 +1,6 @@
 import random
-from TAL_terrain import *
-from TAL_battalions import *
-from TAL_situation import *
-from TAL_pilots import *
 import unittest
+from deck_building.tal import TAL_campaigns, TAL_situation
 
 class A_10A:
 	def __init__(self):
@@ -194,13 +191,13 @@ class AGM_65(VB_Weapon):
 
 class TestMethods(unittest.TestCase):
 	def test_legal_actions(self):
-		test_campaign = Iraq()
+		test_campaign = TAL_campaigns.Iraq()
 		for plane in legal_actions(test_campaign):
 			self.assertTrue(plane().year <= 1991)
 
 	def test_get_all_planes(self):
-		test_campaign = Iraq()
-		test_situation = Surge()
+		test_campaign = TAL_campaigns.Iraq()
+		test_situation = TAL_situation.Surge()
 		sample = get_all_planes(test_campaign, test_situation, random_strategy, random_strategy)
 		for plane in sample:
 			self.assertTrue(plane.year <= 1991)

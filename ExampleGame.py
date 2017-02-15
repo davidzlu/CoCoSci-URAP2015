@@ -4,7 +4,7 @@
  - maybe a method for each phase would make most conceptual sense
 '''
 
-import DeckBuilding
+from deck_building import DeckBuilding
 import Features
 
 class ExampleGame(DeckBuilding.DeckBuilding):

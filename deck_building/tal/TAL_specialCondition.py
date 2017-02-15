@@ -1,7 +1,4 @@
 import random
-from TAL_terrain import *
-from TAL_battalions import *
-from TAL_situation import *
 import unittest
 
 class SpecialCondition:
@@ -25,4 +22,5 @@ class EnemyReinforcement:
 		if boolean:
 			situation.SOpoints -= 1
 		else:
+			pass
 			# TODO: add 1 battalion

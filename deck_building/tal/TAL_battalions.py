@@ -1,8 +1,6 @@
 import random
-from TAL_terrain import *
-from TAL_campaigns import *
-from TAL_situation import *
 import unittest
+import deck_building.tal.TAL_campaigns
 
 def get_enemy_units(list_unittype_num):
     """construct a list of enemy units in battalion using a list of [unit type, nums of units] sublists"""
@@ -244,6 +242,7 @@ class SectorMap:
         self.scouts = 0
         self.places = [self.erear, self.etransit, self.frontline, self.ftransit, self.frear, self.airbase]
         self.potential_enemies = {}
+        self.setup_enemy_units()
 
     def can_put_piece(self, piece, location, constraints=None):
         # if special note, place piece somewhere else
@@ -254,15 +253,19 @@ class SectorMap:
         if piece.type[1] == "C" and location is self.erear:
             return True
         return False
+    
+    def get_battalions_on_map(self):
+        return [batt for sector in self.places for batt in sector]
 
     # def place_piece(self, piece, location, constraints=None):
     #     location.append(piece)
 
     def place_piece(self, piece, constraints=None):
+        #TODO: FINISH WRITING
         for place in self.places:
             if self.can_put_piece(piece, place):
-              #  self.place_piece(piece, place)
                 self.place.append(piece)
+                
 
     def place_all_enemy_units(self, list_of_battalions):
         for battalion in list_of_battalions:
@@ -276,18 +279,18 @@ class SectorMap:
         "S": [EngineerUnit(), FuelDepot(), SupplyDepot(), Reserves(), Convoy(), Bombardment(), ArtilleryUnit()]}
 
     def get_next_unit(self, list_of_battalions):
-        next = None
+        next_unit = None
         if len(list_of_battalions) in range(0, 2):
-            next = random.choice(self.potential_enemies["A"])
+            next_unit = random.choice(self.potential_enemies["A"])
         elif list_of_battalions[-1].type[1] == "A" and list_of_battalions[-2].type[1] == "A":
-            next = random.choice(self.potential_enemies["S"])
+            next_unit = random.choice(self.potential_enemies["S"])
         elif list_of_battalions[-1].type[1] == "S":
-            next = random.choice(self.potential_enemies["C"])
+            next_unit = random.choice(self.potential_enemies["C"])
         elif list_of_battalions[-1].type[1] == "A" and list_of_battalions[-2].type[1] == "C":
-            next = random.choice(self.potential_enemies["A"])
+            next_unit = random.choice(self.potential_enemies["A"])
         elif list_of_battalions[-1].type[1] == "C" and list_of_battalions[-2].type[1] == "S":
-            next = random.choice(self.potential_enemies["A"])
-        list_of_battalions.append(next)
+            next_unit = random.choice(self.potential_enemies["A"])
+        list_of_battalions.append(next_unit)
         return list_of_battalions
 
     def get_all_enemies(self, campaign):
@@ -323,11 +326,12 @@ class TestMethods(unittest.TestCase):
     def test_get_all_enemies(self):
         sm = SectorMap()
         sm.setup_enemy_units()
-        campaign = Iraq()
+        campaign = deck_building.tal.TAL_campaigns.Iraq()
         enemy_list = sm.get_all_enemies(campaign)
-        c = Constraint()
+        c = deck_building.tal.TAL_campaigns.Constraint()
         self.assertTrue(c.setup_constraint_battalion_VP(campaign, enemy_list))
         self.assertTrue(c.setup_constraint_batallion_cycle(enemy_list))
+
 
 if __name__ == '__main__':
     unittest.main()

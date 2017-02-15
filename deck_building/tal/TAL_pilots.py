@@ -1,9 +1,6 @@
 # A Thunderbolt Apache Leader game file to interface with DeckBuilding.py
-from TAL_planes import *
-from TAL_terrain import *
-from TAL_battalions import *
-from TAL_situation import *
 import unittest
+from deck_building.tal import TAL_planes, TAL_campaigns, TAL_situation
 
 class Pilot:
     """Speed is 0 or 1 whether it is Slow or Fast.
@@ -397,18 +394,18 @@ def get_pilot(name, skill):
             return Pilot(name, skill, 100, "AH-64", "Apache", 1, 1, 1, 2, (6, 10), evasive=1)
 
 def get_pilot_types(aircrafttype):
-    if type(aircrafttype) is AH_1:
+    if type(aircrafttype) is TAL_planes.AH_1:
         return ["Gator", "Grandpa", "Scuttle", "Freak"]
-    elif (type(aircrafttype) is A_10A) or (type(aircrafttype) is A_10C):
+    elif (type(aircrafttype) is TAL_planes.A_10A) or (type(aircrafttype) is TAL_planes.A_10C):
         return ["Pirate", "Viper", "Gumby", "Halo", "Thor", "Rebel"]
-    elif (type(aircrafttype) is AH_64A) or (type(aircrafttype) is AH_64D):
+    elif (type(aircrafttype) is TAL_planes.AH_64A) or (type(aircrafttype) is TAL_planes.AH_64D):
         return ["Hammer", "Judge", "Rock", "Montana", "Shadow", "Daddy-O", "Eagle",
                 "Tex", "Flash", "Cougar"]
-    elif type(aircrafttype) is F_16:
+    elif type(aircrafttype) is TAL_planes.F_16:
         return ["Dart", "Mohawk"]
-    elif type(aircrafttype) is AC_130:
+    elif type(aircrafttype) is TAL_planes.AC_130:
         return ["Neon", "Zinger"]
-    elif type(aircrafttype) is AV_8B:
+    elif type(aircrafttype) is TAL_planes.AV_8B:
         return ["Divot", "Genius", "Hack", "Pro"]
 
 
@@ -458,15 +455,18 @@ def promote_pilots(pilotList):
     return pilotList, promotions, demotions
 
 def get_plane_pilot(campaign, situation, pick_strategy, determine_strategy):
-    aircrafts = get_all_planes(campaign, situation, pick_strategy, determine_strategy)
+    #pick_strategy: pick planes
+    #determine_strategy: whether to stop or not
+    
+    aircrafts = TAL_planes.get_all_planes(campaign, situation, pick_strategy, determine_strategy)
     pilots = select_pilots(aircrafts, pick_strategy)
     return aircrafts, pilots
 
 class TestMethods(unittest.TestCase):
     def test_get_plane_pilot(self):
-        test_campaign = Iraq()
-        test_situation = Surge()
-        sample = get_plane_pilot(test_campaign, test_situation, random_strategy, random_strategy)
+        test_campaign = TAL_campaigns.Iraq()
+        test_situation = TAL_situation.Surge()
+        sample = get_plane_pilot(test_campaign, test_situation, TAL_planes.random_strategy, TAL_planes.random_strategy)
         for plane in sample[0]:
             self.assertTrue(plane.year <= 1991)
         self.assertTrue(sum([p.so for p in sample[0]]) <= 38)
