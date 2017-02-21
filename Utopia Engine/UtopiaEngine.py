@@ -187,7 +187,7 @@ class GameBoard:
             self_dice = result[0]
             enemy_dice = result[1]
             if enemy_dice in enemy.attack:
-                damage_taken = damage_taken + 1
+                damage_taken += 1
         self.take_damage(damage_taken)
         # get_item_or_not = roll_dice(1)
         # if get_item_or_not <= enemy.level:
@@ -288,6 +288,8 @@ class GameBoard:
                         else:
                             self.component[search_area.component] = 2
                     else:
+                        print("You found a construct! You got the " + search_area.construct)
+                        print("It's already activated!")
                         self.construct[search_area.construct] = 999  # automatically activate
                         self.score += 15
                         search_area.construct = None
@@ -298,6 +300,7 @@ class GameBoard:
                         else:
                             self.component[search_area.component] = 2
                     else:
+                        print("You found a construct! You got the " + search_area.construct)
                         self.construct[search_area.construct] = 0
                         self.score += 10
                         search_area.construct = None

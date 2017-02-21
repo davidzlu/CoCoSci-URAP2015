@@ -1,10 +1,9 @@
-import random
-import numpy as np
-import ast
-from copy import deepcopy
-from itertools import permutations, combinations_with_replacement, combinations
-import unittest
 from UtopiaEngine import *
+import numpy as np
+from itertools import permutations, combinations_with_replacement, combinations
+from copy import deepcopy
+import unittest
+import random
 
 
 def create_mini_game(row, column):
@@ -28,15 +27,7 @@ def roll_dice(n):
 
 
 def randomPolicy(actions):
-# def random_policy(state):
-    """ Generates next legal action for agent to take.
-        Arguments:
-            state: The current state for which an action will be generated.
-    """
-    # legalMoves = state.legalActions()
     return random.choice(actions)
-    # legalMoves = state.legal_actions()
-    # return random.choice(legalMoves)
 
 
 class Minigame:
@@ -44,6 +35,7 @@ class Minigame:
     def __init__(self, row, column):
         """initial state for minigame"""
         self.board = create_mini_game(row, column)
+        self.tpm = {}
 
     def roll_dice_get_number(self, n):
         """get number for each step"""
@@ -74,18 +66,18 @@ class Minigame:
     def transition_prob_matrix(self):
         return self.tpm
 
-    def transition_prob_vector(self, action):
+    def transition_prob_vector(self, action, nrows, ncols):
         """ Method for finding transition probabilities of all next states
         given current state (self) and an action.
         """
         vector = []
-        states = self.next_states(action)
+        states = self.next_states(action, nrows, ncols)
         for next_state in states:
             vector.append( self.transition_prob(action, next_state) )
         return vector
 
     def transition_prob(self, action, next_state):
-        """ Returns pobability of transitioning from current state to
+        """ Returns probability of transitioning from current state to
         next_state by taking action.
         """
         if (self, action, next_state) in self.tpm:
@@ -129,7 +121,7 @@ class Minigame:
         # List of all pairs of spaces with repeats
         # e.g. permutations([1, 2, 3], 2) returns [(1, 2), (1, 3), (2, 1), (2, 3), (3, 1), (3, 2)]
         actions = tuple(permutations(emptySpaces, 2))
-        print("Actions: ", actions)
+        #print("Actions: ", actions)
         return actions
 
     # def __hash__(self):
@@ -156,12 +148,12 @@ class Activation(Minigame):
             for i in range(0, 4):
                 diff = self.board[0][i] - self.board[1][i]
                 if diff == 5:
-                    energy_point = energy_point + 2
+                    energy_point += 2
                 elif diff == 4:
-                    energy_point = energy_point + 1
+                    energy_point += 1
                 elif diff < 1:
-                    damage_take = damage_take + 1
-        return (energy_point, damage_take)
+                    damage_take += 1
+        return energy_point, damage_take
 
     def next_states(self, action):
         return Minigame.next_states(self, action, 2, 4)
@@ -324,10 +316,9 @@ class Search(Minigame):
     """Class for search minigame.
     """
 
-    tpm = {}
-
     def __init__(self):
         Minigame.__init__(self, 2, 3)
+        self.tpm = {}
 
     def play(self, policy):
         """Play through one search round. Returns final difference after filling in board, along
@@ -344,6 +335,8 @@ class Search(Minigame):
             print(self.board)
             statesVisited.append(deepcopy(self))
             roll1, roll2 = self.roll_dice_get_number(2)
+            print("You rolled: ")
+            print([roll1, roll2])
             action = policy(self.legal_actions())
             actionsTaken.append(action)
             self = self.simulate_action(action, roll1, roll2)
@@ -365,12 +358,12 @@ class Search(Minigame):
 
 class FinalActivation:
 
-    tpm = {}
-
     def __init__(self, finalActivationDifficulty, hitpoints):
         self.actNum = finalActivationDifficulty
         self.rolls = hitpoints + 1
         self.activated = False
+        self.hitpoints = hitpoints
+        self.tpm = {}
 
     def play(self, policy):
         statesVisited = [deepcopy(self)] # Sequence of states visited during a game
