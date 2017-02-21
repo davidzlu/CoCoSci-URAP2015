@@ -261,10 +261,10 @@ class SectorMap:
     #     location.append(piece)
 
     def place_piece(self, piece, constraints=None):
-        #TODO: FINISH WRITING
+        # Each 'place' refers to an area on the sector map, represented as a list
         for place in self.places:
             if self.can_put_piece(piece, place):
-                self.place.append(piece)
+                place.append(piece)
                 
 
     def place_all_enemy_units(self, list_of_battalions):
