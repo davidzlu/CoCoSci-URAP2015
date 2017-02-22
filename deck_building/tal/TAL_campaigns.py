@@ -1,8 +1,6 @@
 # A Thunderbolt Apache Leader game file to interface with DeckBuilding.py
-import random
-import unittest
 from deck_building.tal import TAL_terrain
-import deck_building.tal.TAL_battalions
+from deck_building.tal.TAL_battalions import *
 
 class Campaign:
     """Abstract class for campaigns. Defines instance variables
@@ -59,7 +57,7 @@ class Campaign:
         return True
 
     def place_piece(self, piece, location, constraints=None):
-        location.append(piece)        
+        location.append(piece)
 
 
 class Iraq(Campaign):
@@ -208,28 +206,28 @@ class TestMethods(unittest.TestCase):
         # case 1: total battalion vp < setup vp
         test_function = Constraint().setup_constraint_battalion_VP
         test_camp = Iraq()
-        test_battalion = [deck_building.tal.TAL_battalions.InfantryForce(), deck_building.tal.TAL_battalions.InfantryForce(), deck_building.tal.TAL_battalions.InfantryForce()]
+        test_battalion = [InfantryForce(), InfantryForce(), InfantryForce()]
         self.assertTrue(not test_function(test_camp, test_battalion))
         # case 2: total battalion = setup vp
-        test_battalion2 = [deck_building.tal.TAL_battalions.InfantryForce(), deck_building.tal.TAL_battalions.InfantryForce(), deck_building.tal.TAL_battalions.InfantryForce(), deck_building.tal.TAL_battalions.InfantryForce(), deck_building.tal.TAL_battalions.MobileHQ(), 
-            deck_building.tal.TAL_battalions.MobileHQ(), deck_building.tal.TAL_battalions.MobileHQ()]
+        test_battalion2 = [InfantryForce(), InfantryForce(), InfantryForce(), InfantryForce(), MobileHQ(), 
+            MobileHQ(), MobileHQ()]
         self.assertTrue(test_function(test_camp, test_battalion2))
         # case 3: total battalion > setup vp and it stops after that point
-        test_battalion3 = [deck_building.tal.TAL_battalions.InfantryForce(), deck_building.tal.TAL_battalions.InfantryForce(), deck_building.tal.TAL_battalions.InfantryForce(), deck_building.tal.TAL_battalions.InfantryForce(), deck_building.tal.TAL_battalions.InfantryForce(), 
-            deck_building.tal.TAL_battalions.InfantryForce()]
+        test_battalion3 = [InfantryForce(), InfantryForce(), InfantryForce(), InfantryForce(), InfantryForce(), 
+            InfantryForce()]
         self.assertTrue(test_function(test_camp, test_battalion3))
         # case 4: total battalion > setup vp and it doesnt stop
-        test_battalion4 = [deck_building.tal.TAL_battalions.InfantryForce(), deck_building.tal.TAL_battalions.InfantryForce(), deck_building.tal.TAL_battalions.InfantryForce(), deck_building.tal.TAL_battalions.InfantryForce(), deck_building.tal.TAL_battalions.InfantryForce(), 
-            deck_building.tal.TAL_battalions.InfantryForce(), deck_building.tal.TAL_battalions.InfantryForce()]
+        test_battalion4 = [InfantryForce(), InfantryForce(), InfantryForce(), InfantryForce(), InfantryForce(), 
+            InfantryForce(), InfantryForce()]
         self.assertTrue(not test_function(test_camp, test_battalion4))
 
     def test_setup_constraint_battalion_cycle(self):
         test_function = Constraint().setup_constraint_batallion_cycle
         # case 1: succeed
-        test_battalion = [deck_building.tal.TAL_battalions.InfantryForce(), deck_building.tal.TAL_battalions.InfantryForce(), deck_building.tal.TAL_battalions.EngineerUnit(), deck_building.tal.TAL_battalions.HeadQuarters()]
+        test_battalion = [InfantryForce(), InfantryForce(), EngineerUnit(), HeadQuarters()]
         self.assertTrue(test_function(test_battalion))
         # case 2: failed
-        test_battalion2 = [deck_building.tal.TAL_battalions.InfantryForce(), deck_building.tal.TAL_battalions.InfantryForce(), deck_building.tal.TAL_battalions.HeadQuarters(), deck_building.tal.TAL_battalions.EngineerUnit()]
+        test_battalion2 = [InfantryForce(), InfantryForce(), HeadQuarters(), EngineerUnit()]
         self.assertTrue(not test_function(test_battalion2))
 
 

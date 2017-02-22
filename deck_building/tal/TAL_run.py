@@ -1,10 +1,9 @@
-from deck_building.tal import TAL_campaigns as camp
-from deck_building.tal import TAL_situation as sit
-from deck_building.tal import TAL_battalions as batt
-from deck_building import DeckBuilding
+from . import TAL_campaigns as camp
+from . import TAL_situation as sit
+from . import TAL_battalions as batt
+import deck_building.DeckBuilding.DeckBuilding as DeckBuilding
 
-
-class TALInstance(DeckBuilding.DeckBuilding):
+class TALInstance(DeckBuilding):
     
     def __init__(self, campaign, situation, policy):
         assert type(campaign) in [camp.Iraq, camp.Libya11, camp.Libya84]

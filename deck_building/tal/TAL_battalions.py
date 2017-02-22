@@ -1,6 +1,6 @@
 import random
 import unittest
-import deck_building.tal.TAL_campaigns
+from deck_building.tal.TAL_campaigns import *
 
 def get_enemy_units(list_unittype_num):
     """construct a list of enemy units in battalion using a list of [unit type, nums of units] sublists"""
@@ -19,7 +19,7 @@ class Battalion:
         self.units = []
         self.half_value = 0
         self.destroy_value = 0
-        self.special = None #Field for special instructions for this battalion
+        self.special = self.special_effect #Field for special instructions for this battalion
         
     def get_vp(self):
         return self.vp
@@ -38,6 +38,11 @@ class Battalion:
     
     def get_special(self):
         return self.special
+    
+    def special_effect(self):
+        """Function that performs battalion's special effect
+        """
+        raise NotImplementedError
         
 
 """battalion information on cards"""
@@ -356,9 +361,9 @@ class TestMethods(unittest.TestCase):
     def test_get_all_enemies(self):
         sm = SectorMap()
         sm.setup_enemy_units()
-        campaign = deck_building.tal.TAL_campaigns.Iraq()
+        campaign = Iraq()
         enemy_list = sm.get_all_enemies(campaign)
-        c = deck_building.tal.TAL_campaigns.Constraint()
+        c = Constraint()
         self.assertTrue(c.setup_constraint_battalion_VP(campaign, enemy_list))
         self.assertTrue(c.setup_constraint_batallion_cycle(enemy_list))
 
