@@ -1,6 +1,8 @@
 from . import TAL_campaigns as camp
 from . import TAL_situation as sit
 from . import TAL_battalions as batt
+from . import TAL_planes as planes
+from . import TAL_pilots as pilots
 import deck_building.DeckBuilding.DeckBuilding as DeckBuilding
 
 class TALInstance(DeckBuilding):
@@ -18,20 +20,27 @@ class TALInstance(DeckBuilding):
         
         print("Selecting aircraft")
         self.planes = []
-        self.scouts = 0
+        #TODO: FIGURE OUT HOW POLICIES IMPLEMENTED
+        pick_policy = None
+        halting_policy = None
+        self.planes = planes.get_all_planes(campaign, situation, pick_policy, halting_policy)
+        self.scouts = self.situation.buy_scouts(policy())
         print("Done selecting aircraft")
         
-        print("Selecting pilots")
+        print("Selecting and promoting pilots")
         self.pilots = []
-        print("Done selecting pilots")
-        #get_all_planes
-        #get_plane_pilot
-        #
+        self.pilots = pilots.select_pilots(self.planes, policy)
+        #TODO: ADJUSTING (NOT PROMOTING) PILOTS NOT IMPLMENTED
+        pilots.promote_pilots(self.pilots, policy)
+        print("Done selecting and promoting pilots")
+        
+        self.day_count = 1
+        print("Setup complete, start-of-day setup begin")
 
     def setup_environment(self):
         sm = batt.SectorMap()
         self.total_vp = sm.get_all_enemies(self.campaign)
-        #TODO: adjustment needed after initla placement
+        #TODO: adjustment needed after inital placement, probably through special effects
         return sm
     
     def setup_enemy_units(self, game):

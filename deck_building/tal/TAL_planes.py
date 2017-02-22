@@ -11,8 +11,8 @@ class Plane:
 		self.cannon = 0
 		self.so = 0
 		self.hit = 0
-		self.weapons_equipped = []
-		self.weapon_set = set()
+		self.weapons_equipped = [] # The weapons the agent chose to equip to plane
+		self.weapon_set = set() #
 		self.weight = 0
 		self.special = None
 		
@@ -137,7 +137,7 @@ def legal_actions(campaign):
 			possible_choices.append(plane)
 	return possible_choices
 
-def get_all_planes(campaign, situation, pick_strategy, determine_strategy):
+def get_all_planes(campaign, situation, pick_policy, halting_policy):
 	planes = []
 	to_pick_or_not = True
 	while to_pick_or_not:
@@ -146,13 +146,13 @@ def get_all_planes(campaign, situation, pick_strategy, determine_strategy):
 			planes_so = sum([p.so for p in planes])
 		if planes_so >= situation.SOpoints:
 			break
-		plane = pick_strategy(legal_actions(campaign))
+		plane = pick_policy(legal_actions(campaign))
 		planes.append(plane())
 		"""TODO: implement methods to determine continue pick plane or not """
-		to_pick_or_not = determine_strategy([True, False])
+		to_pick_or_not = halting_policy([True, False])
 	return planes
 
-def random_strategy(possible_choices):
+def random_policy(possible_choices):
 	return random.choice(possible_choices)
 
 class Weapon:
@@ -234,7 +234,7 @@ class TestMethods(unittest.TestCase):
 	def test_get_all_planes(self):
 		test_campaign = TAL_campaigns.Iraq()
 		test_situation = TAL_situation.Surge()
-		sample = get_all_planes(test_campaign, test_situation, random_strategy, random_strategy)
+		sample = get_all_planes(test_campaign, test_situation, random_policy, random_policy)
 		for plane in sample:
 			self.assertTrue(plane.year <= 1991)
 		self.assertTrue(sum([p.so for p in sample]) <= 38)

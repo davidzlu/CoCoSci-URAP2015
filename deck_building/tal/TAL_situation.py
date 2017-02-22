@@ -36,8 +36,9 @@ class Situation:
 		else:
 			return 0
 		
-	
-
+	def buy_scouts(self, policy):
+		return self.spend_so_points(policy())
+		
 class Surge(Situation):
 
 	def __init__(self):

@@ -293,7 +293,6 @@ class SectorMap:
     def get_battalions_on_map(self):
         return [batt for sector in self.places for batt in sector]
 
-
     def place_piece(self, piece, constraints=None):
         # Each 'place' refers to an area on the sector map, represented as a list
         for place in self.places:
