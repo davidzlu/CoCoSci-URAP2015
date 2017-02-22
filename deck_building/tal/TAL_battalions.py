@@ -280,6 +280,7 @@ class SectorMap:
         self.setup_enemy_units()
 
     def can_put_piece(self, piece, location, constraints=None):
+        # TODO: Finish writing method once special notes are implemented
         # if special note, place piece somewhere else
         if piece.type[1] == "A" and location is self.frontline:
             return True
@@ -292,14 +293,12 @@ class SectorMap:
     def get_battalions_on_map(self):
         return [batt for sector in self.places for batt in sector]
 
-    # def place_piece(self, piece, location, constraints=None):
-    #     location.append(piece)
 
     def place_piece(self, piece, constraints=None):
-        #TODO: FINISH WRITING
+        # Each 'place' refers to an area on the sector map, represented as a list
         for place in self.places:
             if self.can_put_piece(piece, place):
-                self.place.append(piece)
+                place.append(piece)
                 
 
     def place_all_enemy_units(self, list_of_battalions):
@@ -332,7 +331,7 @@ class SectorMap:
         battalions = []
         while True:
             battalion_vp = 0
-            if battalions != None:
+            if battalions is not None:
                 battalion_vp = sum([b.vp for b in battalions])
             if battalion_vp >= campaign.setup_vp:
                 break
