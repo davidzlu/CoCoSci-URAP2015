@@ -101,7 +101,7 @@ def legal_actions(campaign):
 			possible_choices.append(plane)
 	return possible_choices
 
-def get_all_planes(campaign, situation, pick_strategy, determine_strategy):
+def get_all_planes(campaign, situation, strategy):
 	planes = []
 	to_pick_or_not = True
 	while to_pick_or_not:
@@ -110,10 +110,10 @@ def get_all_planes(campaign, situation, pick_strategy, determine_strategy):
 			planes_so = sum([p.so for p in planes])
 		if planes_so >= situation.SOpoints:
 			break
-		plane = pick_strategy(legal_actions(campaign))
+		plane = strategy(legal_actions(campaign))
 		planes.append(plane())
 		"""TODO: implement methods to determine continue pick plane or not """
-		to_pick_or_not = determine_strategy([True, False])
+		to_pick_or_not = strategy(situation.SOpoints - planes_so)
 	return planes
 
 def random_strategy(possible_choices):
