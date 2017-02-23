@@ -428,7 +428,9 @@ def select_pilots(aircraftList, strategy):
         pilotList.append(pilot)
     return pilotList
 
-def promote_pilots(pilotList):
+def promote_pilots(pilotList, policy):
+    #TODO: REWRITE TO ACCEPT ARBITRARY POLICIES
+    #TODO: REWRITE TO CHANGE PILOT TO ANY SKILL LEVEL, NOT JUST SKILLED AND GREEN
     #This code currently only works for the setup portion
     pilotList = []
     #if these two numbers aren't equal, the difference will be the number of so points spent.
@@ -466,7 +468,7 @@ class TestMethods(unittest.TestCase):
     def test_get_plane_pilot(self):
         test_campaign = TAL_campaigns.Iraq()
         test_situation = TAL_situation.Surge()
-        sample = get_plane_pilot(test_campaign, test_situation, TAL_planes.random_strategy, TAL_planes.random_strategy)
+        sample = get_plane_pilot(test_campaign, test_situation, TAL_planes.random_policy, TAL_planes.random_policy)
         for plane in sample[0]:
             self.assertTrue(plane.year <= 1991)
         self.assertTrue(sum([p.so for p in sample[0]]) <= 38)

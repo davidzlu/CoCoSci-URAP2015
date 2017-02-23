@@ -1,10 +1,66 @@
 # A Thunderbolt Apache Leader game file to interface with DeckBuilding.py
-import random
-import unittest
 from deck_building.tal import TAL_terrain
-import deck_building.tal.TAL_battalions
+from deck_building.tal.TAL_battalions import *
 
-class Iraq:
+class Campaign:
+    """Abstract class for campaigns. Defines instance variables
+    and getter methods. Has methods for creating hex-map.
+    """
+    
+    def __init__(self):
+        self.year = 0
+        self.setup_vp = 0
+        self.terrain_nums = []
+        self.eval = []
+        self.special = None
+        self.hex_map = None
+                
+    def get_year(self):
+        return self.year
+    
+    def get_setup_vp(self):
+        return self.setup_vp
+    
+    def get_terrain(self):
+        return self.terrain_nums
+    
+    def get_eval(self):
+        return self.eval
+    
+    def get_special(self):
+        return self.special
+    
+    def create_hex_map(self):
+        piecenums = random.shuffle(self.get_terrain())
+        board = []
+        for piece in piecenums:
+            board.append(TAL_terrain.get_tile(piece))  # get piece will be found in the terrain file
+        #board = [list(pieces[0:3]), list(pieces[3:7]), list(pieces[7:])]
+        set_adjacent_tiles(board)
+        self.hex_map = board
+        
+    # constraints should be the number returned by diceroll or 0 if you can
+    # place the piece anywhere
+    def can_put_piece(self, piece, location, constraints):
+        legit_types = ["A", "C", "S"] #add the aircraft types later
+        ptype = piece.type
+        if len(piece.type) == 2:
+            ptype = piece.type[1]
+
+        if ptype not in legit_types:
+            return False
+
+        legal_locations = constraints
+        if location not in legal_locations:
+            return False
+
+        return True
+
+    def place_piece(self, piece, location, constraints=None):
+        location.append(piece)
+
+
+class Iraq(Campaign):
     """Campaign information for Iraq"""
     # Special Note: Do not roll for Battalion Movement on the 1st Day
 
@@ -17,7 +73,7 @@ class Iraq:
         self.eval = [(0, 6), (7, 9), (10, 12), (13, 19), (20, 100)]
 
 
-class Libya84:
+class Libya84(Campaign):
     # Special Note: Remove 2 "No Enemy" Pop-Ups
 
     def __init__(self):
@@ -29,7 +85,7 @@ class Libya84:
         self.eval = [(0, 10), (11, 13), (14, 17), (18, 25), (26, 100)]
 
 
-class Libya11:
+class Libya11(Campaign):
     #double check numbers with card
     def __init__(self):
         self.year = 2011
@@ -40,15 +96,7 @@ class Libya11:
         self.eval = [(0, 6), (7, 9), (10, 12), (13, 19), (20, 100)]
 
 
-def create_board(Campaign):
-    piecenums = random.shuffle(Campaign.terrain_nums)
-    pieces = []
-    for piece in piecenums:
-        pieces.append(TAL_terrain.get_tile(piece))  # get piece will be found in the terrain file
-    #board = [list(pieces[0:3]), list(pieces[3:7]), list(pieces[7:])]
-    board = pieces
-    set_adjacent_tiles(board)
-    return board
+
 
 
 def set_adjacent_tiles(tilelist):
@@ -122,31 +170,6 @@ def set_adjacent_tiles(tilelist):
     p10.enext = p9
     p10.fnext = p6
 
-class HexMap:
-    def __init__(self, Campaign):
-        create_board(Campaign)
-
-    # constraints should be the number returned by diceroll or 0 if you can
-    # place the piece anywhere
-    def can_put_piece(self, piece, location, constraints):
-        legit_types = ["A", "C", "S"] #add the aircraft types later
-        ptype = piece.type
-        if len(piece.type) == 2:
-            ptype = piece.type[1]
-
-        if ptype not in legit_types:
-            return False
-
-        legal_locations = constraints
-        if location not in legal_locations:
-            return False
-
-        return True
-
-    def place_piece(self, piece, location, constraints=None):
-        location.append(piece)
-        
-
 class Constraint:
     """a class that stores constraint/rules of the game"""
     def setup_constraint_battalion_VP(self, campaign, battalion):
@@ -183,28 +206,28 @@ class TestMethods(unittest.TestCase):
         # case 1: total battalion vp < setup vp
         test_function = Constraint().setup_constraint_battalion_VP
         test_camp = Iraq()
-        test_battalion = [deck_building.tal.TAL_battalions.InfantryForce(), deck_building.tal.TAL_battalions.InfantryForce(), deck_building.tal.TAL_battalions.InfantryForce()]
+        test_battalion = [InfantryForce(), InfantryForce(), InfantryForce()]
         self.assertTrue(not test_function(test_camp, test_battalion))
         # case 2: total battalion = setup vp
-        test_battalion2 = [deck_building.tal.TAL_battalions.InfantryForce(), deck_building.tal.TAL_battalions.InfantryForce(), deck_building.tal.TAL_battalions.InfantryForce(), deck_building.tal.TAL_battalions.InfantryForce(), deck_building.tal.TAL_battalions.MobileHQ(), 
-            deck_building.tal.TAL_battalions.MobileHQ(), deck_building.tal.TAL_battalions.MobileHQ()]
+        test_battalion2 = [InfantryForce(), InfantryForce(), InfantryForce(), InfantryForce(), MobileHQ(), 
+            MobileHQ(), MobileHQ()]
         self.assertTrue(test_function(test_camp, test_battalion2))
         # case 3: total battalion > setup vp and it stops after that point
-        test_battalion3 = [deck_building.tal.TAL_battalions.InfantryForce(), deck_building.tal.TAL_battalions.InfantryForce(), deck_building.tal.TAL_battalions.InfantryForce(), deck_building.tal.TAL_battalions.InfantryForce(), deck_building.tal.TAL_battalions.InfantryForce(), 
-            deck_building.tal.TAL_battalions.InfantryForce()]
+        test_battalion3 = [InfantryForce(), InfantryForce(), InfantryForce(), InfantryForce(), InfantryForce(), 
+            InfantryForce()]
         self.assertTrue(test_function(test_camp, test_battalion3))
         # case 4: total battalion > setup vp and it doesnt stop
-        test_battalion4 = [deck_building.tal.TAL_battalions.InfantryForce(), deck_building.tal.TAL_battalions.InfantryForce(), deck_building.tal.TAL_battalions.InfantryForce(), deck_building.tal.TAL_battalions.InfantryForce(), deck_building.tal.TAL_battalions.InfantryForce(), 
-            deck_building.tal.TAL_battalions.InfantryForce(), deck_building.tal.TAL_battalions.InfantryForce()]
+        test_battalion4 = [InfantryForce(), InfantryForce(), InfantryForce(), InfantryForce(), InfantryForce(), 
+            InfantryForce(), InfantryForce()]
         self.assertTrue(not test_function(test_camp, test_battalion4))
 
     def test_setup_constraint_battalion_cycle(self):
         test_function = Constraint().setup_constraint_batallion_cycle
         # case 1: succeed
-        test_battalion = [deck_building.tal.TAL_battalions.InfantryForce(), deck_building.tal.TAL_battalions.InfantryForce(), deck_building.tal.TAL_battalions.EngineerUnit(), deck_building.tal.TAL_battalions.HeadQuarters()]
+        test_battalion = [InfantryForce(), InfantryForce(), EngineerUnit(), HeadQuarters()]
         self.assertTrue(test_function(test_battalion))
         # case 2: failed
-        test_battalion2 = [deck_building.tal.TAL_battalions.InfantryForce(), deck_building.tal.TAL_battalions.InfantryForce(), deck_building.tal.TAL_battalions.HeadQuarters(), deck_building.tal.TAL_battalions.EngineerUnit()]
+        test_battalion2 = [InfantryForce(), InfantryForce(), HeadQuarters(), EngineerUnit()]
         self.assertTrue(not test_function(test_battalion2))
 
 

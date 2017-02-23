@@ -2,7 +2,43 @@ import random
 import unittest
 from deck_building.tal import TAL_campaigns, TAL_situation
 
-class A_10A:
+class Plane:
+	"""Abstract class for planes. Defines instance variables and
+	common methods.
+	"""
+	def __init__(self):
+		self.year = 0
+		self.cannon = 0
+		self.so = 0
+		self.hit = 0
+		self.weapons_equipped = [] # The weapons the agent chose to equip to plane
+		self.weapon_set = set() #
+		self.weight = 0
+		self.special = None
+		
+	def get_year(self):
+		return self.year
+	
+	def get_cannon(self):
+		return self.cannon
+	
+	def get_cost(self):
+		return self.so
+	
+	def get_hitpoints(self):
+		return self.hit
+	
+	def get_weapons_equip(self):
+		return self.weapons_equipped
+	
+	def get_weapon_set(self):
+		return self.weapon_set
+	
+	def get_weight(self):
+		return self.weight
+		
+		
+class A_10A(Plane):
 	def __init__(self):
 		self.year = 1976
 		self.cannon = 4
@@ -11,7 +47,7 @@ class A_10A:
 		"""TODO: weapon list"""
 		self.weight = 14
 
-class AH_1:
+class AH_1(Plane):
 	def __init__(self):
 		self.year = 1967
 		self.cannon = 9
@@ -20,7 +56,7 @@ class AH_1:
 		"""TODO: weapon list"""
 		self.weight = 6
 
-class F_16:
+class F_16(Plane):
 	def __init__(self):
 		self.year = 1976
 		self.cannon = 7
@@ -29,7 +65,7 @@ class F_16:
 		"""TODO: weapon list"""
 		self.weight = 10
 
-class AH_64A:
+class AH_64A(Plane):
 	def __init__(self):
 		self.year = 1986
 		self.cannon = 7
@@ -38,7 +74,7 @@ class AH_64A:
 		"""TODO: weapon list"""
 		self.weight = 8
 
-class AV_8B:
+class AV_8B(Plane):
 	def __init__(self):
 		self.year = 1985
 		self.cannon = 7
@@ -47,7 +83,7 @@ class AV_8B:
 		"""TODO: weapon list"""
 		self.weight = 10
 
-class A_10C:
+class A_10C(Plane):
 	def __init__(self):
 		self.year = 2006
 		self.cannon = 4
@@ -56,7 +92,7 @@ class A_10C:
 		"""TODO: weapon list"""
 		self.weight = 14
 
-class MQ_1:
+class MQ_1(Plane):
 	def __init__(self):
 		self.year = 2001
 		self.cannon = 0
@@ -65,7 +101,7 @@ class MQ_1:
 		"""TODO: weapon list"""
 		self.weight = 0
 
-class RQ_1:
+class RQ_1(Plane):
 	def __init__(self):
 		self.year = 1995
 		self.cannon = 0
@@ -74,7 +110,7 @@ class RQ_1:
 		"""TODO: weapon list"""
 		self.weight = 0
 
-class AH_64D:
+class AH_64D(Plane):
 	def __init__(self):
 		self.year = 1997
 		self.cannon = 7
@@ -83,7 +119,7 @@ class AH_64D:
 		"""TODO: weapon list"""
 		self.weight = 8
 
-class AC_130:
+class AC_130(Plane):
 	def __init__(self):
 		self.year = 1995
 		self.cannon = 5 # or 3 or 1
@@ -116,7 +152,7 @@ def get_all_planes(campaign, situation, strategy):
 		to_pick_or_not = strategy(situation.SOpoints - planes_so)
 	return planes
 
-def random_strategy(possible_choices):
+def random_policy(possible_choices):
 	return random.choice(possible_choices)
 
 class Weapon:
@@ -198,7 +234,7 @@ class TestMethods(unittest.TestCase):
 	def test_get_all_planes(self):
 		test_campaign = TAL_campaigns.Iraq()
 		test_situation = TAL_situation.Surge()
-		sample = get_all_planes(test_campaign, test_situation, random_strategy, random_strategy)
+		sample = get_all_planes(test_campaign, test_situation, random_policy, random_policy)
 		for plane in sample:
 			self.assertTrue(plane.year <= 1991)
 		self.assertTrue(sum([p.so for p in sample]) <= 38)
