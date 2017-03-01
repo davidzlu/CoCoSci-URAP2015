@@ -1,6 +1,17 @@
 import random
 import unittest
 
+def generate_special_condition_deck():
+	"""Creates and returns a list of every special condition in this file.
+	List contains SpecialCondition objects.
+	"""
+	special_condition_deck = []
+	
+	
+	
+	random.shuffle(special_condition_deck)
+	return special_condition_deck
+
 class SpecialCondition:
 	def __init__(self):
 		self.pool = []

@@ -137,7 +137,8 @@ def legal_actions(campaign):
 			possible_choices.append(plane)
 	return possible_choices
 
-def get_all_planes(campaign, situation, pick_policy, halting_policy):
+def get_all_planes(campaign, situation, policy):
+	#TODO: NEEDS TO BE REWRITTEN TO WORK WITH POLICY ARGUMENT
 	planes = []
 	to_pick_or_not = True
 	while to_pick_or_not:
@@ -146,10 +147,10 @@ def get_all_planes(campaign, situation, pick_policy, halting_policy):
 			planes_so = sum([p.so for p in planes])
 		if planes_so >= situation.SOpoints:
 			break
-		plane = pick_policy(legal_actions(campaign))
+		plane = policy(legal_actions(campaign))
 		planes.append(plane())
 		"""TODO: implement methods to determine continue pick plane or not """
-		to_pick_or_not = halting_policy([True, False])
+		to_pick_or_not = policy([True, False])
 	return planes
 
 def random_policy(possible_choices):
@@ -234,7 +235,7 @@ class TestMethods(unittest.TestCase):
 	def test_get_all_planes(self):
 		test_campaign = TAL_campaigns.Iraq()
 		test_situation = TAL_situation.Surge()
-		sample = get_all_planes(test_campaign, test_situation, random_policy, random_policy)
+		sample = get_all_planes(test_campaign, test_situation, random_policy)
 		for plane in sample:
 			self.assertTrue(plane.year <= 1991)
 		self.assertTrue(sum([p.so for p in sample]) <= 38)

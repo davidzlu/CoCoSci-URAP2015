@@ -1,6 +1,36 @@
 import random
 import unittest
 from deck_building.tal.TAL_campaigns import *
+from enum import Enum
+"""Enums are a way of defining a set of constant names in a way
+more organized than a bunch of global variables. See 
+https://docs.python.org/3/library/enum.html for details on enums
+"""
+
+class EnemyUnitNames(Enum):
+    """Enum of enemy unit names
+    """
+    AAA = "aaa"
+    AAA_SITE = "aaa site"
+    APC = "apc"
+    BUILDING = "building"
+    COMMAND = "command"
+    HELICOPTER = "helicopter"
+    INFANTRY = "infantry"
+    SAM = "sam"
+    SCUD = "scud"
+    SPA = "spa"
+    STORAGE = "storage"
+    TANK = "tank"
+    TRUCK = "truck"
+
+class EnemyAttackTypes(Enum):
+    HEAVY = "heavy"
+    LIGHT = "light"
+
+class EnemyUnitTypes(Enum):
+    V = "v"
+    B = "b"
 
 def get_enemy_units(list_unittype_num):
     """construct a list of enemy units in battalion using a list of [unit type, nums of units] sublists"""
@@ -44,6 +74,191 @@ class Battalion:
         """
         raise NotImplementedError
         
+class EnemyUnit:
+    """Abstract class for enemy units. See page 11 of game manual
+    for details on each field.
+    """
+        
+    def __init__(self):
+        self.point_value = 0
+        self.attack_type = None
+        self.attack_number = 0
+        self.attack_range = 0
+        self.unit_type = None
+        self.unit_name = None
+        self.roll_modifier = 0
+        self.active = True
+
+    def get_point_value(self):
+        return self.point_value
+
+    def get_attack_type(self):
+        return self.attack_type
+
+    def get_attack_number(self):
+        return self.attack_number
+
+    def get_attack_range(self):
+        return self.attack_range
+
+    def get_unit_type(self):
+        return self.unit_type
+
+    def get_unit_name(self):
+        return self.unit_name
+
+    def get_roll_modifier(self):
+        return self.roll_modifier
+    
+    def is_active(self):
+        return self.active
+    
+class AAA(EnemyUnit):
+    
+    def __init__(self):
+        self.point_value = 2
+        self.attack_type = EnemyAttackTypes.HEAVY
+        self.attack_number = 2
+        self.attack_range = 1
+        self.unit_type = EnemyUnitTypes.V
+        self.unit_name = EnemyUnitNames.AAA
+        self.roll_modifier = 0
+        
+class AAASite(EnemyUnit):
+    
+    def __init__(self):
+        self.point_value = 2
+        self.attack_type = EnemyAttackTypes.LIGHT
+        self.attack_number = 3
+        self.attack_range = 2
+        self.unit_type = EnemyUnitTypes.B
+        self.unit_name = EnemyUnitNames.AAA_SITE
+        self.roll_modifier = 0
+        
+class APC(EnemyUnit):
+    
+    def __init__(self):
+        self.point_value = 1
+        self.attack_type = EnemyAttackTypes.LIGHT
+        self.attack_number = 1
+        self.attack_range = 0
+        self.unit_type = EnemyUnitTypes.V
+        self.unit_name = EnemyUnitNames.APC
+        self.roll_modifier = 0
+        
+class Building(EnemyUnit):
+    
+    def __init__(self):
+        self.point_value = 3
+        self.attack_type = EnemyAttackTypes.LIGHT
+        self.attack_number = 1
+        self.attack_range = 0
+        self.unit_type = EnemyUnitTypes.B
+        self.unit_name = EnemyUnitNames.BUILDING
+        self.roll_modifier = -4
+        
+class Command(EnemyUnit):
+    
+    def __init__(self):
+        self.point_value = 4
+        self.attack_type = EnemyAttackTypes.LIGHT
+        self.attack_number = 2
+        self.attack_range = 1
+        self.unit_type = EnemyUnitTypes.V
+        self.unit_name = EnemyUnitNames.COMMAND
+        self.roll_modifier = 0
+        
+class Helicopter(EnemyUnit):
+    
+    def __init__(self):
+        self.point_value = 3
+        self.attack_type = EnemyAttackTypes.HEAVY
+        self.attack_number = 2
+        self.attack_range = 1
+        self.unit_type = None
+        self.unit_name = EnemyUnitNames.HELICOPTER
+        self.roll_modifier = 0
+        self.speed = 1
+        
+    def get_speed(self):
+        return self.speed
+    
+class Infantry(EnemyUnit):
+    
+    def __init__(self):
+        self.point_value = 1
+        self.attack_type = EnemyAttackTypes.LIGHT
+        self.attack_number = 1
+        self.attack_range = 1
+        self.unit_type = None
+        self.unit_name = EnemyUnitNames.INFANTRY
+        self.roll_modifier = 0
+        
+class SAM(EnemyUnit):
+    
+    def __init__(self):
+        self.point_value = 3
+        self.attack_type = EnemyAttackTypes.HEAVY
+        self.attack_number = 2
+        self.attack_range = 3
+        self.unit_type = EnemyAttackTypes.V
+        self.unit_name = EnemyUnitNames.SAM
+        self.roll_modifier = 0
+    
+class SCUD(EnemyUnit):
+    
+    def __init__(self):
+        self.point_value = 3
+        self.attack_type = None
+        self.attack_number = None
+        self.attack_range = 0
+        self.unit_type = EnemyAttackTypes.V
+        self.unit_name = EnemyUnitNames.SCUD
+        self.roll_modifier = 0
+        
+class SPA(EnemyUnit):
+    
+    def __init__(self):
+        self.point_value = 2
+        self.attack_type = None
+        self.attack_number = None
+        self.attack_range = 0
+        self.unit_type = EnemyAttackTypes.V
+        self.unit_name = EnemyUnitNames.SPA
+        self.roll_modifier = 0
+        
+class Storage(EnemyUnit):
+    
+    def __init__(self):
+        self.point_value = 2
+        self.attack_type = EnemyAttackTypes.LIGHT
+        self.attack_number = 1
+        self.attack_range = 0
+        self.unit_type = EnemyAttackTypes.B
+        self.unit_name = EnemyUnitNames.STORAGE
+        self.roll_modifier = 0
+        
+class Tank(EnemyUnit):
+    
+    def __init__(self):
+        self.point_value = 2
+        self.attack_type = EnemyAttackTypes.LIGHT
+        self.attack_number = 1
+        self.attack_range = 0
+        self.unit_type = EnemyAttackTypes.V
+        self.unit_name = EnemyUnitNames.TANK
+        self.roll_modifier = -2
+        
+class Truck(EnemyUnit):
+    
+    def __init__(self):
+        self.point_value = 1
+        self.attack_type = EnemyAttackTypes.LIGHT
+        self.attack_number = 1
+        self.attack_range = 0
+        self.unit_type = EnemyAttackTypes.V
+        self.unit_name = EnemyUnitNames.TRUCK
+        self.roll_modifier = 2
 
 """battalion information on cards"""
 class MobileHQ(Battalion):

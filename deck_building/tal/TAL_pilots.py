@@ -409,7 +409,7 @@ def get_pilot_types(aircrafttype):
         return ["Divot", "Genius", "Hack", "Pro"]
 
 
-def select_pilots(aircraftList, strategy):
+def select_pilots(aircraftList, policy):
     pilotList = []
     for craft in aircraftList:
         choices = get_pilot_types(craft)
@@ -447,6 +447,7 @@ def promote_pilots(pilotList, policy):
                              "If you've changed your mind, you may answer with 'n': ")
             while response not in answers:
                 response = input("Please answer with 'promote' or 'demote' or 'n': ")
+            #Below only works with one level of promotion/demotion
             if response == "promote":
                 promotions += 1
                 pilot = get_pilot(pilot.name, "Skilled")
