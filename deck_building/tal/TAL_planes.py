@@ -242,7 +242,7 @@ class TestMethods(unittest.TestCase):
     def test_get_all_planes(self):
         test_campaign = TAL_campaigns.Iraq()
         test_situation = TAL_situation.Surge()
-        sample = get_all_planes(test_campaign, test_situation, random_policy, random_policy)
+        sample = get_all_planes(test_campaign, test_situation, random_policy)
         for plane in sample:
             self.assertTrue(plane.year <= 1991)
         self.assertTrue(sum([p.so for p in sample]) <= 38)
