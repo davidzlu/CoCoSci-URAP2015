@@ -143,14 +143,16 @@ def legal_actions(campaign):
 def get_all_planes(campaign, situation, strategy):
     planes = []
     to_pick_or_not = True
+    planes_so = 0
+    # if planes is not None:
+    #     planes_so = sum([p.so for p in planes])
     while to_pick_or_not:
-        planes_so = 0
-        if planes != None:
-            planes_so = sum([p.so for p in planes])
         if planes_so >= situation.SOpoints:
             break
         plane = strategy(legal_actions(campaign))
-        planes.append(plane())
+        chosen_plane = plane()
+        planes.append(chosen_plane)
+        planes_so += chosen_plane.so
         """TODO: implement methods to determine continue pick plane or not """
         to_pick_or_not = strategy(situation.SOpoints - planes_so)
     return planes
@@ -209,23 +211,27 @@ class Ordinary_Weapon(Weapon):
 
 class MK_83(Ordinary_Weapon):
     def __init__(self):
-        Weapon.__init__(2, 0, 4, (0, 0), [True, True])
+        Ordinary_Weapon.__init__(self, 2, 0, 4, (0, 0), [True, True])
 
 class LAU_61(Ordinary_Weapon):
     def __init__(self):
-        Weapon.__init__(2, 1, 4, (0, 1), [True, True])
+        Ordinary_Weapon.__init__(self, 2, 1, 4, (0, 1), [True, True])
+
+class LAU_68(Ordinary_Weapon):
+    def __init__(self):
+        Ordinary_Weapon.__init__(self, 2, 0, 6, (0, 1), [True, True])
 
 class AGM_114(VB_Weapon):
     def __init__(self):
-        Weapon.__init__(1, 1, 4, (1, 2), [True, True])
+        VB_Weapon.__init__(self, 1, 1, 4, (1, 2), [True, True])
 
 class GBU_12(Independent_Weapon):
     def __init__(self):
-        Weapon.__init__(1, 1, 4, (0, 1), [True, False])
+        Independent_Weapon.__init__(self, 1, 1, 4, (0, 1), [True, False])
 
 class AGM_65(VB_Weapon):
     def __init__(self):
-        Weapon.__init__(2, 1, 1, (1, 3), [True, True])
+        VB_Weapon.__init__(self, 2, 1, 1, (1, 3), [True, True])
 
 class TestMethods(unittest.TestCase):
     def test_legal_actions(self):
