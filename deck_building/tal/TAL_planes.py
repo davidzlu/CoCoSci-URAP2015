@@ -161,8 +161,8 @@ def random_policy(possible_choices):
     return random.choice(possible_choices)
 
 class Weapon:
-    def __init__(self, weaponPoints, ordnancePoints, attackNumber, attackRange, altitudeAttacks, VB, independence):
-        self.weaponPoints = weaponPoints
+    def __init__(self, weaponWeight, ordnancePoints, attackNumber, attackRange, altitudeAttacks, VB, independence):
+        self.weaponWeight = weaponWeight
         self.ordnancePoints = ordnancePoints
         self.attackNumber = attackNumber
         self.attackRange = attackRange
@@ -176,12 +176,12 @@ class Weapon:
         ###for detailed description see weapon section in rule book
     def attack(self, target, dice_roll):
         if dice_roll >= self.attackNumber:
-            target.status = False # TODO: check what the target attributes actually are
+            target.active = False
         # removing weapon from set will be a separate method
 
 class VB_Weapon(Weapon):
-    def __init__(self, weaponPoints, ordnancePoints, attackNumber, attackRange, altitudeAttacks):
-        Weapon.__init__(self, weaponPoints, ordnancePoints, attackNumber, attackRange, altitudeAttacks, True, False)
+    def __init__(self, weaponWeight, ordnancePoints, attackNumber, attackRange, altitudeAttacks):
+        Weapon.__init__(self, weaponWeight, ordnancePoints, attackNumber, attackRange, altitudeAttacks, True, False)
 
     def attack(self, target, dice_roll):
         if dice_roll >= self.attackNumber:
@@ -190,8 +190,8 @@ class VB_Weapon(Weapon):
         return
 
 class Independent_Weapon(Weapon):
-    def __init__(self, weaponPoints, ordnancePoints, attackNumber, attackRange, altitudeAttacks):
-        Weapon.__init__(self, weaponPoints, ordnancePoints, attackNumber, attackRange, altitudeAttacks, False, True)
+    def __init__(self, weaponWeight, ordnancePoints, attackNumber, attackRange, altitudeAttacks):
+        Weapon.__init__(self, weaponWeight, ordnancePoints, attackNumber, attackRange, altitudeAttacks, False, True)
 
     def attack(self, target, dice_roll):
         if dice_roll >= self.attackNumber:
@@ -200,8 +200,8 @@ class Independent_Weapon(Weapon):
         return
 
 class Ordinary_Weapon(Weapon):
-    def __init__(self, weaponPoints, ordnancePoints, attackNumber, attackRange, altitudeAttacks):
-        Weapon.__init__(self, weaponPoints, ordnancePoints, attackNumber, attackRange, altitudeAttacks, False, False)
+    def __init__(self, weaponWeight, ordnancePoints, attackNumber, attackRange, altitudeAttacks):
+        Weapon.__init__(self, weaponWeight, ordnancePoints, attackNumber, attackRange, altitudeAttacks, False, False)
 
     def attack(self, target, dice_roll):
         if dice_roll >= self.attackNumber:
