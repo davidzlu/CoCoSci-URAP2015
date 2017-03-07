@@ -5,6 +5,7 @@ from . import TAL_planes as planes
 from . import TAL_pilots as pilots
 from . import TAL_specialCondition as spec_cond
 import deck_building.DeckBuilding.DeckBuilding as DeckBuilding
+import random
 
 class TALInstance(DeckBuilding):
     
@@ -23,7 +24,7 @@ class TALInstance(DeckBuilding):
         print("Finished placing battalions")
         
         print("Selecting aircraft")
-        self.planes = planes.get_all_planes(campaign, situation, policy) #A list of Plane objects, see TAL_planes
+        self.planes = planes.get_all_planes(self, situation, policy) #A list of Plane objects, see TAL_planes
         self.scouts = self.situation.buy_scouts(policy) #A nonnegative integer
         print("Done selecting aircraft")
         
@@ -117,3 +118,13 @@ class TALInstance(DeckBuilding):
     
     def loiter_turn_setup_done(self):
         pass
+
+
+def random_policy(gameInstance):
+    """Pseudocode placeholder for what the policies should look like when written"""
+    curphase = gameInstance.phase
+    if curphase == "choose planes": #this comparator can be/should be changed
+        choice = random.choice([True, False])
+        if choice:
+            choice = random.choice(planes.legal_actions(gameInstance.campaign))
+        return choice
