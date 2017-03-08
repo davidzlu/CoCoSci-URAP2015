@@ -410,6 +410,7 @@ def get_pilot_types(aircrafttype):
 
 
 def select_pilots(talinst, aircraftList, policy):
+    #TODO: Implement picking one additional pilot per aircraft type in aircraftList
     pilotList = []
     # following code is for human player
     if policy == 'human player':  # TODO: Figure out how to differentiate between policies
