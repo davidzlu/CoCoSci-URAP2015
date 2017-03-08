@@ -206,6 +206,14 @@ class Ordinary_Weapon(Weapon):
             # TODO: fill in this method to enable attack
         return
 
+class MK_20(Ordinary_Weapon):
+    def __init__(self):
+        Ordinary_Weapon.__init__(self, 1, 1, 6, (0, 0), [True, True])
+
+class MK_82(Ordinary_Weapon):
+    def __init__(self):
+        Ordinary_Weapon.__init__(self, 1, 0, 7, (0, 0), [True, True])
+
 class MK_83(Ordinary_Weapon):
     def __init__(self):
         Ordinary_Weapon.__init__(self, 2, 0, 4, (0, 0), [True, True])
@@ -222,13 +230,42 @@ class AGM_114(VB_Weapon):
     def __init__(self):
         VB_Weapon.__init__(self, 1, 1, 4, (1, 2), [True, True])
 
+class BGM_71(VB_Weapon):
+    def __init__(self):
+        VB_Weapon.__init__(self, 1, 0, 7, (0, 1), [True, True])
+
 class GBU_12(Independent_Weapon):
     def __init__(self):
         Independent_Weapon.__init__(self, 1, 1, 4, (0, 1), [True, False])
 
+class GBU_16(Independent_Weapon):
+    def __init__(self):
+        Independent_Weapon.__init__(self, 2, 1, 0, (0, 1), [True, False])
+
 class AGM_65(VB_Weapon):
     def __init__(self):
         VB_Weapon.__init__(self, 2, 1, 1, (1, 3), [True, True])
+
+class AIM_92(Ordinary_Weapon):
+    def __init__(self):
+        Ordinary_Weapon.__init__(self, 1, 0, 7, (0, 1), [True, True])
+
+class AIM_9(Ordinary_Weapon):
+    def __init__(self):
+        Ordinary_Weapon.__init__(self, 1, 1, 3, (0, 3), [True, True])
+
+class FUEL:
+    def __init__(self):
+        self.weaponWeight = 2
+        self.ordnancePoints = 0
+
+class ECM:
+    def __init__(self):
+        self.weaponWeight = 1
+        self.ordnancePoints = 1
+
+weapon_pool = {MK_20: 16, LAU_61: 16, MK_83: 8, GBU_16: 8, AGM_65: 16, AGM_114: 16, LAU_68: 6, BGM_71: 6,
+               GBU_12: 8, MK_82: 8, AIM_9: 4, AIM_92: 4, FUEL: 4, ECM: 4}
 
 class TestMethods(unittest.TestCase):
     def test_legal_actions(self):
