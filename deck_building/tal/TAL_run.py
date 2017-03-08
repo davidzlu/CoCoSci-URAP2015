@@ -128,3 +128,13 @@ def random_policy(gameInstance):
         if choice:
             choice = random.choice(planes.legal_actions(gameInstance.campaign))
         return choice
+    elif curphase == "choose pilot":
+        pilotList = []
+        for plane in gameInstance.planes:
+            choices = pilots.get_pilot_types(plane)
+            chosenpilot = random.choice(choices)
+            choices.remove(chosenpilot)
+            pilotList.append(chosenpilot)
+            # make a dictionary/set/list? of planes with pilots here or later?
+        return pilots
+
