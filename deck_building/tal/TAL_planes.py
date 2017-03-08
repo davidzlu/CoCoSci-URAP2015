@@ -170,6 +170,8 @@ class Weapon:
         # Vehicle/building or not, in form of boolean
         self.independence = independence
         # independent or not, boolean
+        self.hex = False #whether attack affects entire hex or not
+        self.expend = True #whether weapon is expended or retained after an attack
         ###for detailed description see weapon section in rule book
     def attack(self, target, dice_roll):
         if dice_roll >= self.attackNumber:
@@ -209,6 +211,7 @@ class Ordinary_Weapon(Weapon):
 class MK_20(Ordinary_Weapon):
     def __init__(self):
         Ordinary_Weapon.__init__(self, 1, 1, 6, (0, 0), [True, True])
+        self.hex = True
 
 class MK_82(Ordinary_Weapon):
     def __init__(self):
@@ -221,10 +224,12 @@ class MK_83(Ordinary_Weapon):
 class LAU_61(Ordinary_Weapon):
     def __init__(self):
         Ordinary_Weapon.__init__(self, 2, 1, 4, (0, 1), [True, True])
+        self.retain = 7
 
 class LAU_68(Ordinary_Weapon):
     def __init__(self):
         Ordinary_Weapon.__init__(self, 2, 0, 6, (0, 1), [True, True])
+        self.retain = 9
 
 class AGM_114(VB_Weapon):
     def __init__(self):
@@ -232,7 +237,7 @@ class AGM_114(VB_Weapon):
 
 class BGM_71(VB_Weapon):
     def __init__(self):
-        VB_Weapon.__init__(self, 1, 0, 7, (0, 1), [True, True])
+        VB_Weapon.__init__(self, 1, 0, 7, (1, 1), [True, True])
 
 class GBU_12(Independent_Weapon):
     def __init__(self):
@@ -266,6 +271,10 @@ class ECM:
 
 weapon_pool = {MK_20: 16, LAU_61: 16, MK_83: 8, GBU_16: 8, AGM_65: 16, AGM_114: 16, LAU_68: 6, BGM_71: 6,
                GBU_12: 8, MK_82: 8, AIM_9: 4, AIM_92: 4, FUEL: 4, ECM: 4}
+
+def arm_aircraft(talinst, planes):
+    #implement weight point penalty of range band + fueling priority
+    pass
 
 class TestMethods(unittest.TestCase):
     def test_legal_actions(self):
