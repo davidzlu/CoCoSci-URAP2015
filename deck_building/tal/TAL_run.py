@@ -119,6 +119,69 @@ class TALInstance(DeckBuilding):
     def loiter_turn_setup_done(self):
         pass
 
+def human_policy(gameInstance):
+    curphase = gameInstance.phase
+    if curphase == "choose planes":
+        pass
+    elif curphase == "choose pilots":
+        # TODO: Implement picking one additional pilot per aircraft type in aircraftList
+        pilotList = []
+        for craft in gameInstance.planes:
+            choices = pilots.get_pilot_types(craft)
+            print(choices)
+            response = input("Select a pilot for your " + str(type(craft)))
+            while response not in choices:
+                response = input("Please enter a valid choice: ")
+            pilot = pilots.get_pilot(response, "Average")
+            while pilot in pilotList:
+                print(choices)
+                response = input("You've already chosen that pilot for another aircraft."
+                                 "Please choose a different one.: ")
+                pilot = pilots.get_pilot(response, "Average")
+            pilotList.append(pilot)
+        return pilotList
+    elif curphase == "promote pilots":
+        # TODO: REWRITE TO ACCEPT ARBITRARY POLICIES
+        # TODO: REWRITE TO CHANGE PILOT TO ANY SKILL LEVEL, NOT JUST SKILLED AND GREEN
+        # This code currently only works for the setup portion
+        # if these two numbers aren't equal, the difference will be the number of so points spent.
+        pilotList = gameInstance.pilots
+        promotions = 0
+        demotions = 0
+        answers = ["y", "n", "promote", "demote"]
+        for pilot in pilotList:
+            response = input("Would you like to promote or demote this pilot? "
+                             "Answer with y or n: ")
+            while response not in answers:
+                response = input("Please answer with y or n: ")
+            if response == "y":
+                response = input("Please answer with either 'promote' or 'demote'."
+                                 "If you've changed your mind, you may answer with 'n': ")
+                while response not in answers:
+                    response = input("Please answer with 'promote' or 'demote' or 'n': ")
+                # Below only works with one level of promotion/demotion
+                if response == "promote":
+                    promotions += 1
+                    pilot = pilots.get_pilot(pilot.name, "Skilled")
+                elif response == "demote":
+                    demotions += 1
+                    pilot = pilots.get_pilot(pilot.name, "Green")
+            pilotList.append(pilot)
+            #calculate how many points spent on promotion/demotion
+        return pilotList
+    elif curphase == "assign missions":
+        pass
+    elif curphase == "allocate scouts":
+        pass
+    elif curphase == "abort mission":
+        pass
+    elif curphase == "fueling priority":
+        pass
+    elif curphase == "arm aircraft":
+        pass
+    elif curphase == "place aircraft":
+        # should probably combine select altitude with this
+        pass
 
 def random_policy(gameInstance):
     """Pseudocode placeholder for what the policies should look like when written"""
@@ -128,7 +191,7 @@ def random_policy(gameInstance):
         if choice:
             choice = random.choice(planes.legal_actions(gameInstance.campaign))
         return choice
-    elif curphase == "choose pilot":
+    elif curphase == "choose pilots":
         pilotList = []
         for plane in gameInstance.planes:
             choices = pilots.get_pilot_types(plane)
@@ -137,4 +200,20 @@ def random_policy(gameInstance):
             pilotList.append(chosenpilot)
             # make a dictionary/set/list? of planes with pilots here or later?
         return pilots
+    elif curphase == "promote pilots":
+        pass
+    elif curphase == "assign missions":
+        pass
+    elif curphase == "allocate scouts":
+        pass
+    elif curphase == "abort mission":
+        pass
+    elif curphase == "fueling priority":
+        pass
+    elif curphase == "arm aircraft":
+        pass
+    elif curphase == "place aircraft":
+        #should probably combine select altitude with this
+        pass
+
 

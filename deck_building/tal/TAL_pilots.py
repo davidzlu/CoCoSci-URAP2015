@@ -409,61 +409,15 @@ def get_pilot_types(aircrafttype):
         return ["Divot", "Genius", "Hack", "Pro"]
 
 
-def select_pilots(talinst, aircraftList, policy):
-    #TODO: Implement picking one additional pilot per aircraft type in aircraftList
-    pilotList = []
-    # following code is for human player
-    if policy == 'human player':  # TODO: Figure out how to differentiate between policies
-        for craft in aircraftList:
-            choices = get_pilot_types(craft)
-            print(choices)
-            response = input("Select a pilot for your " + str(type(craft)))
-            while response not in choices:
-                response = input("Please enter a valid choice: ")
-            pilot = get_pilot(response, "Average")
-            while pilot in pilotList:
-                print(choices)
-                response = input("You've already chosen that pilot for another aircraft."
-                                 "Please choose a different one.: ")
-                pilot = get_pilot(response, "Average")
-            pilotList.append(pilot)
-    else:
-        pilotList = policy(talinst)
+def select_pilots(talinst, policy):
+    pilotList = policy(talinst)
     return pilotList
 
-def promote_pilots(pilotList, policy):
-    #TODO: REWRITE TO ACCEPT ARBITRARY POLICIES
-    #TODO: REWRITE TO CHANGE PILOT TO ANY SKILL LEVEL, NOT JUST SKILLED AND GREEN
-    #This code currently only works for the setup portion
-    pilotList = []
-    #if these two numbers aren't equal, the difference will be the number of so points spent.
-    promotions = 0
-    demotions = 0
-    answers = ["y", "n", "promote", "demote"]
-    for pilot in pilotList:
-        response = input("Would you like to promote or demote this pilot? "
-                         "Answer with y or n: ")
-        while response not in answers:
-            response = input("Please answer with y or n: ")
-        if response == "y":
-            response = input("Please answer with either 'promote' or 'demote'."
-                             "If you've changed your mind, you may answer with 'n': ")
-            while response not in answers:
-                response = input("Please answer with 'promote' or 'demote' or 'n': ")
-            #Below only works with one level of promotion/demotion
-            if response == "promote":
-                promotions += 1
-                pilot = get_pilot(pilot.name, "Skilled")
-            elif response == "demote":
-                demotions += 1
-                pilot = get_pilot(pilot.name, "Green")
-        pilotList.append(pilot)
-    return pilotList, promotions, demotions
+def promote_pilots(talinst, policy):
+    pilotList = policy(talinst)
+    return pilotList
 
 def get_plane_pilot(campaign, situation, strategy):
-    #pick_strategy: pick planes
-    #determine_strategy: whether to stop or not
-    
     aircrafts = TAL_planes.get_all_planes(campaign, situation, strategy)
     pilots = select_pilots(aircrafts, strategy)
     return aircrafts, pilots
