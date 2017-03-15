@@ -124,9 +124,12 @@ def human_policy(gameInstance):
     if curphase == "choose planes":
         pass
     elif curphase == "choose pilots":
-        # TODO: Implement picking one additional pilot per aircraft type in aircraftList
         pilotList = []
+        planeTypes = set()
         for craft in gameInstance.planes:
+            if craft.get_name() == 'RQ_1' or craft.get_name() == 'MQ_1':
+                continue
+            planeTypes.add(type(craft))
             choices = pilots.get_pilot_types(craft)
             print(choices)
             response = input("Select a pilot for your " + str(type(craft)))
@@ -136,7 +139,20 @@ def human_policy(gameInstance):
             while pilot in pilotList:
                 print(choices)
                 response = input("You've already chosen that pilot for another aircraft."
-                                 "Please choose a different one.: ")
+                                 "Please choose a different one: ")
+                pilot = pilots.get_pilot(response, "Average")
+            pilotList.append(pilot)
+        for pType in planeTypes:
+            choices = pilots.get_pilot_types(pType)
+            print(choices)
+            response = input("Please select an additional pilot for your " + str(type(pType)))
+            while response not in choices:
+                response = input("Please enter a valid choice: ")
+            pilot = pilots.get_pilot(response, "Average")
+            while pilot in pilotList:
+                print(choices)
+                response = input("You've already chosen that pilot for another aircraft."
+                                 "Please choose a different one: ")
                 pilot = pilots.get_pilot(response, "Average")
             pilotList.append(pilot)
         return pilotList
