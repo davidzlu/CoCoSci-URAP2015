@@ -64,7 +64,7 @@ class TALInstance(DeckBuilding):
     
     def allocate_scouts(self):
         """Returns list of battalions that have been assigned a scout
-        """ 
+        """
         return []
     
     def day_setup(self):
@@ -78,6 +78,7 @@ class TALInstance(DeckBuilding):
         assert(len(self.special_condition_deck) > 0)
         self.day_special_condition = self.special_condition_deck.pop()
         #TODO: ACTIVATE SPECIAL CONDITION
+        #TODO: CHANGE PHASE OF GAME?
         self.day_missions = self.allocate_planes_and_pilots_to_misions(self.select_battalions_for_day())
         self.scouted_missions = self.allocate_scouts()
         
@@ -94,6 +95,7 @@ class TALInstance(DeckBuilding):
           - Checking scout success
           - Setting loiter turn count
         """
+        #TODO: CHANGE PHASE OF GAME?
         #TODO: ABORT MISSION OPTION
         #TODO: APPLY RANGE BAND EFFECT
         #TODO: ARM AIRCRAFT
