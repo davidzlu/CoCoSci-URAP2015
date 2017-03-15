@@ -178,7 +178,50 @@ def human_policy(gameInstance):
     elif curphase == "fueling priority":
         pass
     elif curphase == "arm aircraft":
-        pass
+        aircrafts = gameInstance.planes
+        weapons = planes.weapon_pool.copy()
+        totalOrdPts = 0
+        SOpts_spent = 0
+        for plane in aircrafts:
+            SOpts_spent = totalOrdPts // 10
+            if (totalOrdPts % 10) != 0:
+                SOpts_spent += 1
+            if SOpts_spent >= gameInstance.situation.SOpoints:
+                print("You have spent all of your SO points.")
+                break
+            arm = True
+            allowed = plane.weapon_set
+            totalweight = plane.weight
+            while totalweight > 0 and arm is True:
+                print('Currently equipping' + plane.get_name())
+                print('You have ' + totalweight + " weight points left.")
+                print('These are your weapon choices: ')
+                print(allowed)
+                response = input("Select a weapon: ")
+                while response not in allowed:
+                    response = input("Please enter a valid choice: ")
+                weapon = planes.get_weapon(response)
+                print('This will cost you ' + weapon.weaponWeight + 'points and '
+                      + weapon.ordnancePoints + ' ordnance points.')
+                response2 = input('Is this okay? Answer with y or n: ')
+                while response2 not in ['y', 'n']:
+                    response2 = input("Please respond with either y or n: ")
+                if response2 == 'n':
+                    continue
+                elif response2 == 'y':
+                    if weapon.weaponWeight <= totalweight:
+                        plane.weapons_equipped.append(weapon)
+                        totalweight -= weapon.weaponWeight
+                        totalOrdPts += weapon.ordnancePoints
+                        weapons[response] -= 1 #Might need to also decrease the paired weapon
+                    else:
+                        print("This weapon is too heavy for the plane to carry.")
+                done = input("Are you done equipping this plane? Answer with y or n: ")
+                while done not in ['y', 'n']:
+                    done = input("Please respond with either y or n: ")
+                if done == 'y':
+                    arm = False
+        gameInstance.situation.SOpoints -= SOpts_spent
     elif curphase == "place aircraft":
         # should probably combine select altitude with this
         pass
