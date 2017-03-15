@@ -15,6 +15,7 @@ class Plane:
         self.weapon_set = set() #
         self.weight = 0
         self.special = None
+        self.name = None
 
     def get_year(self):
         return self.year
@@ -37,9 +38,12 @@ class Plane:
     def get_weight(self):
         return self.weight
 
+    def get_name(self):
+        return self.name
 
 class A_10A(Plane):
     def __init__(self):
+        Plane.__init__(self)
         self.year = 1976
         self.cannon = 4
         self.so = 8
@@ -47,18 +51,22 @@ class A_10A(Plane):
         self.weapon_set = {'AIM_9', 'AIM_92', 'MK_20', 'LAU_61', 'LAU_68', 'AGM_114', 'AGM_65', 'MK_82', 'MK_83',
                            'GBU_12', 'GBU_16', 'ECM Pod', 'Fuel Tank'}
         self.weight = 14
+        self.name = 'A_10A'
 
 class AH_1(Plane):
     def __init__(self):
+        Plane.__init__(self)
         self.year = 1967
         self.cannon = 9
         self.so = 2
         self.hit = 1
         self.weapon_set = {'AIM_9', 'AIM_92', 'BGM_71', 'LAU_61', 'LAU_68', 'AGM_114', 'Fuel Tank'}
         self.weight = 6
+        self.name = 'AH_1'
 
 class F_16(Plane):
     def __init__(self):
+        Plane.__init__(self)
         self.year = 1976
         self.cannon = 7
         self.so = 5
@@ -66,18 +74,22 @@ class F_16(Plane):
         self.weapon_set = {'AIM_9', 'MK_20', 'LAU_61', 'LAU_68', 'AGM_65', 'MK_82', 'MK_83', 'GBU_12',
                            'GBU_16', 'ECM Pod', 'Fuel Tank'}
         self.weight = 10
+        self.name = 'F_16'
 
 class AH_64A(Plane):
     def __init__(self):
+        Plane.__init__(self)
         self.year = 1986
         self.cannon = 7
         self.so = 4
         self.hit = 2
         self.weapon_set = {'AIM_9', 'AIM_92', 'LAU_61', 'LAU_68', 'AGM_114', 'Fuel Tank'}
         self.weight = 8
+        self.name = 'AH_64A'
 
 class AV_8B(Plane):
     def __init__(self):
+        Plane.__init__(self)
         self.year = 1985
         self.cannon = 7
         self.so = 6
@@ -85,9 +97,11 @@ class AV_8B(Plane):
         self.weapon_set = {'AIM_9', 'AIM_92', 'MK_20', 'LAU_61', 'LAU_68', 'AGM_65', 'AGM_114', 'MK_82', 'MK_83', 'GBU_12',
                            'GBU_16', 'ECM Pod', 'Fuel Tank'}
         self.weight = 10
+        self.name = 'AV_8B'
 
 class A_10C(Plane):
     def __init__(self):
+        Plane.__init__(self)
         self.year = 2006
         self.cannon = 4
         self.so = 9
@@ -95,41 +109,50 @@ class A_10C(Plane):
         self.weapon_set = {'AIM_9', 'AIM_92', 'MK_20', 'LAU_61', 'LAU_68', 'AGM_65', 'AGM_114', 'MK_82', 'MK_83', 'GBU_12',
                            'GBU_16', 'ECM Pod', 'Fuel Tank'}
         self.weight = 14
+        self.name = 'A_10C'
 
 class MQ_1(Plane):
     def __init__(self):
+        Plane.__init__(self)
         self.year = 2001
         self.cannon = 0
         self.so = 4
         self.hit = 0
         self.weapon_set = {'AGM_114'}
         self.weight = 0
+        self.name = 'MQ_1'
 
 class RQ_1(Plane):
     def __init__(self):
+        Plane.__init__(self)
         self.year = 1995
         self.cannon = 0
         self.so = 4
         self.hit = 0
         self.weight = 0
+        self.name = 'RQ_1'
 
 class AH_64D(Plane):
     def __init__(self):
+        Plane.__init__(self)
         self.year = 1997
         self.cannon = 7
         self.so = 5
         self.hit = 2
         self.weapon_set = {'AIM_9', 'AIM_92', 'LAU_61', 'LAU_68', 'AGM_114', 'Fuel Tank'}
         self.weight = 8
+        self.name = 'AH_64D'
 
 class AC_130(Plane):
     def __init__(self):
+        Plane.__init__(self)
         self.year = 1995
         self.cannon = 5 # or 3 or 1
         self.so = 10
         self.hit = 3
         """TODO: special effect"""
         self.weight = 0
+        self.name = 'AC_130'
 
 plane_pool = {A_10A: 4, AH_1: 3, F_16: 1, AH_64A: 8, AV_8B: 3, A_10C: 2, MQ_1: 2, RQ_1: 2, AH_64D: 4, AC_130: 1}
 
@@ -272,9 +295,39 @@ class ECM:
 weapon_pool = {MK_20: 16, LAU_61: 16, MK_83: 8, GBU_16: 8, AGM_65: 16, AGM_114: 16, LAU_68: 6, BGM_71: 6,
                GBU_12: 8, MK_82: 8, AIM_9: 4, AIM_92: 4, FUEL: 4, ECM: 4}
 
-def arm_aircraft(talinst, planes):
+def get_weapon(weapon_name):
+    if weapon_name == 'MK_20':
+        return MK_20()
+    elif weapon_name == 'LAU_61':
+        return LAU_61()
+    elif weapon_name == 'MK_83':
+        return MK_83()
+    elif weapon_name == 'GBU_16':
+        return GBU_16()
+    elif weapon_name == 'AGM_65':
+        return AGM_65()
+    elif weapon_name == 'AGM_114':
+        return AGM_114()
+    elif weapon_name == 'LAU_68':
+        return LAU_68()
+    elif weapon_name == 'BGM_71':
+        return BGM_71()
+    elif weapon_name == 'GBU_12':
+        return GBU_12()
+    elif weapon_name == 'MK_82':
+        return MK_82()
+    elif weapon_name == 'AIM_9':
+        return AIM_9()
+    elif weapon_name == 'AIM_92':
+        return AIM_92()
+    elif weapon_name == 'FUEL':
+        return FUEL()
+    elif weapon_name == 'ECM':
+        return ECM()
+
+def arm_aircraft(talinst, planes, policy):
     #implement weight point penalty of range band + fueling priority
-    pass
+    policy(talinst)
 
 class TestMethods(unittest.TestCase):
     def test_legal_actions(self):
