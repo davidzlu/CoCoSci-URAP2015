@@ -30,7 +30,6 @@ class TALInstance(DeckBuilding):
         
         print("Selecting and promoting pilots")
         self.pilots = pilots.select_pilots(self.planes, policy) #A list of Pilot objects, see TAL_pilots
-        #TODO: ADJUSTING/PROMOTING PILOTS NOT FULLY IMPLEMENTED
         pilots.promote_pilots(self.pilots, policy)
         print("Done selecting and promoting pilots")
         
@@ -49,24 +48,37 @@ class TALInstance(DeckBuilding):
     def setup_friendly_units(self):
         pass
     
-    def select_battalions_for_day(self):
-        """Returns list of battalions to attack for the day based on self.policy
+    def allocate_planes_and_pilots_to_missions(self):
+        """Chooses battalions to attack and assigns (plane, pilot) pairs to each chosen.
+        Chooses a battalion and assigns planes one at a time.
+        Updates self.day_missions, a dictionary mapping battalion->[list of (plane, pilot) pairs].
         TODO: WRITE THIS FUNCTION
         """
-        return []
-    
-    def allocate_planes_and_pilots_to_missions(self, battalions_to_attack):
-        """Assigns (plane, pilot) pairs to every battalion in battalions_to_attack.
-        Returns dictionary mapping battalion->[list of (plane, pilot) pairs]
-        TODO: DISCUSS PLAN FOR THIS WHOLE METHOD
-        TODO: WRITE THIS FUNCTION
-        """
-        return {}
+        policy = self.policy
+        self.phase = "assign missions"
+        self.day_missions = {}
+        while policy(self) and len(self.day_missions) < 1: #Must have at least one mission
+            #Choose battalion
+            self.phase = "choose battalion"
+            battalion = policy(self)
+            
+            #Choose planes
+            self.phase = "assign planes"
+            planes = policy(self)
+            
+            assert(battalion not in self.day_missions)
+            self.day_missions[battalion] = planes
+                        
+            #See if more missions wanted
+            self.phase = "assign missions"
     
     def allocate_scouts(self):
         """Returns list of battalions that have been assigned a scout
         """
-        return []
+        policy = self.policy
+        self.phase = "allocate scouts"
+        scouted_missions = policy(self)
+        return scouted_missions
     
     def day_setup(self):
         """Sets up variables at start of a day in TAL.
@@ -79,8 +91,7 @@ class TALInstance(DeckBuilding):
         assert(len(self.special_condition_deck) > 0)
         self.day_special_condition = self.special_condition_deck.pop()
         #TODO: ACTIVATE SPECIAL CONDITION
-        #TODO: CHANGE PHASE OF GAME?
-        self.day_missions = self.allocate_planes_and_pilots_to_misions(self.select_battalions_for_day())
+        self.allocate_planes_and_pilots_to_misions()
         self.scouted_missions = self.allocate_scouts()
         
     def mission_setup(self):
@@ -188,8 +199,29 @@ def human_policy(gameInstance):
             #calculate how many points spent on promotion/demotion
         return pilotList
     elif curphase == "assign missions":
+        """For this block:
+         - Decide whether to continue choosing missions
+         - Return True/False
+        """
+        pass
+    elif curphase == "choose battalion":
+        """For this block:
+         - Check gameInstance.sm for active battalions
+         - Choose battalions not in gameInstance.day_missions
+         - return a battalion
+        """
+        pass
+    elif curphase == "assign planes":
+        """For this block:
+         - 
+        """
         pass
     elif curphase == "allocate scouts":
+        """For this block:
+         - Loop through gameInstance.day_missions, decide to assign scout
+         - Add scouted missions to a list
+         - Return list of battalions with scouts
+        """
         pass
     elif curphase == "abort mission":
         pass
