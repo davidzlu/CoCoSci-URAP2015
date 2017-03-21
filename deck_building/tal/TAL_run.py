@@ -169,12 +169,9 @@ def human_policy(gameInstance):
                 pilot = pilots.get_pilot(response, "Average")
             pilotList.append(pilot)
         return pilotList
-    elif curphase == "promote pilots":
-        # TODO: REWRITE TO ACCEPT ARBITRARY POLICIES
-        # TODO: REWRITE TO CHANGE PILOT TO ANY SKILL LEVEL, NOT JUST SKILLED AND GREEN
-        # This code currently only works for the setup portion
-        # if these two numbers aren't equal, the difference will be the number of so points spent.
+    elif curphase == "promote pilots": #returns True or False depending on success
         pilotList = gameInstance.pilots
+        # if these two numbers aren't equal, the difference will be the number of so points spent.
         promotions = 0
         demotions = 0
         answers = ["y", "n", "promote", "demote"]
@@ -192,12 +189,36 @@ def human_policy(gameInstance):
                 if response == "promote":
                     promotions += 1
                     pilot = pilots.get_pilot(pilot.name, "Skilled")
+                    response2 = input("Would you like to promote again? Please answer with y or n: ")
+                    while response2 not in answers:
+                        response2 = input("Please answer with y or n: ")
+                    if response2 == "y":
+                        promotions += 1
+                        pilot = pilots.get_pilot(pilot.name, "Veteran")
+                        response2 = input("Would you like to promote again? Please answer with y or n: ")
+                        while response2 not in answers:
+                            response2 = input("Please answer with y or n: ")
+                        if response2 == "y":
+                            promotions += 1
+                            pilot = pilots.get_pilot(pilot.name, "Ace")
                 elif response == "demote":
                     demotions += 1
                     pilot = pilots.get_pilot(pilot.name, "Green")
+                    response2 = input("Would you like to promote again? Please answer with y or n: ")
+                    while response2 not in answers:
+                        response2 = input("Please answer with y or n: ")
+                    if response2 == "y":
+                        demotions += 1
+                        pilot = pilots.get_pilot(pilot.name, "Newbie")
             pilotList.append(pilot)
-            #calculate how many points spent on promotion/demotion
-        return pilotList
+        #calculate how many points spent on promotion/demotion
+        SOpts_spent = abs(promotions - demotions)
+        if SOpts_spent > gameInstance.situation.SOpoints:
+            print("You've spent too many SO points during promotion. Please try again.")
+            return False
+        gameInstance.situation.SOpoints -= SOpts_spent
+        gameInstance.pilots = pilotList
+        return True
     elif curphase == "assign missions":
         """For this block:
          - Decide whether to continue choosing missions
