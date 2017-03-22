@@ -245,7 +245,12 @@ def human_policy(gameInstance):
         """
         pass
     elif curphase == "abort mission":
-        pass
+        response = input("Do you wish to abort this mission? Answer with y or n: ")
+        while response not in ["y", "n"]:
+            response = input("Please answer either with y or n: ")
+        if response == "y":
+            return False
+        return True
     elif curphase == "fueling priority":
         pass
     elif curphase == "arm aircraft":
