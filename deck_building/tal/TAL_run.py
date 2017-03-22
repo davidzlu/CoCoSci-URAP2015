@@ -36,6 +36,8 @@ class TALInstance(DeckBuilding):
         self.day_count = 1
         print("Setup complete, start-of-day setup begin")
 
+        self.day_missions = {}
+
     def setup_environment(self):
         sm = batt.SectorMap()
         self.total_vp = sm.get_all_enemies(self.campaign)
@@ -234,7 +236,7 @@ def human_policy(gameInstance):
         pass
     elif curphase == "assign planes":
         """For this block:
-         - 
+         - adjust weight penalty
         """
         pass
     elif curphase == "allocate scouts":
@@ -252,7 +254,15 @@ def human_policy(gameInstance):
             return False
         return True
     elif curphase == "fueling priority":
-        pass
+        print("Would you like to purchase Fueling Priority for 1 SO point?")
+        response = input("Please answer with y or n: ")
+        while response not in ["y", "n"]:
+            response = input("Please answer either with y or n: ")
+        if response == "y":
+            #go through and reduce weight penalty
+            for mission in gameInstance.day_missions:
+                pass # TODO: Adjust the weight penalty of each plane depending on the range band the battalion is in
+            gameInstance.situation.SOpoints -= 1
     elif curphase == "arm aircraft":
         aircrafts = gameInstance.planes
         weapons = planes.weapon_pool.copy()
