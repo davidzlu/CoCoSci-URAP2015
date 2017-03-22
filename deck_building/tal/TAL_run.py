@@ -173,7 +173,7 @@ def human_policy(gameInstance):
         return pilotList
     elif curphase == "promote pilots": #returns True or False depending on success
         pilotList = gameInstance.pilots
-        # if these two numbers aren't equal, the difference will be the number of so points spent.
+        # if promotions are greater than demotions, the difference will be the number of so points spent.
         promotions = 0
         demotions = 0
         answers = ["y", "n", "promote", "demote"]
@@ -214,11 +214,12 @@ def human_policy(gameInstance):
                         pilot = pilots.get_pilot(pilot.name, "Newbie")
             pilotList.append(pilot)
         #calculate how many points spent on promotion/demotion
-        SOpts_spent = abs(promotions - demotions)
+        SOpts_spent = promotions - demotions
         if SOpts_spent > gameInstance.situation.SOpoints:
             print("You've spent too many SO points during promotion. Please try again.")
             return False
-        gameInstance.situation.SOpoints -= SOpts_spent
+        if SOpts_spent > 0:
+            gameInstance.situation.SOpoints -= SOpts_spent
         gameInstance.pilots = pilotList
         return True
     elif curphase == "assign missions":
