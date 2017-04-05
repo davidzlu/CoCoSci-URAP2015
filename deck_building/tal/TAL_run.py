@@ -36,6 +36,8 @@ class TALInstance(DeckBuilding):
         self.day_count = 1
         print("Setup complete, start-of-day setup begin")
 
+        self.day_missions = {}
+
     def setup_environment(self):
         self.sm = batt.SectorMap()
         self.total_vp = self.sm.total_vp
@@ -192,12 +194,9 @@ def human_policy(gameInstance):
                 pilot = pilots.get_pilot(response, "Average")
             pilotList.append(pilot)
         return pilotList
-    elif curphase == "promote pilots":
-        # TODO: REWRITE TO ACCEPT ARBITRARY POLICIES
-        # TODO: REWRITE TO CHANGE PILOT TO ANY SKILL LEVEL, NOT JUST SKILLED AND GREEN
-        # This code currently only works for the setup portion
-        # if these two numbers aren't equal, the difference will be the number of so points spent.
+    elif curphase == "promote pilots": #returns True or False depending on success
         pilotList = gameInstance.pilots
+        # if promotions are greater than demotions, the difference will be the number of so points spent.
         promotions = 0
         demotions = 0
         answers = ["y", "n", "promote", "demote"]
@@ -215,12 +214,37 @@ def human_policy(gameInstance):
                 if response == "promote":
                     promotions += 1
                     pilot = pilots.get_pilot(pilot.name, "Skilled")
+                    response2 = input("Would you like to promote again? Please answer with y or n: ")
+                    while response2 not in answers:
+                        response2 = input("Please answer with y or n: ")
+                    if response2 == "y":
+                        promotions += 1
+                        pilot = pilots.get_pilot(pilot.name, "Veteran")
+                        response2 = input("Would you like to promote again? Please answer with y or n: ")
+                        while response2 not in answers:
+                            response2 = input("Please answer with y or n: ")
+                        if response2 == "y":
+                            promotions += 1
+                            pilot = pilots.get_pilot(pilot.name, "Ace")
                 elif response == "demote":
                     demotions += 1
                     pilot = pilots.get_pilot(pilot.name, "Green")
+                    response2 = input("Would you like to promote again? Please answer with y or n: ")
+                    while response2 not in answers:
+                        response2 = input("Please answer with y or n: ")
+                    if response2 == "y":
+                        demotions += 1
+                        pilot = pilots.get_pilot(pilot.name, "Newbie")
             pilotList.append(pilot)
-            #calculate how many points spent on promotion/demotion
-        return pilotList
+        #calculate how many points spent on promotion/demotion
+        SOpts_spent = promotions - demotions
+        if SOpts_spent > gameInstance.situation.SOpoints:
+            print("You've spent too many SO points during promotion. Please try again.")
+            return False
+        if SOpts_spent > 0:
+            gameInstance.situation.SOpoints -= SOpts_spent
+        gameInstance.pilots = pilotList
+        return True
     elif curphase == "assign missions":
         return human_policy_assign_missions(gameInstance)
     elif curphase == "choose battalion":
@@ -238,9 +262,22 @@ def human_policy(gameInstance):
         """
         pass
     elif curphase == "abort mission":
-        pass
+        response = input("Do you wish to abort this mission? Answer with y or n: ")
+        while response not in ["y", "n"]:
+            response = input("Please answer either with y or n: ")
+        if response == "y":
+            return False
+        return True
     elif curphase == "fueling priority":
-        pass
+        print("Would you like to purchase Fueling Priority for 1 SO point?")
+        response = input("Please answer with y or n: ")
+        while response not in ["y", "n"]:
+            response = input("Please answer either with y or n: ")
+        if response == "y":
+            #go through and reduce weight penalty
+            for mission in gameInstance.day_missions:
+                pass # TODO: Adjust the weight penalty of each plane depending on the range band the battalion is in
+            gameInstance.situation.SOpoints -= 1
     elif curphase == "arm aircraft":
         aircrafts = gameInstance.planes
         weapons = planes.weapon_pool.copy()
