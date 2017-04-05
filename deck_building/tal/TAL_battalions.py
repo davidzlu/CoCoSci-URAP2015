@@ -49,7 +49,20 @@ class Battalion:
         self.units = []
         self.half_value = 0
         self.destroy_value = 0
+        self.map_location = ""
         self.special = self.special_effect #Field for special instructions for this battalion
+        
+    def get_location(self):
+        a = "front line"
+        s = "enemy transit"
+        c = "enemy rear"
+        typ = self.type[1]
+        if typ == "A":
+            return a
+        elif typ == "S":
+            return s
+        elif typ == "C":
+            return c 
         
     def get_vp(self):
         return self.vp
@@ -268,6 +281,7 @@ class MobileHQ(Battalion):
         self.units = get_enemy_units([["AAA", 2], ["APC", 2], ["Commands", 4], ["SCUD", 2], ["SPA", 2], ["Truck", 2]])
         self.half_value = 16
         self.destroy_value = 5
+        self.map_location = self.get_location()
         """TODO list: special note here"""
 
 class InfantryForce(Battalion):
@@ -277,6 +291,7 @@ class InfantryForce(Battalion):
         self.units = get_enemy_units([["AAA", 4], ["APC", 8], ["Commands", 2], ["Infantry", 10], ["Truck", 4]])
         self.half_value = 20
         self.destroy_value = 5
+        self.map_location = self.get_location()
 
 class HeadQuarters(Battalion):
     def __init__(self):
@@ -286,6 +301,7 @@ class HeadQuarters(Battalion):
                                       ["Helicopters", 2], ["Infantry", 2], ["SAM", 2], ["Storage", 2], ["Truck", 2]])
         self.half_value = 29
         self.destroy_value = 7
+        self.map_location = self.get_location()
         """TODO list: special note here"""
 
 class ReconInForce(Battalion):
@@ -295,6 +311,7 @@ class ReconInForce(Battalion):
         self.units = get_enemy_units([["APC", 4], ["Helicopters", 2], ["Tank", 2], ["Truck", 2]])
         self.half_value = 10
         self.destroy_value = 2
+        self.map_location = self.get_location()
         """TODO list: special note here"""
 
 class ScoutGroup(Battalion):
@@ -304,6 +321,7 @@ class ScoutGroup(Battalion):
         self.units = get_enemy_units([["APC", 2], ["Commands", 2], ["Tank", 2], ["Truck", 2]])
         self.half_value = 10
         self.destroy_value = 2
+        self.map_location = self.get_location()
         """TODO list: special note here"""
 
 class EngineerUnit(Battalion):
@@ -313,6 +331,7 @@ class EngineerUnit(Battalion):
         self.units = get_enemy_units([["APC", 4], ["Infantry", 2], ["Truck", 4]])
         self.half_value = 6
         self.destroy_value = 2
+        self.map_location = self.get_location()
         """TODO list: special note here"""
 
 class FuelDepot(Battalion):
@@ -322,6 +341,7 @@ class FuelDepot(Battalion):
         self.units = get_enemy_units([["AAA Sites", 2], ["Buildings", 6], ["Infantry", 2], ["Storage", 6], ["Truck", 4]])
         self.half_value = 17
         self.destroy_value = 4
+        self.map_location = self.get_location()
         """TODO list: special note here"""
 
 class SupplyDepot(Battalion):
@@ -331,6 +351,7 @@ class SupplyDepot(Battalion):
         self.units = get_enemy_units([["AAA Sites", 4], ["Buildings", 4], ["Infantry", 4], ["Storage", 4], ["Truck", 6]])
         self.half_value = 23
         self.destroy_value = 6
+        self.map_location = self.get_location()
         """TODO list: special note here"""
 
 class Reserves(Battalion):
@@ -340,6 +361,7 @@ class Reserves(Battalion):
         self.units = get_enemy_units([["APC", 2], ["Infantry", 2], ["SCUD", 2], ["SPA", 2], ["Tank", 2], ["Truck", 2]])
         self.half_value = 12
         self.destroy_value = 3
+        self.map_location = self.get_location()
         """TODO list: special note here"""
 
 class Convoy(Battalion):
@@ -349,6 +371,7 @@ class Convoy(Battalion):
         self.units = get_enemy_units([["APC", 4], ["Truck", 6]])
         self.half_value = 7
         self.destroy_value = 2
+        self.map_location = self.get_location()
         """TODO list: special note here"""
 
 class AirDefenseUnit(Battalion):
@@ -358,6 +381,7 @@ class AirDefenseUnit(Battalion):
         self.units = get_enemy_units([["AAA", 4], ["APC", 2], ["SAM", 2]])
         self.half_value = 10
         self.destroy_value = 2
+        self.map_location = self.get_location()
         """TODO list: special note here"""
 
 class TankLeader(Battalion):
@@ -367,6 +391,7 @@ class TankLeader(Battalion):
         self.units = get_enemy_units([["AAA", 2], ["Commands", 2], ["Helicopters", 2], ["Tank", 4]])
         self.half_value = 16
         self.destroy_value = 4
+        self.map_location = self.get_location()
         """TODO list: special note here"""
 
 class Dismounted(Battalion):
@@ -376,6 +401,7 @@ class Dismounted(Battalion):
         self.units = get_enemy_units([["APC", 2], ["Commands", 2], ["Infantry", 6], ["Truck", 2]])
         self.half_value = 11
         self.destroy_value = 3
+        self.map_location = self.get_location()
         """TODO list: special note here"""
 
 class FastAssault(Battalion):
@@ -385,6 +411,7 @@ class FastAssault(Battalion):
         self.units = get_enemy_units([["APC", 4], ["Tank", 4], ["Truck", 4]])
         self.half_value = 10
         self.destroy_value = 2
+        self.map_location = self.get_location()
         """TODO list: special note here"""
 
 class Mechanized(Battalion):
@@ -394,6 +421,7 @@ class Mechanized(Battalion):
         self.units = get_enemy_units([["AAA", 2], ["APC", 4], ["Infantry", 4], ["Tank", 2]])
         self.half_value = 10
         self.destroy_value = 2
+        self.map_location = self.get_location()
 
 class TankForce(Battalion):
     def __init__(self):
@@ -402,6 +430,7 @@ class TankForce(Battalion):
         self.units = get_enemy_units([["AAA", 2], ["Helicopters", 2], ["SAM", 2], ["Tank", 10]])
         self.half_value = 22
         self.destroy_value = 5
+        self.map_location = self.get_location()
 
 class TankSpearhead(Battalion):
     def __init__(self):
@@ -410,6 +439,7 @@ class TankSpearhead(Battalion):
         self.units = get_enemy_units([["AAA", 2], ["Helicopters", 2], ["SAM", 2], ["Tank", 10]])
         self.half_value = 22
         self.destroy_value = 5
+        self.map_location = self.get_location()
         """TODO list: special note here"""
 
 class ScoutForce(Battalion):
@@ -419,6 +449,7 @@ class ScoutForce(Battalion):
         self.units = get_enemy_units([["APC", 2], ["Helicopters", 2], ["Tank", 2], ["Truck", 2]])
         self.half_value = 8
         self.destroy_value = 2
+        self.map_location = self.get_location()
 
 class MixedForce(Battalion):
     def __init__(self):
@@ -427,6 +458,7 @@ class MixedForce(Battalion):
         self.units = get_enemy_units([["APC", 4], ["Commands", 2], ["Helicopters", 2], ["SPA", 4], ["Tank", 2]])
         self.half_value = 18
         self.destroy_value = 5
+        self.map_location = self.get_location()
 
 class Bombardment(Battalion):
     def __init__(self):
@@ -435,6 +467,7 @@ class Bombardment(Battalion):
         self.units = get_enemy_units([["AAA", 4], ["APC", 2], ["SCUD", 6], ["SPA", 4], ["Truck", 2]])
         self.half_value = 23
         self.destroy_value = 6
+        self.map_location = self.get_location()
         """TODO list: special note here"""
 
 class ForwardBase(Battalion):
@@ -444,6 +477,7 @@ class ForwardBase(Battalion):
         self.units = get_enemy_units([["AAA Sites", 2], ["APC", 2], ["Buildings", 2], ["SCUD", 6], ["Storage", 2]])
         self.half_value = 13
         self.destroy_value = 3
+        self.map_location = self.get_location()
         """TODO list: special note here"""
 
 class MountedInfantry(Battalion):
@@ -453,6 +487,7 @@ class MountedInfantry(Battalion):
         self.units = get_enemy_units([["APC", 8], ["Commands", 2], ["Infantry", 4], ["SAM", 4], ["Truck", 2]])
         self.half_value = 17
         self.destroy_value = 4
+        self.map_location = self.get_location()
         """TODO list: special note here"""
 
 class CommandUnit(Battalion):
@@ -462,6 +497,7 @@ class CommandUnit(Battalion):
         self.units = get_enemy_units([["APC", 2], ["Commands", 4], ["SAM", 4]])
         self.half_value = 18
         self.destroy_value = 5
+        self.map_location = self.get_location()
         """TODO list: special note here"""
 
 class ArtilleryUnit(Battalion):
@@ -471,6 +507,7 @@ class ArtilleryUnit(Battalion):
         self.units = get_enemy_units([["Infantry", 4], ["SAM", 2], ["SCUD", 6], ["SPA", 4]])
         self.half_value = 22
         self.destroy_value = 5
+        self.map_location = self.get_location()
         """TODO list: special note here"""
 
 class InfantryFormation(Battalion):
@@ -480,9 +517,10 @@ class InfantryFormation(Battalion):
         self.units = get_enemy_units([["APC", 4], ["Infantry", 6], ["Truck", 4]])
         self.half_value = 17
         self.destroy_value = 4
+        self.map_location = self.get_location()
 
 class SectorMap:
-    def __init__(self):
+    def __init__(self, setup_vp):
         self.erear = []
         self.etransit = []
         self.frontline = []
@@ -492,7 +530,7 @@ class SectorMap:
         self.scouts = 0
         self.places = [self.erear, self.etransit, self.frontline, self.ftransit, self.frear, self.airbase]
         self.potential_enemies = {}
-        self.setup_enemy_units()
+        self.total_vp = self.setup_enemy_units(setup_vp)
 
     def can_put_piece(self, piece, location, constraints=None):
         # TODO: Finish writing method once special notes are implemented
@@ -514,50 +552,38 @@ class SectorMap:
             if self.can_put_piece(piece, place):
                 place.append(piece)
                 
-
     def place_all_enemy_units(self, list_of_battalions):
         for battalion in list_of_battalions:
             self.place_piece(battalion)
 
-    def setup_enemy_units(self):
-        self.potential_enemies = {"C": [MobileHQ(), HeadQuarters(), ReconInForce(), ScoutGroup(), ForwardBase(), \
-        CommandUnit()], \
-        "A": [InfantryForce(), AirDefenseUnit(), TankLeader(), Dismounted(), FastAssault(), Mechanized(), \
-        TankForce(), TankSpearhead(), ScoutForce(), MixedForce(), MountedInfantry(), InfantryFormation()], \
-        "S": [EngineerUnit(), FuelDepot(), SupplyDepot(), Reserves(), Convoy(), Bombardment(), ArtilleryUnit()]}
-
-    def get_next_unit(self, list_of_battalions):
-        next_unit = None
-        if len(list_of_battalions) in range(0, 2):
-            next_unit = random.choice(self.potential_enemies["A"])
-        elif list_of_battalions[-1].type[1] == "A" and list_of_battalions[-2].type[1] == "A":
-            next_unit = random.choice(self.potential_enemies["S"])
-        elif list_of_battalions[-1].type[1] == "S":
-            next_unit = random.choice(self.potential_enemies["C"])
-        elif list_of_battalions[-1].type[1] == "A" and list_of_battalions[-2].type[1] == "C":
-            next_unit = random.choice(self.potential_enemies["A"])
-        elif list_of_battalions[-1].type[1] == "C" and list_of_battalions[-2].type[1] == "S":
-            next_unit = random.choice(self.potential_enemies["A"])
-        list_of_battalions.append(next_unit)
-        return list_of_battalions
-
-    def get_all_enemies(self, campaign):
-        battalions = []
-        while True:
-            battalion_vp = 0
-            if battalions is not None:
-                battalion_vp = sum([b.vp for b in battalions])
-            if battalion_vp >= campaign.setup_vp:
-                break
-            battalions = self.get_next_unit(battalions)
-        return battalions
-
-    def place_enemy_units(self, campaign):
-        """the method to call for placing all enemy units"""
-        battalions = self.get_all_enemies(campaign)
-        self.place_all_enemy_units(battalions)
-
-
+    def setup_enemy_units(self, setup_vp):
+        """Sets up battalion decks and draws to populate sector map. Returns drawn victory points.
+        
+        Parameters:
+         - setup_vp: how many victory points needed before drawing stops
+        """
+        c_deck =  [MobileHQ(), HeadQuarters(), ReconInForce(), ScoutGroup(), ForwardBase(), CommandUnit()]
+        random.shuffle(c_deck)
+        a_deck = [InfantryForce(), AirDefenseUnit(), TankLeader(), Dismounted(), FastAssault(), Mechanized(), \
+                  TankForce(), TankSpearhead(), ScoutForce(), MixedForce(), MountedInfantry(), InfantryFormation()]
+        random.shuffle(a_deck) 
+        s_deck = [EngineerUnit(), FuelDepot(), SupplyDepot(), Reserves(), Convoy(), Bombardment(), ArtilleryUnit()]
+        random.shuffle(s_deck)
+        
+        self.potential_enemies = {"C": c_deck,
+                                  "A": a_deck,
+                                  "S": s_deck}
+        drawn_vp = 0
+        draw_order = ("A", "A", "S", "C")
+        draw_phase = 0
+        while drawn_vp < setup_vp:
+            deck_to_draw = draw_order[draw_phase]
+            batt = self.potential_enemies[deck_to_draw].pop()
+            assert(type(batt) == Battalion)
+            drawn_vp += batt.get_vp()
+            self.place_piece(batt)
+            draw_phase = (draw_phase + 1) % len(draw_order)
+        return drawn_vp
 
 class TestMethods(unittest.TestCase):
     def test_get_enemy_units_mobile_HQ(self):
