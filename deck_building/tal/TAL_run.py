@@ -20,7 +20,7 @@ class TALInstance(DeckBuilding):
           
         print("Drawing and placing battalions")
         self.total_vp = 0
-        self.sm = self.setup_environment() #A SectorMap object, see TAL_battalions.py
+        self.setup_environment() #A SectorMap object, see TAL_battalions.py
         print("Finished placing battalions")
         
         print("Selecting aircraft")
@@ -39,10 +39,9 @@ class TALInstance(DeckBuilding):
         self.day_missions = {}
 
     def setup_environment(self):
-        sm = batt.SectorMap()
-        self.total_vp = sm.get_all_enemies(self.campaign)
+        self.sm = batt.SectorMap()
+        self.total_vp = self.sm.total_vp
         #TODO: adjustment needed after inital placement, probably through special effects
-        return sm
     
     def setup_enemy_units(self, game):
         return game.board.setup_enemy_units()
@@ -59,18 +58,11 @@ class TALInstance(DeckBuilding):
         policy = self.policy
         self.phase = "assign missions"
         self.day_missions = {}
-        while policy(self) and len(self.day_missions) < 1: #Must have at least one mission
+        while policy(self) or len(self.day_missions) < 1: #Must have at least one mission
             #Choose battalion
             self.phase = "choose battalion"
             battalion = policy(self)
-            
-            #Choose planes
-            self.phase = "assign planes"
-            planes = policy(self)
-            
-            assert(battalion not in self.day_missions)
-            self.day_missions[battalion] = planes
-                        
+
             #See if more missions wanted
             self.phase = "assign missions"
     
@@ -133,6 +125,37 @@ class TALInstance(DeckBuilding):
     
     def loiter_turn_setup_done(self):
         pass
+    
+def human_policy_assign_missions(gameInstance):
+    print(" - Will you continue choosing missions?")
+    ans = ""
+    answers = ("y", "n")
+    while ans not in answers:
+        ans = input(" - Your answer [y/n]: ")
+        if ans not in answers:
+            print("Please enter a valid choice.")
+    if ans == "y":
+        return True
+    if ans == "n":
+        return False
+    
+def select_planes_for_battalion(game_instance, battalion):
+    print(" - Please pick a plane and pilot for this battalion.")
+    
+def human_policy_choose_battalion(game_instance):
+    answers = ("y", "n")
+    print(" - Starting mission selection.")
+    print(" - Please pick a battalion.")
+    active_batts = game_instance.sm.get_battalions_on_map()
+    for active_batt in active_batts:
+        if active_batt not in game_instance.day_missions:
+            ans = ""
+            while ans not in answers:
+                ans = input(" - Select "+active_batt+active_batt.map_location+" [y/n]?")
+                if ans == "y":
+                    select_planes_for_battalion(game_instance, active_batt)
+                elif ans not in answers:
+                    print(" - Please enter a valid answer.")
 
 def human_policy(gameInstance):
     curphase = gameInstance.phase
@@ -270,23 +293,14 @@ def human_policy(gameInstance):
                 phaseII = False
         gameInstance.pilots = pilotList
     elif curphase == "assign missions":
-        """For this block:
-         - Decide whether to continue choosing missions
-         - Return True/False
-        """
-        pass
+        return human_policy_assign_missions(gameInstance)
     elif curphase == "choose battalion":
         """For this block:
          - Check gameInstance.sm for active battalions
          - Choose battalions not in gameInstance.day_missions
          - return a battalion
         """
-        pass
-    elif curphase == "assign planes":
-        """For this block:
-         - adjust weight penalty
-        """
-        pass
+        return human_policy_choose_battalion(gameInstance)
     elif curphase == "allocate scouts":
         """For this block:
          - Loop through gameInstance.day_missions, decide to assign scout
