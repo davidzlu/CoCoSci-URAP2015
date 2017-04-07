@@ -171,7 +171,7 @@ def human_policy(gameInstance):
                 pilot = pilots.get_pilot(response, "Average")
             pilotList.append(pilot)
         return pilotList
-    elif curphase == "promote pilots": #returns True or False depending on success
+    elif curphase == "promote pilots":
         pilotList = gameInstance.pilots
         answers = ["y", "n"]
         phaseI = True
