@@ -125,7 +125,15 @@ class TALInstance(DeckBuilding):
     
     def loiter_turn_setup_done(self):
         pass
-    
+
+"""Utility to check for bad input. Prompt should be a string while acceptable_answers should be a list of strings."""
+def check_input(prompt, acceptable_answers):
+    response = input(prompt)
+    while response not in acceptable_answers:
+        print("Your response did not match any of these: " + acceptable_answers)
+        response = input("Please respond with one of the above options: ")
+    return response
+
 def human_policy_assign_missions(gameInstance):
     print(" - Will you continue choosing missions?")
     ans = ""
