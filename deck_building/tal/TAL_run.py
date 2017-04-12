@@ -110,9 +110,13 @@ class TALInstance(DeckBuilding):
         #TODO: ENGINE DAMAGE CHECK
         #TODO: PLACE TERRAIN HEXES
         #TODO: PLACE ENEMY UNITS, CHECKING IF BATTALION AT HALF STRENGTH
-        #TODO: PLACE FRIENDY AIRCRAFT
+        #TODO: PLACE FRIENDLY AIRCRAFT
         #TODO: SCOUT SUCCESS CHECK
         #TODO: SET LOITER COUNTER
+        pass
+
+    def place_enemy_units(self):
+        self.dice_roll(1, 6)
         pass
 
     def loiter_turn_setup(self):
