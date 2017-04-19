@@ -22,10 +22,12 @@ class Pilot:
         self.standoff = standoff
         self.cool = cool
         self.evasive = evasive
-        self.status = status
-        self.stress = stress
+        self.status = status # okay, shaken, or unfit
+        self.stress = stress # this is the numerical stress
         self.stressScale = stressScale
 
+num2skill = {1: "Newbie", 2: "Green", 3: "Average", 4: "Skilled", 5: "Veteran", 6: "Ace"}
+skill2num = {"Newbie": 1, "Green": 2, "Average": 3, "Skilled": 4, "Veteran": 5, "Ace": 6}
 
 def get_pilot(name, skill):
     if name == "Grandpa":

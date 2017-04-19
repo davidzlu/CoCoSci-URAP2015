@@ -133,6 +133,14 @@ class TALInstance(DeckBuilding):
                 return True
         return False
     
+"""Utility to check for bad input. Prompt should be a string while acceptable_answers should be a list of strings."""
+def check_input(prompt, acceptable_answers):
+    response = input(prompt)
+    while response not in acceptable_answers:
+        print("Your response did not match any of these: " + acceptable_answers)
+        response = input("Please respond with one of the above options: ")
+    return response
+
 def human_policy_assign_missions(gameInstance):
     print(" - Will you continue choosing missions?")
     ans = ""
@@ -148,7 +156,11 @@ def human_policy_assign_missions(gameInstance):
     
 def select_pilot_for_plane(game_instance, battalion, plane):
     print(" - Please pick a pilot to fly the ", plane)
-    
+    valid_pilots = pilots.get_pilot_types(plane)
+    for pilot in valid_pilots:
+        ans = check_input("Will you select {} for this plane?".format(pilot), ("y", "n"))
+        if ans == "y":
+            game_instance.day_missions[battalion].append((plane, pilot))
     
 def select_planes_for_battalion(game_instance, battalion):
     print(" - Please pick a plane and pilot for this battalion.")
@@ -176,6 +188,7 @@ def human_policy_choose_battalion(game_instance):
             while ans not in answers:
                 ans = input(" - Select "+active_batt+active_batt.map_location+" [y/n]?")
                 if ans == "y":
+                    game_instance.day_missions[active_batt] = []
                     return select_planes_for_battalion(game_instance, active_batt)
                 elif ans not in answers:
                     print(" - Please enter a valid answer.")
@@ -217,57 +230,104 @@ def human_policy(gameInstance):
                 pilot = pilots.get_pilot(response, "Average")
             pilotList.append(pilot)
         return pilotList
-    elif curphase == "promote pilots": #returns True or False depending on success
+    elif curphase == "promote pilots":
         pilotList = gameInstance.pilots
-        # if promotions are greater than demotions, the difference will be the number of so points spent.
-        promotions = 0
-        demotions = 0
-        answers = ["y", "n", "promote", "demote"]
-        for pilot in pilotList:
-            response = input("Would you like to promote or demote this pilot? "
-                             "Answer with y or n: ")
-            while response not in answers:
-                response = input("Please answer with y or n: ")
-            if response == "y":
-                response = input("Please answer with either 'promote' or 'demote'."
-                                 "If you've changed your mind, you may answer with 'n': ")
+        answers = ["y", "n"]
+        phaseI = True
+        phaseII = False
+        while phaseI: #How many times you go through the pilots promoting and demoting
+            newList = []
+            for pilot in pilotList:
+                print("Pilot: " + pilot.name)
+                print("Skill Level: " + pilot.skill)
+                response = input("Would you like to promote this pilot?: "
+                                 "Answer with y or n: ")
                 while response not in answers:
-                    response = input("Please answer with 'promote' or 'demote' or 'n': ")
-                # Below only works with one level of promotion/demotion
-                if response == "promote":
-                    promotions += 1
-                    pilot = pilots.get_pilot(pilot.name, "Skilled")
-                    response2 = input("Would you like to promote again? Please answer with y or n: ")
-                    while response2 not in answers:
-                        response2 = input("Please answer with y or n: ")
-                    if response2 == "y":
-                        promotions += 1
-                        pilot = pilots.get_pilot(pilot.name, "Veteran")
-                        response2 = input("Would you like to promote again? Please answer with y or n: ")
-                        while response2 not in answers:
-                            response2 = input("Please answer with y or n: ")
-                        if response2 == "y":
-                            promotions += 1
-                            pilot = pilots.get_pilot(pilot.name, "Ace")
-                elif response == "demote":
-                    demotions += 1
-                    pilot = pilots.get_pilot(pilot.name, "Green")
-                    response2 = input("Would you like to promote again? Please answer with y or n: ")
-                    while response2 not in answers:
-                        response2 = input("Please answer with y or n: ")
-                    if response2 == "y":
-                        demotions += 1
-                        pilot = pilots.get_pilot(pilot.name, "Newbie")
-            pilotList.append(pilot)
-        #calculate how many points spent on promotion/demotion
-        SOpts_spent = promotions - demotions
-        if SOpts_spent > gameInstance.situation.SOpoints:
-            print("You've spent too many SO points during promotion. Please try again.")
-            return False
-        if SOpts_spent > 0:
-            gameInstance.situation.SOpoints -= SOpts_spent
+                    response = input("Please answer with y or n: ")
+                if response == "y":
+                    print("You must demote another pilot in exchange.")
+                    flag = False #set to true once an equivalent demotion is made
+                    for other_pilot in pilotList:
+                        if other_pilot is pilot:
+                            continue
+                        elif flag:
+                            newList.append(other_pilot)
+                            continue
+                        else:
+                            print("Pilot: " + other_pilot.name)
+                            print("Skill Level: " + other_pilot.skill)
+                            demote = input("Demote this pilot?: ")
+                            while demote not in answers:
+                                demote = input("Please answer with y or n: ")
+                            if demote == "y":
+                                if (pilots.skill2num[other_pilot.skill] - 1) < 1:
+                                    print("This pilot can not be demoted anymore.")
+                                    newList.append(other_pilot)
+                                    continue
+                                elif (pilots.skill2num[pilot.skill] + 1) > 6:
+                                    print("This pilot can not be promoted anymore.")
+                                    newList.append(other_pilot)
+                                    continue
+                                else:
+                                    promoted_skill = pilots.num2skill[pilots.skill2num[pilot.skill] + 1]
+                                    promoted_p = pilots.get_pilot(pilot.name, promoted_skill)
+                                    demoted_skill = pilots.num2skill[pilots.skill2num[other_pilot.skill] - 1]
+                                    demoted_p = pilots.get_pilot(other_pilot.name, demoted_skill)
+                                    newList.append(demoted_p)
+                                    newList.append(promoted_p)
+                                    flag = True
+                            else:
+                                newList.append(other_pilot)
+                    if flag is False:
+                        print("Pilot was not promoted.")
+                        newList.append(pilot)
+                else:
+                    newList.append(pilot)
+            pilotList = newList
+            print("Would you like to continue promoting in exchange for demoting?")
+            print("If you answer 'n', you will get a chance to promote in exchange for SO points.")
+            cont = input("Answer with y or n: ")
+            while cont not in answers:
+                cont = input("Please answer with y or n: ")
+            if cont == "n":
+                phaseI = False
+
+        p2 = input("Do you want to spend SO points to promote pilots?: ")
+        while p2 not in answers:
+            p2 = input("Please answer with y or n: ")
+        if p2 == "y":
+            phaseII = True
+        while phaseII:
+            newList = []
+            for pilot in pilotList:
+                print("Pilot: " + pilot.name)
+                print("Skill Level: " + pilot.skill)
+                print("Remaining SO points: " + gameInstance.situation.SOpoints)
+                response = input("Would you like to promote this pilot?: "
+                                 "Answer with y or n: ")
+                while response not in answers:
+                    response = input("Please answer with y or n: ")
+                if response == "n":
+                    newList.append(pilot)
+                elif response == "y":
+                    if (pilots.skill2num[pilot.skill] + 1) > 6:
+                        print("This pilot can not be promoted anymore.")
+                        newList.append(pilot)
+                    elif gameInstance.situation.SOpoints < 1:
+                        print("You don't have enough SO points.")
+                        newList.append(pilot)
+                    else:
+                        gameInstance.situation.SOpoints -= 1
+                        promoted_p = pilots.get_pilot(pilot.name, pilots.skill2num[pilot.skill] + 1)
+                        newList.append(promoted_p)
+            pilotList = newList
+            print("Would you like to continue promoting in exchange for SO points?")
+            cont = input("Answer with y or n: ")
+            while cont not in answers:
+                cont = input("Please answer with y or n: ")
+            if cont == "n":
+                phaseII = False
         gameInstance.pilots = pilotList
-        return True
     elif curphase == "assign missions":
         return human_policy_assign_missions(gameInstance)
     elif curphase == "choose battalion":
