@@ -18,7 +18,9 @@ class TALInstance(DeckBuilding):
         self.situation = situation #A Situation object, see TAL_situation
         self.policy = policy
         self.special_condition_deck = spec_cond.generate_special_condition_deck() #A list of SpecialCondition objects, see TAL_specialCondition
-          
+        self.sm = None
+        self.phase = "setup"
+
         print("Drawing and placing battalions")
         self.total_vp = 0
         self.setup_environment() #A SectorMap object, see TAL_battalions.py
@@ -89,7 +91,7 @@ class TALInstance(DeckBuilding):
         self.allocate_planes_and_pilots_to_misions()
         self.scouted_missions = self.allocate_scouts()
         
-    def mission_setup(self):
+    def mission_setup(self, policy):
         """Sets up a mission.
         This includes:
           - Abort mission option
@@ -103,17 +105,30 @@ class TALInstance(DeckBuilding):
           - Setting loiter turn count
         """
         #TODO: CHANGE PHASE OF GAME?
+        #TODO: WRITE A CLEAR MAP METHOD
         #TODO: ABORT MISSION OPTION
         #TODO: APPLY RANGE BAND EFFECT
-        #TODO: ARM AIRCRAFT
+        self.phase = "arm aircraft"
+        policy(self)
         #TODO: FUELING PRIORITY OPTION
         #TODO: TARGET-BOUND MISSION EVENT
         #TODO: ENGINE DAMAGE CHECK
-        #TODO: PLACE TERRAIN HEXES
+        self.campaign.create_hex_map()
         #TODO: PLACE ENEMY UNITS, CHECKING IF BATTALION AT HALF STRENGTH
-        #TODO: PLACE FRIENDY AIRCRAFT
+        #TODO: PLACE FRIENDLY AIRCRAFT
         #TODO: SCOUT SUCCESS CHECK
         #TODO: SET LOITER COUNTER
+        pass
+
+    def place_enemy_units(self, battalion):
+        units = battalion.units
+        #TODO: Check if battalion is at half strength and adjust
+        map = self.campaign.hex_map
+        for unit in units:
+            roll = self.dice_roll(1, 10)
+            map[roll - 1].center.append(unit)
+
+    def place_friendly_aircraft(self):
         pass
 
     def loiter_turn_setup(self):
