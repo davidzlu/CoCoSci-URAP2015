@@ -50,7 +50,7 @@ class Battalion:
         self.half_value = 0
         self.destroy_value = 0
         self.map_location = ""
-        self.special = self.special_effect #Field for special instructions for this battalion
+        self.special = self.special_effect() #Field for special instructions for this battalion
         
     def get_location(self):
         a = "front line"

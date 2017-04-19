@@ -6,6 +6,7 @@ from . import TAL_pilots as pilots
 from . import TAL_specialCondition as spec_cond
 import deck_building.DeckBuilding.DeckBuilding as DeckBuilding
 import random
+from deck_building.tal.TAL_battalions import Battalion
 
 class TALInstance(DeckBuilding):
     
@@ -36,7 +37,7 @@ class TALInstance(DeckBuilding):
         self.day_count = 1
         print("Setup complete, start-of-day setup begin")
 
-        self.day_missions = {}
+        self.day_missions = {} # Maps battalion to list of (plane, pilot) pairs. Each pairing represents a mission in a day. 
 
     def setup_environment(self):
         self.sm = batt.SectorMap()
@@ -126,6 +127,12 @@ class TALInstance(DeckBuilding):
     def loiter_turn_setup_done(self):
         pass
     
+    def plane_on_mission(self, plane):
+        for mission in self.day_missions:
+            if plane in self.day_missions[mission]:
+                return True
+        return False
+    
 def human_policy_assign_missions(gameInstance):
     print(" - Will you continue choosing missions?")
     ans = ""
@@ -139,8 +146,24 @@ def human_policy_assign_missions(gameInstance):
     if ans == "n":
         return False
     
+def select_pilot_for_plane(game_instance, battalion, plane):
+    print(" - Please pick a pilot to fly the ", plane)
+    
+    
 def select_planes_for_battalion(game_instance, battalion):
     print(" - Please pick a plane and pilot for this battalion.")
+    for plane in game_instance.planes:
+        if not game_instance.plane_on_mission(plane):
+            answers = ("y", "n")
+            ans = ""
+            while ans not in answers:                
+                ans = input(" - Will you add "+ plane.name + " to this mission [y/n]?")
+                if ans == "y":
+                    return select_pilot_for_plane(game_instance, battalion, plane)
+                
+            
+    print(" - No planes to select.")
+    game_instance.phase = "allocate scouts"
     
 def human_policy_choose_battalion(game_instance):
     answers = ("y", "n")
@@ -153,7 +176,7 @@ def human_policy_choose_battalion(game_instance):
             while ans not in answers:
                 ans = input(" - Select "+active_batt+active_batt.map_location+" [y/n]?")
                 if ans == "y":
-                    select_planes_for_battalion(game_instance, active_batt)
+                    return select_planes_for_battalion(game_instance, active_batt)
                 elif ans not in answers:
                     print(" - Please enter a valid answer.")
 
