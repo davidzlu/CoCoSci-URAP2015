@@ -102,6 +102,7 @@ class TALInstance(DeckBuilding):
           - Setting loiter turn count
         """
         #TODO: CHANGE PHASE OF GAME?
+        #TODO: WRITE A CLEAR MAP METHOD
         #TODO: ABORT MISSION OPTION
         #TODO: APPLY RANGE BAND EFFECT
         #TODO: ARM AIRCRAFT
@@ -115,9 +116,12 @@ class TALInstance(DeckBuilding):
         #TODO: SET LOITER COUNTER
         pass
 
-    def place_enemy_units(self):
-        self.dice_roll(1, 6)
-        pass
+    def place_enemy_units(self, battalion):
+        units = battalion.units
+        map = self.campaign.hex_map
+        for unit in units:
+            roll = self.dice_roll(1, 10)
+            map[roll - 1].center.append(unit)
 
     def loiter_turn_setup(self):
         """Sets up loiter turn.

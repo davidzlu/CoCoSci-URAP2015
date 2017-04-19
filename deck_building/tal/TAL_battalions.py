@@ -129,6 +129,7 @@ class EnemyUnit:
 class AAA(EnemyUnit):
     
     def __init__(self):
+        EnemyUnit.__init__(self)
         self.point_value = 2
         self.attack_type = EnemyAttackTypes.HEAVY
         self.attack_number = 2
@@ -140,6 +141,7 @@ class AAA(EnemyUnit):
 class AAASite(EnemyUnit):
     
     def __init__(self):
+        EnemyUnit.__init__(self)
         self.point_value = 2
         self.attack_type = EnemyAttackTypes.LIGHT
         self.attack_number = 3
@@ -151,6 +153,7 @@ class AAASite(EnemyUnit):
 class APC(EnemyUnit):
     
     def __init__(self):
+        EnemyUnit.__init__(self)
         self.point_value = 1
         self.attack_type = EnemyAttackTypes.LIGHT
         self.attack_number = 1
@@ -158,10 +161,11 @@ class APC(EnemyUnit):
         self.unit_type = EnemyUnitTypes.V
         self.unit_name = EnemyUnitNames.APC
         self.roll_modifier = 0
-        
+
 class Building(EnemyUnit):
-    
+
     def __init__(self):
+        EnemyUnit.__init__(self)
         self.point_value = 3
         self.attack_type = EnemyAttackTypes.LIGHT
         self.attack_number = 1
@@ -169,10 +173,11 @@ class Building(EnemyUnit):
         self.unit_type = EnemyUnitTypes.B
         self.unit_name = EnemyUnitNames.BUILDING
         self.roll_modifier = -4
-        
+
 class Command(EnemyUnit):
-    
+
     def __init__(self):
+        EnemyUnit.__init__(self)
         self.point_value = 4
         self.attack_type = EnemyAttackTypes.LIGHT
         self.attack_number = 2
@@ -180,10 +185,11 @@ class Command(EnemyUnit):
         self.unit_type = EnemyUnitTypes.V
         self.unit_name = EnemyUnitNames.COMMAND
         self.roll_modifier = 0
-        
+
 class Helicopter(EnemyUnit):
-    
+
     def __init__(self):
+        EnemyUnit.__init__(self)
         self.point_value = 3
         self.attack_type = EnemyAttackTypes.HEAVY
         self.attack_number = 2
@@ -192,13 +198,14 @@ class Helicopter(EnemyUnit):
         self.unit_name = EnemyUnitNames.HELICOPTER
         self.roll_modifier = 0
         self.speed = 1
-        
+
     def get_speed(self):
         return self.speed
-    
+
 class Infantry(EnemyUnit):
-    
+
     def __init__(self):
+        EnemyUnit.__init__(self)
         self.point_value = 1
         self.attack_type = EnemyAttackTypes.LIGHT
         self.attack_number = 1
@@ -206,10 +213,11 @@ class Infantry(EnemyUnit):
         self.unit_type = None
         self.unit_name = EnemyUnitNames.INFANTRY
         self.roll_modifier = 0
-        
+
 class SAM(EnemyUnit):
-    
+
     def __init__(self):
+        EnemyUnit.__init__(self)
         self.point_value = 3
         self.attack_type = EnemyAttackTypes.HEAVY
         self.attack_number = 2
@@ -217,10 +225,11 @@ class SAM(EnemyUnit):
         self.unit_type = EnemyAttackTypes.V
         self.unit_name = EnemyUnitNames.SAM
         self.roll_modifier = 0
-    
+
 class SCUD(EnemyUnit):
-    
+
     def __init__(self):
+        EnemyUnit.__init__(self)
         self.point_value = 3
         self.attack_type = None
         self.attack_number = None
@@ -228,10 +237,11 @@ class SCUD(EnemyUnit):
         self.unit_type = EnemyAttackTypes.V
         self.unit_name = EnemyUnitNames.SCUD
         self.roll_modifier = 0
-        
+
 class SPA(EnemyUnit):
-    
+
     def __init__(self):
+        EnemyUnit.__init__(self)
         self.point_value = 2
         self.attack_type = None
         self.attack_number = None
@@ -239,10 +249,11 @@ class SPA(EnemyUnit):
         self.unit_type = EnemyAttackTypes.V
         self.unit_name = EnemyUnitNames.SPA
         self.roll_modifier = 0
-        
+
 class Storage(EnemyUnit):
-    
+
     def __init__(self):
+        EnemyUnit.__init__(self)
         self.point_value = 2
         self.attack_type = EnemyAttackTypes.LIGHT
         self.attack_number = 1
@@ -250,10 +261,11 @@ class Storage(EnemyUnit):
         self.unit_type = EnemyAttackTypes.B
         self.unit_name = EnemyUnitNames.STORAGE
         self.roll_modifier = 0
-        
+
 class Tank(EnemyUnit):
-    
+
     def __init__(self):
+        EnemyUnit.__init__(self)
         self.point_value = 2
         self.attack_type = EnemyAttackTypes.LIGHT
         self.attack_number = 1
@@ -261,10 +273,11 @@ class Tank(EnemyUnit):
         self.unit_type = EnemyAttackTypes.V
         self.unit_name = EnemyUnitNames.TANK
         self.roll_modifier = -2
-        
+
 class Truck(EnemyUnit):
-    
+
     def __init__(self):
+        EnemyUnit.__init__(self)
         self.point_value = 1
         self.attack_type = EnemyAttackTypes.LIGHT
         self.attack_number = 1
@@ -276,6 +289,7 @@ class Truck(EnemyUnit):
 """battalion information on cards"""
 class MobileHQ(Battalion):
     def __init__(self):
+        Battalion.__init__(self)
         self.vp = 2
         self.type = (3, "C")
         self.units = get_enemy_units([["AAA", 2], ["APC", 2], ["Commands", 4], ["SCUD", 2], ["SPA", 2], ["Truck", 2]])
@@ -286,6 +300,7 @@ class MobileHQ(Battalion):
 
 class InfantryForce(Battalion):
     def __init__(self):
+        Battalion.__init__(self)
         self.vp = 5
         self.type = (1, "A")
         self.units = get_enemy_units([["AAA", 4], ["APC", 8], ["Commands", 2], ["Infantry", 10], ["Truck", 4]])
@@ -295,6 +310,7 @@ class InfantryForce(Battalion):
 
 class HeadQuarters(Battalion):
     def __init__(self):
+        Battalion.__init__(self)
         self.vp = 4
         self.type = (5, "C")
         self.units = get_enemy_units([["AAA", 2], ["AAA Sites", 2], ["APC", 2], ["Buildings", 6],
@@ -306,6 +322,7 @@ class HeadQuarters(Battalion):
 
 class ReconInForce(Battalion):
     def __init__(self):
+        Battalion.__init__(self)
         self.vp = 1
         self.type = (4, "C")
         self.units = get_enemy_units([["APC", 4], ["Helicopters", 2], ["Tank", 2], ["Truck", 2]])
@@ -316,6 +333,7 @@ class ReconInForce(Battalion):
 
 class ScoutGroup(Battalion):
     def __init__(self):
+        Battalion.__init__(self)
         self.vp = 3
         self.type = (2, "C")
         self.units = get_enemy_units([["APC", 2], ["Commands", 2], ["Tank", 2], ["Truck", 2]])
@@ -326,6 +344,7 @@ class ScoutGroup(Battalion):
 
 class EngineerUnit(Battalion):
     def __init__(self):
+        Battalion.__init__(self)
         self.vp = 2
         self.type = (6, "S")
         self.units = get_enemy_units([["APC", 4], ["Infantry", 2], ["Truck", 4]])
@@ -336,6 +355,7 @@ class EngineerUnit(Battalion):
 
 class FuelDepot(Battalion):
     def __init__(self):
+        Battalion.__init__(self)
         self.vp = 4
         self.type = (5, "S")
         self.units = get_enemy_units([["AAA Sites", 2], ["Buildings", 6], ["Infantry", 2], ["Storage", 6], ["Truck", 4]])
@@ -346,6 +366,7 @@ class FuelDepot(Battalion):
 
 class SupplyDepot(Battalion):
     def __init__(self):
+        Battalion.__init__(self)
         self.vp = 3
         self.type = (4, "S")
         self.units = get_enemy_units([["AAA Sites", 4], ["Buildings", 4], ["Infantry", 4], ["Storage", 4], ["Truck", 6]])
@@ -356,6 +377,7 @@ class SupplyDepot(Battalion):
 
 class Reserves(Battalion):
     def __init__(self):
+        Battalion.__init__(self)
         self.vp = 1
         self.type = (7, "S")
         self.units = get_enemy_units([["APC", 2], ["Infantry", 2], ["SCUD", 2], ["SPA", 2], ["Tank", 2], ["Truck", 2]])
@@ -366,6 +388,7 @@ class Reserves(Battalion):
 
 class Convoy(Battalion):
     def __init__(self):
+        Battalion.__init__(self)
         self.vp = 1
         self.type = (2, "S")
         self.units = get_enemy_units([["APC", 4], ["Truck", 6]])
@@ -376,6 +399,7 @@ class Convoy(Battalion):
 
 class AirDefenseUnit(Battalion):
     def __init__(self):
+        Battalion.__init__(self)
         self.vp = 4
         self.type = (12, "A")
         self.units = get_enemy_units([["AAA", 4], ["APC", 2], ["SAM", 2]])
@@ -386,6 +410,7 @@ class AirDefenseUnit(Battalion):
 
 class TankLeader(Battalion):
     def __init__(self):
+        Battalion.__init__(self)
         self.vp = 4
         self.type = (11, "A")
         self.units = get_enemy_units([["AAA", 2], ["Commands", 2], ["Helicopters", 2], ["Tank", 4]])
@@ -396,6 +421,7 @@ class TankLeader(Battalion):
 
 class Dismounted(Battalion):
     def __init__(self):
+        Battalion.__init__(self)
         self.vp = 2
         self.type = (7, "A")
         self.units = get_enemy_units([["APC", 2], ["Commands", 2], ["Infantry", 6], ["Truck", 2]])
@@ -406,6 +432,7 @@ class Dismounted(Battalion):
 
 class FastAssault(Battalion):
     def __init__(self):
+        Battalion.__init__(self)
         self.vp = 3
         self.type = (9, "A")
         self.units = get_enemy_units([["APC", 4], ["Tank", 4], ["Truck", 4]])
@@ -416,6 +443,7 @@ class FastAssault(Battalion):
 
 class Mechanized(Battalion):
     def __init__(self):
+        Battalion.__init__(self)
         self.vp = 3
         self.type = (3, "A")
         self.units = get_enemy_units([["AAA", 2], ["APC", 4], ["Infantry", 4], ["Tank", 2]])
@@ -425,6 +453,7 @@ class Mechanized(Battalion):
 
 class TankForce(Battalion):
     def __init__(self):
+        Battalion.__init__(self)
         self.vp = 5
         self.type = (2, "A")
         self.units = get_enemy_units([["AAA", 2], ["Helicopters", 2], ["SAM", 2], ["Tank", 10]])
@@ -434,6 +463,7 @@ class TankForce(Battalion):
 
 class TankSpearhead(Battalion):
     def __init__(self):
+        Battalion.__init__(self)
         self.vp = 6
         self.type = (6, "A")
         self.units = get_enemy_units([["AAA", 2], ["Helicopters", 2], ["SAM", 2], ["Tank", 10]])
@@ -444,6 +474,7 @@ class TankSpearhead(Battalion):
 
 class ScoutForce(Battalion):
     def __init__(self):
+        Battalion.__init__(self)
         self.vp = 2
         self.type = (8, "A")
         self.units = get_enemy_units([["APC", 2], ["Helicopters", 2], ["Tank", 2], ["Truck", 2]])
@@ -453,6 +484,7 @@ class ScoutForce(Battalion):
 
 class MixedForce(Battalion):
     def __init__(self):
+        Battalion.__init__(self)
         self.vp = 3
         self.type = (4, "A")
         self.units = get_enemy_units([["APC", 4], ["Commands", 2], ["Helicopters", 2], ["SPA", 4], ["Tank", 2]])
@@ -462,6 +494,7 @@ class MixedForce(Battalion):
 
 class Bombardment(Battalion):
     def __init__(self):
+        Battalion.__init__(self)
         self.vp = 4
         self.type = (3, "S")
         self.units = get_enemy_units([["AAA", 4], ["APC", 2], ["SCUD", 6], ["SPA", 4], ["Truck", 2]])
@@ -472,6 +505,7 @@ class Bombardment(Battalion):
 
 class ForwardBase(Battalion):
     def __init__(self):
+        Battalion.__init__(self)
         self.vp = 3
         self.type = (6, "C")
         self.units = get_enemy_units([["AAA Sites", 2], ["APC", 2], ["Buildings", 2], ["SCUD", 6], ["Storage", 2]])
@@ -482,6 +516,7 @@ class ForwardBase(Battalion):
 
 class MountedInfantry(Battalion):
     def __init__(self):
+        Battalion.__init__(self)
         self.vp = 4
         self.type = (5, "A")
         self.units = get_enemy_units([["APC", 8], ["Commands", 2], ["Infantry", 4], ["SAM", 4], ["Truck", 2]])
@@ -492,6 +527,7 @@ class MountedInfantry(Battalion):
 
 class CommandUnit(Battalion):
     def __init__(self):
+        Battalion.__init__(self)
         self.vp = 5
         self.type = (1, "C")
         self.units = get_enemy_units([["APC", 2], ["Commands", 4], ["SAM", 4]])
@@ -502,6 +538,7 @@ class CommandUnit(Battalion):
 
 class ArtilleryUnit(Battalion):
     def __init__(self):
+        Battalion.__init__(self)
         self.vp = 6
         self.type = (1, "S")
         self.units = get_enemy_units([["Infantry", 4], ["SAM", 2], ["SCUD", 6], ["SPA", 4]])
@@ -512,6 +549,7 @@ class ArtilleryUnit(Battalion):
 
 class InfantryFormation(Battalion):
     def __init__(self):
+        Battalion.__init__(self)
         self.vp = 2
         self.type = (10, "A")
         self.units = get_enemy_units([["APC", 4], ["Infantry", 6], ["Truck", 4]])
@@ -584,6 +622,7 @@ class SectorMap:
             self.place_piece(batt)
             draw_phase = (draw_phase + 1) % len(draw_order)
         return drawn_vp
+
 
 class TestMethods(unittest.TestCase):
     def test_get_enemy_units_mobile_HQ(self):
