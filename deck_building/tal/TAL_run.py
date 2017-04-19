@@ -163,7 +163,7 @@ def select_pilot_for_plane(game_instance, battalion, plane):
         ans = check_input("Will you select {} for this plane?".format(pilot), ("y", "n"))
         if ans == "y":
             game_instance.day_missions[battalion].append((plane, pilot))
-            return
+            return (battalion, plane, pilot)
         i = (i + 1) % len(valid_pilots)
     
 def select_planes_for_battalion(game_instance, battalion):
