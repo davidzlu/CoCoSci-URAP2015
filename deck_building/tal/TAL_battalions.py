@@ -7,6 +7,33 @@ more organized than a bunch of global variables. See
 https://docs.python.org/3/library/enum.html for details on enums
 """
 
+class BattalionNames(Enum):
+    MOBILEHQ = "mobile hq"
+    INFANTRYFORCE = "infantry force"
+    HEADQUARTERS = "headquarters"
+    REACONINFORCE = "recon in force"
+    SCOUTGROUP = "scout group"
+    ENGINEERUNIT = "engineer unit"
+    FUELDEPOT = "fuel depot"
+    SUPPLYDEPOT = "supply depot"
+    RESERVES = "reserves"
+    CONVOY = "convoy"
+    AIRDEFENSEUNIT = "air defense unit"
+    TANKLEADER = "tank leader"
+    DISMOUNTED = "dismounted"
+    FASTASSAULT = "fast assault"
+    MECHANIZED = "mechanized"
+    TANKFORCE = "tank force"
+    TANKSPEARHEAD = "tank spearhead"
+    SCOUTFORCE = "scout force"
+    MIXEDFORCE = "mixed force"
+    BOMBARDMENT = "bombardment"
+    FORWARDBASE = "forward base"
+    MOUNTEDINFANTRY = "mounted infantry"
+    COMMANDUNIT = "command unit"
+    ARTILLERYUNIT = "artillery unit"
+    INFANTRYFORMATION = "infantry formation"
+
 class EnemyUnitNames(Enum):
     """Enum of enemy unit names
     """
@@ -50,7 +77,14 @@ class Battalion:
         self.half_value = 0
         self.destroy_value = 0
         self.map_location = ""
+        self.name = ""
         self.special = self.special_effect() #Field for special instructions for this battalion
+        
+    def __hash__(self):
+        return hash(self.name)
+    
+    def __eq__(self, other):
+        return self.name == other.name
         
     def get_location(self):
         a = "front line"
@@ -282,6 +316,7 @@ class MobileHQ(Battalion):
         self.half_value = 16
         self.destroy_value = 5
         self.map_location = self.get_location()
+        self.name = BattalionNames.MOBILEHQ
         """TODO list: special note here"""
 
 class InfantryForce(Battalion):
@@ -292,6 +327,7 @@ class InfantryForce(Battalion):
         self.half_value = 20
         self.destroy_value = 5
         self.map_location = self.get_location()
+        self.name = BattalionNames.INFANTRYFORCE
 
 class HeadQuarters(Battalion):
     def __init__(self):
@@ -302,6 +338,7 @@ class HeadQuarters(Battalion):
         self.half_value = 29
         self.destroy_value = 7
         self.map_location = self.get_location()
+        self.name = BattalionNames.HEADQUARTERS
         """TODO list: special note here"""
 
 class ReconInForce(Battalion):
@@ -312,6 +349,7 @@ class ReconInForce(Battalion):
         self.half_value = 10
         self.destroy_value = 2
         self.map_location = self.get_location()
+        self.name = BattalionNames.RECONINFORCE
         """TODO list: special note here"""
 
 class ScoutGroup(Battalion):
@@ -322,6 +360,7 @@ class ScoutGroup(Battalion):
         self.half_value = 10
         self.destroy_value = 2
         self.map_location = self.get_location()
+        self.name = BattalionNames.SCOUTGROUP
         """TODO list: special note here"""
 
 class EngineerUnit(Battalion):
@@ -332,6 +371,7 @@ class EngineerUnit(Battalion):
         self.half_value = 6
         self.destroy_value = 2
         self.map_location = self.get_location()
+        self.name = BattalionNames.ENGINEERUNIT
         """TODO list: special note here"""
 
 class FuelDepot(Battalion):
@@ -342,6 +382,7 @@ class FuelDepot(Battalion):
         self.half_value = 17
         self.destroy_value = 4
         self.map_location = self.get_location()
+        self.name = BattalionNames.FUELDEPOT
         """TODO list: special note here"""
 
 class SupplyDepot(Battalion):
@@ -352,6 +393,7 @@ class SupplyDepot(Battalion):
         self.half_value = 23
         self.destroy_value = 6
         self.map_location = self.get_location()
+        self.name = BattalionNames.SUPPLYDEPOT
         """TODO list: special note here"""
 
 class Reserves(Battalion):
@@ -362,6 +404,7 @@ class Reserves(Battalion):
         self.half_value = 12
         self.destroy_value = 3
         self.map_location = self.get_location()
+        self.name = BattalionNames.RESERVES
         """TODO list: special note here"""
 
 class Convoy(Battalion):
@@ -372,6 +415,7 @@ class Convoy(Battalion):
         self.half_value = 7
         self.destroy_value = 2
         self.map_location = self.get_location()
+        self.name = BattalionNames.CONVOY
         """TODO list: special note here"""
 
 class AirDefenseUnit(Battalion):
@@ -382,6 +426,7 @@ class AirDefenseUnit(Battalion):
         self.half_value = 10
         self.destroy_value = 2
         self.map_location = self.get_location()
+        self.name = BattalionNames.AIRDEFENSEUNIT
         """TODO list: special note here"""
 
 class TankLeader(Battalion):
@@ -392,6 +437,7 @@ class TankLeader(Battalion):
         self.half_value = 16
         self.destroy_value = 4
         self.map_location = self.get_location()
+        self.name = BattalionNames.TANKLEADER
         """TODO list: special note here"""
 
 class Dismounted(Battalion):
@@ -402,6 +448,7 @@ class Dismounted(Battalion):
         self.half_value = 11
         self.destroy_value = 3
         self.map_location = self.get_location()
+        self.name = BattalionNames.DISMOUNTED
         """TODO list: special note here"""
 
 class FastAssault(Battalion):
@@ -412,6 +459,7 @@ class FastAssault(Battalion):
         self.half_value = 10
         self.destroy_value = 2
         self.map_location = self.get_location()
+        self.name = BattalionNames.FASTASSAULT
         """TODO list: special note here"""
 
 class Mechanized(Battalion):
@@ -422,6 +470,7 @@ class Mechanized(Battalion):
         self.half_value = 10
         self.destroy_value = 2
         self.map_location = self.get_location()
+        self.name = BattalionNames.MECHANIZED
 
 class TankForce(Battalion):
     def __init__(self):
@@ -431,6 +480,7 @@ class TankForce(Battalion):
         self.half_value = 22
         self.destroy_value = 5
         self.map_location = self.get_location()
+        self.name = BattalionNames.TANKFORCE
 
 class TankSpearhead(Battalion):
     def __init__(self):
@@ -440,6 +490,7 @@ class TankSpearhead(Battalion):
         self.half_value = 22
         self.destroy_value = 5
         self.map_location = self.get_location()
+        self.name = BattalionNames.TANKSPEARHEAD
         """TODO list: special note here"""
 
 class ScoutForce(Battalion):
@@ -450,6 +501,7 @@ class ScoutForce(Battalion):
         self.half_value = 8
         self.destroy_value = 2
         self.map_location = self.get_location()
+        self.name = BattalionNames.SCOUTFORCE
 
 class MixedForce(Battalion):
     def __init__(self):
@@ -459,6 +511,7 @@ class MixedForce(Battalion):
         self.half_value = 18
         self.destroy_value = 5
         self.map_location = self.get_location()
+        self.name = BattalionNames.MIXEDFORCE
 
 class Bombardment(Battalion):
     def __init__(self):
@@ -468,6 +521,7 @@ class Bombardment(Battalion):
         self.half_value = 23
         self.destroy_value = 6
         self.map_location = self.get_location()
+        self.name = BattalionNames.BOMBARDMENT
         """TODO list: special note here"""
 
 class ForwardBase(Battalion):
@@ -478,6 +532,7 @@ class ForwardBase(Battalion):
         self.half_value = 13
         self.destroy_value = 3
         self.map_location = self.get_location()
+        self.name = BattalionNames.FORWARDBASE
         """TODO list: special note here"""
 
 class MountedInfantry(Battalion):
@@ -488,6 +543,7 @@ class MountedInfantry(Battalion):
         self.half_value = 17
         self.destroy_value = 4
         self.map_location = self.get_location()
+        self.name = BattalionNames.MOUNTEDINFANTRY
         """TODO list: special note here"""
 
 class CommandUnit(Battalion):
@@ -498,6 +554,7 @@ class CommandUnit(Battalion):
         self.half_value = 18
         self.destroy_value = 5
         self.map_location = self.get_location()
+        self.name = BattalionNames.COMMANDUNIT
         """TODO list: special note here"""
 
 class ArtilleryUnit(Battalion):
@@ -508,6 +565,7 @@ class ArtilleryUnit(Battalion):
         self.half_value = 22
         self.destroy_value = 5
         self.map_location = self.get_location()
+        self.name = BattalionNames.ARTILLERYUNIT
         """TODO list: special note here"""
 
 class InfantryFormation(Battalion):
@@ -518,6 +576,7 @@ class InfantryFormation(Battalion):
         self.half_value = 17
         self.destroy_value = 4
         self.map_location = self.get_location()
+        self.name = BattalionNames.INFANTRYFORMATION
 
 class SectorMap:
     def __init__(self, setup_vp):

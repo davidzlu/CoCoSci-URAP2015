@@ -157,10 +157,14 @@ def human_policy_assign_missions(gameInstance):
 def select_pilot_for_plane(game_instance, battalion, plane):
     print(" - Please pick a pilot to fly the ", plane)
     valid_pilots = pilots.get_pilot_types(plane)
-    for pilot in valid_pilots:
+    i = 0
+    while True:
+        pilot = valid_pilots[i]
         ans = check_input("Will you select {} for this plane?".format(pilot), ("y", "n"))
         if ans == "y":
             game_instance.day_missions[battalion].append((plane, pilot))
+            return
+        i = (i + 1) % len(valid_pilots)
     
 def select_planes_for_battalion(game_instance, battalion):
     print(" - Please pick a plane and pilot for this battalion.")
