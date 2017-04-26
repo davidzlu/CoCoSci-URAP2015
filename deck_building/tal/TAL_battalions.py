@@ -1,6 +1,7 @@
 import random
 import unittest
 from deck_building.tal.TAL_campaigns import *
+from deck_building.tal.TAL_counters import *
 from enum import Enum
 """Enums are a way of defining a set of constant names in a way
 more organized than a bunch of global variables. See 
@@ -334,6 +335,9 @@ class Truck(EnemyUnit):
         self.unit_name = EnemyUnitNames.TRUCK
         self.roll_modifier = 2
 
+"""Some pop up counters"""
+popups = [PopUp(), PopUp(), PopUp(), PopUp()]
+
 """battalion information on cards"""
 class MobileHQ(Battalion):
     def __init__(self):
@@ -655,6 +659,8 @@ class InfantryFormation(Battalion):
         self.destroy_value = 4
         self.map_location = self.get_location()
         self.name = BattalionNames.INFANTRYFORMATION
+
+
 
 class SectorMap:
     def __init__(self, setup_vp):
