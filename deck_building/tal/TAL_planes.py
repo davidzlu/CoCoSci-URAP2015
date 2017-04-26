@@ -15,6 +15,7 @@ class Plane:
         self.weapon_set = set() #
         self.weight = 0
         self.special = None
+        self.altitude = 1 #1 means high and 0 means low; 2 means hover
         self.name = None
 
     def get_year(self):
@@ -37,6 +38,9 @@ class Plane:
 
     def get_weight(self):
         return self.weight
+
+    def get_altitude(self):
+        return self.altitude
 
     def get_name(self):
         return self.name

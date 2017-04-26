@@ -1,6 +1,7 @@
 import random
 import unittest
 from deck_building.tal.TAL_campaigns import *
+from deck_building.tal.TAL_counters import *
 from enum import Enum
 """Enums are a way of defining a set of constant names in a way
 more organized than a bunch of global variables. See 
@@ -79,7 +80,9 @@ class Battalion:
         self.vp = 0
         self.type = ()
         self.units = []
+        self.half_units = []
         self.half_value = 0
+        self.half = False
         self.destroy_value = 0
         self.map_location = ""
         self.name = ""
@@ -111,9 +114,15 @@ class Battalion:
     
     def get_units(self):
         return self.units
-    
+
+    def get_half_units(self):
+        return self.half_units
+
     def get_half_value(self):
         return self.half_value
+
+    def is_half(self):
+        return self.half
     
     def get_destroy_value(self):
         return self.destroy_value
@@ -325,6 +334,9 @@ class Truck(EnemyUnit):
         self.unit_name = EnemyUnitNames.TRUCK
         self.roll_modifier = 2
 
+"""Some pop up counters"""
+popups = [PopUp(), PopUp(), PopUp(), PopUp()]
+
 """battalion information on cards"""
 class MobileHQ(Battalion):
     def __init__(self):
@@ -332,6 +344,7 @@ class MobileHQ(Battalion):
         self.vp = 2
         self.type = (3, "C")
         self.units = get_enemy_units([[AAA, 2], [APC, 2], [Command, 4], [SCUD, 2], [SPA, 2], [Truck, 2]])
+        self.half_units = get_enemy_units([[AAA, 1], [APC, 1], [Command, 2], [SCUD, 1], [SPA, 1], [Truck, 1]])
         self.half_value = 16
         self.destroy_value = 5
         self.map_location = self.get_location()
@@ -344,6 +357,7 @@ class InfantryForce(Battalion):
         self.vp = 5
         self.type = (1, "A")
         self.units = get_enemy_units([[AAA, 4], [APC, 8], [Command, 2], [Infantry, 10], [Truck, 4]])
+        self.half_units = get_enemy_units([[AAA, 2], [APC, 4], [Command, 1], [Infantry, 5], [Truck, 2]])
         self.half_value = 20
         self.destroy_value = 5
         self.map_location = self.get_location()
@@ -356,6 +370,8 @@ class HeadQuarters(Battalion):
         self.type = (5, "C")
         self.units = get_enemy_units([[AAA, 2], [AAASite, 2], [APC, 2], [Building, 6],
                                       [Helicopter, 2], [Infantry, 2], [SAM, 2], [Storage, 2], [Truck, 2]])
+        self.half_units = get_enemy_units([[AAA, 1], [AAASite, 1], [APC, 1], [Building, 3],
+                                      [Helicopter, 1], [Infantry, 1], [SAM, 1], [Storage, 1], [Truck, 1]])
         self.half_value = 29
         self.destroy_value = 7
         self.map_location = self.get_location()
@@ -368,6 +384,7 @@ class ReconInForce(Battalion):
         self.vp = 1
         self.type = (4, "C")
         self.units = get_enemy_units([[APC, 4], [Helicopter, 2], [Tank, 2], [Truck, 2]])
+        self.half_units = get_enemy_units([[APC, 2], [Helicopter, 1], [Tank, 1], [Truck, 1]])
         self.half_value = 10
         self.destroy_value = 2
         self.map_location = self.get_location()
@@ -380,6 +397,7 @@ class ScoutGroup(Battalion):
         self.vp = 3
         self.type = (2, "C")
         self.units = get_enemy_units([[APC, 2], [Command, 2], [Tank, 2], [Truck, 2]])
+        self.half_units = get_enemy_units([[APC, 1], [Command, 1], [Tank, 1], [Truck, 1]])
         self.half_value = 10
         self.destroy_value = 2
         self.map_location = self.get_location()
@@ -392,6 +410,7 @@ class EngineerUnit(Battalion):
         self.vp = 2
         self.type = (6, "S")
         self.units = get_enemy_units([[APC, 4], [Infantry, 2], [Truck, 4]])
+        self.half_units = get_enemy_units([[APC, 2], [Infantry, 1], [Truck, 2]])
         self.half_value = 6
         self.destroy_value = 2
         self.map_location = self.get_location()
@@ -404,6 +423,7 @@ class FuelDepot(Battalion):
         self.vp = 4
         self.type = (5, "S")
         self.units = get_enemy_units([[AAASite, 2], [Building, 6], [Infantry, 2], [Storage, 6], [Truck, 4]])
+        self.half_units = get_enemy_units([[AAASite, 1], [Building, 3], [Infantry, 1], [Storage, 3], [Truck, 2]])
         self.half_value = 17
         self.destroy_value = 4
         self.map_location = self.get_location()
@@ -416,6 +436,7 @@ class SupplyDepot(Battalion):
         self.vp = 3
         self.type = (4, "S")
         self.units = get_enemy_units([[AAASite, 4], [Building, 4], [Infantry, 4], [Storage, 4], [Truck, 6]])
+        self.half_units = get_enemy_units([[AAASite, 2], [Building, 2], [Infantry, 2], [Storage, 2], [Truck, 3]])
         self.half_value = 23
         self.destroy_value = 6
         self.map_location = self.get_location()
@@ -428,6 +449,7 @@ class Reserves(Battalion):
         self.vp = 1
         self.type = (7, "S")
         self.units = get_enemy_units([[APC, 2], [Infantry, 2], [SCUD, 2], [SPA, 2], [Tank, 2], [Truck, 2]])
+        self.half_units = get_enemy_units([[APC, 1], [Infantry, 1], [SCUD, 1], [SPA, 1], [Tank, 1], [Truck, 1]])
         self.half_value = 12
         self.destroy_value = 3
         self.map_location = self.get_location()
@@ -440,6 +462,7 @@ class Convoy(Battalion):
         self.vp = 1
         self.type = (2, "S")
         self.units = get_enemy_units([[APC, 4], [Truck, 6]])
+        self.half_units = get_enemy_units([[APC, 2], [Truck, 3]])
         self.half_value = 7
         self.destroy_value = 2
         self.map_location = self.get_location()
@@ -452,6 +475,7 @@ class AirDefenseUnit(Battalion):
         self.vp = 4
         self.type = (12, "A")
         self.units = get_enemy_units([[AAA, 4], [APC, 2], [SAM, 2]])
+        self.half_units = get_enemy_units([[AAA, 2], [APC, 1], [SAM, 1]])
         self.half_value = 10
         self.destroy_value = 2
         self.map_location = self.get_location()
@@ -464,6 +488,7 @@ class TankLeader(Battalion):
         self.vp = 4
         self.type = (11, "A")
         self.units = get_enemy_units([[AAA, 2], [Command, 2], [Helicopter, 2], [Tank, 4]])
+        self.half_units = get_enemy_units([[AAA, 1], [Command, 1], [Helicopter, 1], [Tank, 2]])
         self.half_value = 16
         self.destroy_value = 4
         self.map_location = self.get_location()
@@ -476,6 +501,7 @@ class Dismounted(Battalion):
         self.vp = 2
         self.type = (7, "A")
         self.units = get_enemy_units([[APC, 2], [Command, 2], [Infantry, 6], [Truck, 2]])
+        self.half_units = get_enemy_units([[APC, 1], [Command, 1], [Infantry, 3], [Truck, 1]])
         self.half_value = 11
         self.destroy_value = 3
         self.map_location = self.get_location()
@@ -488,6 +514,7 @@ class FastAssault(Battalion):
         self.vp = 3
         self.type = (9, "A")
         self.units = get_enemy_units([[APC, 4], [Tank, 4], [Truck, 4]])
+        self.half_units = get_enemy_units([[APC, 2], [Tank, 2], [Truck, 2]])
         self.half_value = 10
         self.destroy_value = 2
         self.map_location = self.get_location()
@@ -500,6 +527,7 @@ class Mechanized(Battalion):
         self.vp = 3
         self.type = (3, "A")
         self.units = get_enemy_units([[AAA, 2], [APC, 4], [Infantry, 4], [Tank, 2]])
+        self.half_units = get_enemy_units([[AAA, 1], [APC, 2], [Infantry, 2], [Tank, 1]])
         self.half_value = 10
         self.destroy_value = 2
         self.map_location = self.get_location()
@@ -511,6 +539,7 @@ class TankForce(Battalion):
         self.vp = 5
         self.type = (2, "A")
         self.units = get_enemy_units([[AAA, 2], [Helicopter, 2], [SAM, 2], [Tank, 10]])
+        self.half_units = get_enemy_units([[AAA, 1], [Helicopter, 1], [SAM, 1], [Tank, 5]])
         self.half_value = 22
         self.destroy_value = 5
         self.map_location = self.get_location()
@@ -522,6 +551,7 @@ class TankSpearhead(Battalion):
         self.vp = 6
         self.type = (6, "A")
         self.units = get_enemy_units([[AAA, 2], [Helicopter, 2], [SAM, 2], [Tank, 10]])
+        self.half_units = get_enemy_units([[AAA, 1], [Helicopter, 1], [SAM, 1], [Tank, 5]])
         self.half_value = 22
         self.destroy_value = 5
         self.map_location = self.get_location()
@@ -534,6 +564,7 @@ class ScoutForce(Battalion):
         self.vp = 2
         self.type = (8, "A")
         self.units = get_enemy_units([[APC, 2], [Helicopter, 2], [Tank, 2], [Truck, 2]])
+        self.half_units = get_enemy_units([[APC, 1], [Helicopter, 1], [Tank, 1], [Truck, 1]])
         self.half_value = 8
         self.destroy_value = 2
         self.map_location = self.get_location()
@@ -545,6 +576,7 @@ class MixedForce(Battalion):
         self.vp = 3
         self.type = (4, "A")
         self.units = get_enemy_units([[APC, 4], [Command, 2], [Helicopter, 2], [SPA, 4], [Tank, 2]])
+        self.half_units = get_enemy_units([[APC, 2], [Command, 1], [Helicopter, 1], [SPA, 2], [Tank, 1]])
         self.half_value = 18
         self.destroy_value = 5
         self.map_location = self.get_location()
@@ -556,6 +588,7 @@ class Bombardment(Battalion):
         self.vp = 4
         self.type = (3, "S")
         self.units = get_enemy_units([[AAA, 4], [APC, 2], [SCUD, 6], [SPA, 4], [Truck, 2]])
+        self.half_units = get_enemy_units([[AAA, 2], [APC, 1], [SCUD, 3], [SPA, 2], [Truck, 1]])
         self.half_value = 23
         self.destroy_value = 6
         self.map_location = self.get_location()
@@ -568,6 +601,7 @@ class ForwardBase(Battalion):
         self.vp = 3
         self.type = (6, "C")
         self.units = get_enemy_units([[AAASite, 2], [APC, 2], [Building, 2], [SCUD, 6], [Storage, 2]])
+        self.half_units = get_enemy_units([[AAASite, 1], [APC, 1], [Building, 1], [SCUD, 3], [Storage, 1]])
         self.half_value = 13
         self.destroy_value = 3
         self.map_location = self.get_location()
@@ -580,6 +614,7 @@ class MountedInfantry(Battalion):
         self.vp = 4
         self.type = (5, "A")
         self.units = get_enemy_units([[APC, 8], [Command, 2], [Infantry, 4], [SAM, 4], [Truck, 2]])
+        self.half_units = get_enemy_units([[APC, 4], [Command, 1], [Infantry, 2], [SAM, 2], [Truck, 1]])
         self.half_value = 17
         self.destroy_value = 4
         self.map_location = self.get_location()
@@ -592,6 +627,7 @@ class CommandUnit(Battalion):
         self.vp = 5
         self.type = (1, "C")
         self.units = get_enemy_units([[APC, 2], [Command, 4], [SAM, 4]])
+        self.half_units = get_enemy_units([[APC, 1], [Command, 2], [SAM, 2]])
         self.half_value = 18
         self.destroy_value = 5
         self.map_location = self.get_location()
@@ -604,6 +640,7 @@ class ArtilleryUnit(Battalion):
         self.vp = 6
         self.type = (1, "S")
         self.units = get_enemy_units([[Infantry, 4], [SAM, 2], [SCUD, 6], [SPA, 4]])
+        self.half_units = get_enemy_units([[Infantry, 2], [SAM, 1], [SCUD, 3], [SPA, 2]])
         self.half_value = 22
         self.destroy_value = 5
         self.map_location = self.get_location()
@@ -616,6 +653,7 @@ class InfantryFormation(Battalion):
         self.vp = 2
         self.type = (10, "A")
         self.units = get_enemy_units([[APC, 4], [Infantry, 6], [Truck, 4]])
+        self.half_units = get_enemy_units([[APC, 2], [Infantry, 3], [Truck, 2]])
         self.half_value = 17
         self.destroy_value = 4
         self.map_location = self.get_location()

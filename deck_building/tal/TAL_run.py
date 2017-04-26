@@ -39,7 +39,7 @@ class TALInstance(DeckBuilding):
         self.day_count = 1
         print("Setup complete, start-of-day setup begin")
 
-        self.day_missions = {} # Maps battalion to list of (plane, pilot) pairs. Each pairing represents a mission in a day. 
+        self.day_missions = {} # Maps battalion to list of (plane, pilot) pairs. Each pairing represents a mission in a day.
 
     def setup_environment(self):
         self.sm = batt.SectorMap()
@@ -91,7 +91,7 @@ class TALInstance(DeckBuilding):
         self.allocate_planes_and_pilots_to_misions()
         self.scouted_missions = self.allocate_scouts()
         
-    def mission_setup(self, policy):
+    def mission_setup(self, policy, battalion, planes):
         """Sets up a mission.
         This includes:
           - Abort mission option
@@ -114,22 +114,20 @@ class TALInstance(DeckBuilding):
         #TODO: TARGET-BOUND MISSION EVENT
         #TODO: ENGINE DAMAGE CHECK
         self.campaign.create_hex_map()
-        #TODO: PLACE ENEMY UNITS, CHECKING IF BATTALION AT HALF STRENGTH
+        self.place_enemy_units(battalion)
         #TODO: PLACE FRIENDLY AIRCRAFT
         #TODO: SCOUT SUCCESS CHECK
         #TODO: SET LOITER COUNTER
         pass
 
     def place_enemy_units(self, battalion):
-        units = battalion.units
-        #TODO: Check if battalion is at half strength and adjust
+        units = battalion.get_units()
+        if battalion.is_half():
+            units = battalion.get_half_units()
         map = self.campaign.hex_map
         for unit in units:
             roll = self.dice_roll(1, 10)
             map[roll - 1].center.append(unit)
-
-    def place_friendly_aircraft(self):
-        pass
 
     def loiter_turn_setup(self):
         """Sets up loiter turn.
@@ -147,9 +145,34 @@ class TALInstance(DeckBuilding):
             if plane in self.day_missions[mission]:
                 return True
         return False
+
+    def draw_popups(self, planes):
+        draw_count = 0
+        new_enemies = []
+        for plane in planes:
+            if plane.name in ['AC_130', 'RQ_1', 'MQ_1']:
+                continue
+            else:
+                if plane.altitude == 1:
+                    draw_count += 1
+        while draw_count > 0:
+            random.shuffle(batt.popups)
+            counter = batt.popups.pop()
+            if counter.enemy_unit:
+                new_enemies.append(counter)
+            else:
+                batt.popups.append(counter)
+            draw_count -= 1
+        map = self.campaign.hex_map
+        for unit in new_enemies:
+            roll = self.dice_roll(1, 10)
+            map[roll - 1].center.append(unit)
+
+
     
 """Utility to check for bad input. Prompt should be a string while acceptable_answers should be a list of strings."""
 def check_input(prompt, acceptable_answers):
+    print("The responses available for the following question are: " + acceptable_answers)
     response = input(prompt)
     while response not in acceptable_answers:
         print("Your response did not match any of these: " + acceptable_answers)
@@ -427,6 +450,82 @@ def human_policy(gameInstance):
         gameInstance.situation.SOpoints -= SOpts_spent
     elif curphase == "place aircraft":
         # should probably combine select altitude with this
+        # figure out what the current mission is
+        # map = gameInstance.campaign.hex_map
+        # mission_planes = cur_mission.planes
+        # for plane in mission_planes:
+        #     print(plane.get_name())
+        #     response = check_input("Which tile do you wish to start this plane on?: ", ["1", "2", "3", "4", "7", "8", "9", "10"])
+        #     tile = map[eval(response)]
+        #     if plane.name in ['AH_64', 'AH_1', 'AV_8B']:
+        #       response2 = check_input("Where on the tile would you like to start?: ", ["NE", "E", "SE", "SW", "W", NW", "Center"])
+        #     else:
+        #       response2 = check_input("Where on the tile would you like to start?: ", ["NE", "E", "SE", "SW", "W", NW"])
+        #     if response2 == "NE":
+        #         if tile.a == 1:
+        #             plane.altitude = 1
+        #         elif plane.name in ['AC_130', 'RQ_1', 'MQ_1']:
+        #             plane.altitude = 1
+        #         else:
+        #             alt = check_input("Select an altitude for this aircraft: ", ["high", "low"])
+        #             if alt == "low":
+        #                 plane.altitude = 0
+        #         tile.apiece.append(plane)
+        #     elif response2 == "E":
+        #         if tile.b == 1:
+        #             plane.altitude = 1
+        #         elif plane.name in ['AC_130', 'RQ_1', 'MQ_1']:
+        #             plane.altitude = 1
+        #         else:
+        #             alt = check_input("Select an altitude for this aircraft: ", ["high", "low"])
+        #             if alt == "low":
+        #                 plane.altitude = 0
+        #         tile.bpiece.append(plane)
+        #     elif response2 == "SE":
+        #         if tile.c == 1:
+        #             plane.altitude = 1
+        #         elif plane.name in ['AC_130', 'RQ_1', 'MQ_1']:
+        #             plane.altitude = 1
+        #         else:
+        #             alt = check_input("Select an altitude for this aircraft: ", ["high", "low"])
+        #             if alt == "low":
+        #                 plane.altitude = 0
+        #         tile.cpiece.append(plane)
+        #     elif response2 == "SW":
+        #         if tile.d == 1:
+        #             plane.altitude = 1
+        #         elif plane.name in ['AC_130', 'RQ_1', 'MQ_1']:
+        #             plane.altitude = 1
+        #         else:
+        #             alt = check_input("Select an altitude for this aircraft: ", ["high", "low"])
+        #             if alt == "low":
+        #                 plane.altitude = 0
+        #         tile.dpiece.append(plane)
+        #     elif response2 == "W":
+        #         if tile.e == 1:
+        #             plane.altitude = 1
+        #         elif plane.name in ['AC_130', 'RQ_1', 'MQ_1']:
+        #             plane.altitude = 1
+        #         else:
+        #             alt = check_input("Select an altitude for this aircraft: ", ["high", "low"])
+        #             if alt == "low":
+        #                 plane.altitude = 0
+        #         tile.epiece.append(plane)
+        #     elif response2 == "NW":
+        #         if tile.f == 1:
+        #             plane.altitude = 1
+        #         elif plane.name in ['AC_130', 'RQ_1', 'MQ_1']:
+        #             plane.altitude = 1
+        #         else:
+        #             alt = check_input("Select an altitude for this aircraft: ", ["high", "low"])
+        #             if alt == "low":
+        #                 plane.altitude = 0
+        #         tile.fpiece.append(plane)
+        #     elif response2 == "Center":
+        #         plane.altitude = 2
+        #         tile.center.append(plane)
+
+
         pass
 
 def random_policy(gameInstance):
