@@ -522,7 +522,6 @@ def human_policy(gameInstance):
         #                 plane.altitude = 0
         #         tile.fpiece.append(plane)
         #     elif response2 == "Center":
-        #         plane.altitude = 2
         #         tile.center.append(plane)
 
 
