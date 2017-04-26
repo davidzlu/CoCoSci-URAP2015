@@ -17,6 +17,15 @@ class Plane:
         self.special = None
         self.altitude = 1 #1 means high and 0 means low; 2 means hover
         self.name = None
+        
+        self.speed = 1 # 0 for slow, 1 for fast
+        self.altitude = 1 # 0 for low, 1 for high
+        self.movements = 0 # Total number of hexes the plane can move
+        self.cur_moves = 0 # Number of hexes the plane has currently moved
+        self.tile = None # The tile plane is currently in
+        
+    def reset_movement(self):
+        self.cur_moves = 0
 
     def get_year(self):
         return self.year
@@ -44,6 +53,41 @@ class Plane:
 
     def get_name(self):
         return self.name
+    
+    def get_tile(self):
+        return self.tile
+    
+    def get_location(self):
+        return self.get_tile(), self.get_tile().get_location(self)
+    
+    def check_valid_movement(self, start_hex, start_edge, dest_hex, dest_edge):
+        if start_hex.get_neighbor(start_edge) == dest_hex:
+            if dest_edge != dest_hex.get_opposite_edge(start_edge):
+                return True
+        return False
+    
+    def change_altitude(self):
+        self.altitude = (self.altitude + 1) % 2
+        
+    def ridge_evasion(self):
+        return
+
+    def move(self, dest_hex, dest_edge):
+        """Moves aircraft one step to hex_edge if possible.
+        """
+        if self.cur_moves < self.movements:
+            cur_tile, cur_edge = self.get_location()
+            if self.check_valid_movement(cur_tile, cur_edge, dest_hex, dest_edge):
+                crossing_ridge = cur_tile.edge_has_ridge(cur_edge) or dest_hex.edge_has_ridge(dest_hex.get_opposite_edge(cur_edge))    
+                if not self.altitude and crossing_ridge:
+                    result = self.ridge_evasion()
+                cur_tile.remove_piece(self)
+                dest_hex.add_piece(self, dest_edge)
+                self.cur_moves += 1
+        else:
+            #Go to next plane
+            #Reset movement?
+            return        
 
 class A_10A(Plane):
     def __init__(self):
