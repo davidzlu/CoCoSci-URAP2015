@@ -39,7 +39,7 @@ class TALInstance(DeckBuilding):
         self.day_count = 1
         print("Setup complete, start-of-day setup begin")
 
-        self.day_missions = {} # Maps battalion to list of (plane, pilot) pairs. Each pairing represents a mission in a day. 
+        self.day_missions = {} # Maps battalion to list of (plane, pilot) pairs. Each pairing represents a mission in a day.
 
     def setup_environment(self):
         self.sm = batt.SectorMap()
@@ -91,7 +91,7 @@ class TALInstance(DeckBuilding):
         self.allocate_planes_and_pilots_to_misions()
         self.scouted_missions = self.allocate_scouts()
         
-    def mission_setup(self, policy):
+    def mission_setup(self, policy, battalion, planes):
         """Sets up a mission.
         This includes:
           - Abort mission option
@@ -114,15 +114,16 @@ class TALInstance(DeckBuilding):
         #TODO: TARGET-BOUND MISSION EVENT
         #TODO: ENGINE DAMAGE CHECK
         self.campaign.create_hex_map()
-        #TODO: PLACE ENEMY UNITS, CHECKING IF BATTALION AT HALF STRENGTH
+        self.place_enemy_units(battalion)
         #TODO: PLACE FRIENDLY AIRCRAFT
         #TODO: SCOUT SUCCESS CHECK
         #TODO: SET LOITER COUNTER
         pass
 
     def place_enemy_units(self, battalion):
-        units = battalion.units
-        #TODO: Check if battalion is at half strength and adjust
+        units = battalion.get_units()
+        if battalion.is_half():
+            units = battalion.get_half_units()
         map = self.campaign.hex_map
         for unit in units:
             roll = self.dice_roll(1, 10)
