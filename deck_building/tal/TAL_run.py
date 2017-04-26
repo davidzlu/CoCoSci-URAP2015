@@ -145,6 +145,30 @@ class TALInstance(DeckBuilding):
             if plane in self.day_missions[mission]:
                 return True
         return False
+
+    def draw_popups(self, planes):
+        draw_count = 0
+        new_enemies = []
+        for plane in planes:
+            if plane.name in ['AC_130', 'RQ_1', 'MQ_1']:
+                continue
+            else:
+                if plane.altitude == 1:
+                    draw_count += 1
+        while draw_count > 0:
+            random.shuffle(batt.popups)
+            counter = batt.popups.pop()
+            if counter.enemy_unit:
+                new_enemies.append(counter)
+            else:
+                batt.popups.append(counter)
+            draw_count -= 1
+        map = self.campaign.hex_map
+        for unit in new_enemies:
+            roll = self.dice_roll(1, 10)
+            map[roll - 1].center.append(unit)
+
+
     
 """Utility to check for bad input. Prompt should be a string while acceptable_answers should be a list of strings."""
 def check_input(prompt, acceptable_answers):
