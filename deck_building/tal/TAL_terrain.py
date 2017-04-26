@@ -53,7 +53,7 @@ class Tile:
 
     def __init__(self, a, b, c, d, e, f, center=[],
                  apiece=[], bpiece=[], cpiece=[], dpiece=[], epiece=[], fpiece=[],
-                 anext=[], bnext=[], cnext=[], dnext=[], enext=[], fnext=[]):
+                 anext=None, bnext=None, cnext=None, dnext=None, enext=None, fnext=None):
         self.a = a
         self.b = b
         self.c = c

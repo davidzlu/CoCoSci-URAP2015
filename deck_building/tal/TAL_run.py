@@ -172,6 +172,7 @@ class TALInstance(DeckBuilding):
     
 """Utility to check for bad input. Prompt should be a string while acceptable_answers should be a list of strings."""
 def check_input(prompt, acceptable_answers):
+    print("The responses available for the following question are: " + acceptable_answers)
     response = input(prompt)
     while response not in acceptable_answers:
         print("Your response did not match any of these: " + acceptable_answers)
@@ -454,8 +455,76 @@ def human_policy(gameInstance):
         # mission_planes = cur_mission.planes
         # for plane in mission_planes:
         #     print(plane.get_name())
-        #     response = check_input("Which tile do you wish to start this plane on?", ["1", "2", "3", "4", "7", "8", "9", "10"])
+        #     response = check_input("Which tile do you wish to start this plane on?: ", ["1", "2", "3", "4", "7", "8", "9", "10"])
         #     tile = map[eval(response)]
+        #     if plane.name in ['AH_64', 'AH_1', 'AV_8B']:
+        #       response2 = check_input("Where on the tile would you like to start?: ", ["NE", "E", "SE", "SW", "W", NW", "Center"])
+        #     else:
+        #       response2 = check_input("Where on the tile would you like to start?: ", ["NE", "E", "SE", "SW", "W", NW"])
+        #     if response2 == "NE":
+        #         if tile.a == 1:
+        #             plane.altitude = 1
+        #         elif plane.name in ['AC_130', 'RQ_1', 'MQ_1']:
+        #             plane.altitude = 1
+        #         else:
+        #             alt = check_input("Select an altitude for this aircraft: ", ["high", "low"])
+        #             if alt == "low":
+        #                 plane.altitude = 0
+        #         tile.apiece.append(plane)
+        #     elif response2 == "E":
+        #         if tile.b == 1:
+        #             plane.altitude = 1
+        #         elif plane.name in ['AC_130', 'RQ_1', 'MQ_1']:
+        #             plane.altitude = 1
+        #         else:
+        #             alt = check_input("Select an altitude for this aircraft: ", ["high", "low"])
+        #             if alt == "low":
+        #                 plane.altitude = 0
+        #         tile.bpiece.append(plane)
+        #     elif response2 == "SE":
+        #         if tile.c == 1:
+        #             plane.altitude = 1
+        #         elif plane.name in ['AC_130', 'RQ_1', 'MQ_1']:
+        #             plane.altitude = 1
+        #         else:
+        #             alt = check_input("Select an altitude for this aircraft: ", ["high", "low"])
+        #             if alt == "low":
+        #                 plane.altitude = 0
+        #         tile.cpiece.append(plane)
+        #     elif response2 == "SW":
+        #         if tile.d == 1:
+        #             plane.altitude = 1
+        #         elif plane.name in ['AC_130', 'RQ_1', 'MQ_1']:
+        #             plane.altitude = 1
+        #         else:
+        #             alt = check_input("Select an altitude for this aircraft: ", ["high", "low"])
+        #             if alt == "low":
+        #                 plane.altitude = 0
+        #         tile.dpiece.append(plane)
+        #     elif response2 == "W":
+        #         if tile.e == 1:
+        #             plane.altitude = 1
+        #         elif plane.name in ['AC_130', 'RQ_1', 'MQ_1']:
+        #             plane.altitude = 1
+        #         else:
+        #             alt = check_input("Select an altitude for this aircraft: ", ["high", "low"])
+        #             if alt == "low":
+        #                 plane.altitude = 0
+        #         tile.epiece.append(plane)
+        #     elif response2 == "NW":
+        #         if tile.f == 1:
+        #             plane.altitude = 1
+        #         elif plane.name in ['AC_130', 'RQ_1', 'MQ_1']:
+        #             plane.altitude = 1
+        #         else:
+        #             alt = check_input("Select an altitude for this aircraft: ", ["high", "low"])
+        #             if alt == "low":
+        #                 plane.altitude = 0
+        #         tile.fpiece.append(plane)
+        #     elif response2 == "Center":
+        #         plane.altitude = 2
+        #         tile.center.append(plane)
+
 
         pass
 
