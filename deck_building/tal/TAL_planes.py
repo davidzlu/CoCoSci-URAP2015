@@ -16,6 +16,15 @@ class Plane:
         self.weight = 0
         self.special = None
         self.name = None
+        
+        self.speed = 1 # 0 for slow, 1 for fast
+        self.altitude = 1 # 0 for low, 1 for high
+        self.movements = 0 # Total number of hexes the plane can move
+        self.cur_moves = 0 # Number of hexes the plane has currently moved
+        self.tile = None # The tile plane is currently in
+        
+    def reset_movement(self):
+        self.cur_moves = 0
 
     def get_year(self):
         return self.year
@@ -40,6 +49,38 @@ class Plane:
 
     def get_name(self):
         return self.name
+    
+    def get_tile(self):
+        return self.tile
+    
+    def get_location(self):
+        return self.get_tile(), self.get_tile().get_location(self)
+    
+    def check_valid_movement(self, start_hex, start_edge, dest_hex, dest_edge):
+        if start_hex.get_neighbor(start_edge) == dest_hex:
+            if dest_edge != dest_hex.get_opposite_edge(start_edge):
+                return True
+        return False
+
+    def move(self, dest_hex, dest_edge):
+        """Moves aircraft one step to hex_edge if possible.
+        """
+        if self.cur_moves < self.movements:
+            cur_tile, cur_edge = self.get_location()
+            if self.check_valid_movement(cur_tile, cur_edge, dest_hex, dest_edge):
+                #perform right kind of movement
+                #check altitude
+                #ridge evasion if needed
+                
+                pass
+            else:
+                return
+        else:
+            #Go to next plane
+            #Reset movement?
+            return
+        return
+        
 
 class A_10A(Plane):
     def __init__(self):
