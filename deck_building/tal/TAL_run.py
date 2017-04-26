@@ -128,9 +128,6 @@ class TALInstance(DeckBuilding):
             roll = self.dice_roll(1, 10)
             map[roll - 1].center.append(unit)
 
-    def place_friendly_aircraft(self):
-        pass
-
     def loiter_turn_setup(self):
         """Sets up loiter turn.
         This includes:
@@ -427,6 +424,14 @@ def human_policy(gameInstance):
         gameInstance.situation.SOpoints -= SOpts_spent
     elif curphase == "place aircraft":
         # should probably combine select altitude with this
+        # figure out what the current mission is
+        # map = gameInstance.campaign.hex_map
+        # mission_planes = cur_mission.planes
+        # for plane in mission_planes:
+        #     print(plane.get_name())
+        #     response = check_input("Which tile do you wish to start this plane on?", ["1", "2", "3", "4", "7", "8", "9", "10"])
+        #     tile = map[eval(response)]
+
         pass
 
 def random_policy(gameInstance):

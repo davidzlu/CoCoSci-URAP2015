@@ -328,6 +328,7 @@ class MobileHQ(Battalion):
         self.vp = 2
         self.type = (3, "C")
         self.units = get_enemy_units([["AAA", 2], ["APC", 2], ["Command", 4], ["SCUD", 2], ["SPA", 2], ["Truck", 2]])
+        self.half_units = get_enemy_units([["AAA", 1], ["APC", 1], ["Command", 2], ["SCUD", 1], ["SPA", 1], ["Truck", 1]])
         self.half_value = 16
         self.destroy_value = 5
         self.map_location = self.get_location()
@@ -340,6 +341,7 @@ class InfantryForce(Battalion):
         self.vp = 5
         self.type = (1, "A")
         self.units = get_enemy_units([["AAA", 4], ["APC", 8], ["Command", 2], ["Infantry", 10], ["Truck", 4]])
+        self.half_units = get_enemy_units([["AAA", 2], ["APC", 4], ["Command", 1], ["Infantry", 5], ["Truck", 2]])
         self.half_value = 20
         self.destroy_value = 5
         self.map_location = self.get_location()
@@ -352,6 +354,8 @@ class HeadQuarters(Battalion):
         self.type = (5, "C")
         self.units = get_enemy_units([["AAA", 2], ["Aaa sites", 2], ["APC", 2], ["Building", 6],
                                       ["Helicopter", 2], ["Infantry", 2], ["SAM", 2], ["Storage", 2], ["Truck", 2]])
+        self.half_units = get_enemy_units([["AAA", 1], ["Aaa sites", 1], ["APC", 1], ["Building", 3],
+                                      ["Helicopter", 1], ["Infantry", 1], ["SAM", 1], ["Storage", 1], ["Truck", 1]])
         self.half_value = 29
         self.destroy_value = 7
         self.map_location = self.get_location()
@@ -364,6 +368,7 @@ class ReconInForce(Battalion):
         self.vp = 1
         self.type = (4, "C")
         self.units = get_enemy_units([["APC", 4], ["Helicopter", 2], ["Tank", 2], ["Truck", 2]])
+        self.half_units = get_enemy_units([["APC", 2], ["Helicopter", 1], ["Tank", 1], ["Truck", 1]])
         self.half_value = 10
         self.destroy_value = 2
         self.map_location = self.get_location()
