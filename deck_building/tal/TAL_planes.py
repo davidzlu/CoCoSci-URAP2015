@@ -61,6 +61,12 @@ class Plane:
             if dest_edge != dest_hex.get_opposite_edge(start_edge):
                 return True
         return False
+    
+    def change_altitude(self):
+        self.altitude = (self.altitude + 1) % 2
+        
+    def ridge_evasion(self):
+        return
 
     def move(self, dest_hex, dest_edge):
         """Moves aircraft one step to hex_edge if possible.
@@ -68,18 +74,18 @@ class Plane:
         if self.cur_moves < self.movements:
             cur_tile, cur_edge = self.get_location()
             if self.check_valid_movement(cur_tile, cur_edge, dest_hex, dest_edge):
-                #perform right kind of movement
-                #check altitude
-                #ridge evasion if needed
-                
-                pass
-            else:
-                return
+                crossing_ridge = cur_tile.edge_has_ridge(cur_edge) or dest_hex.edge_has_ridge(dest_hex.get_opposite_edge(cur_edge))
+                if self.altitude or not crossing_ridge:
+                    cur_tile.remove_piece(self)
+                    dest_hex.add_piece(self, dest_edge)
+                else:
+                    #ridge evasion
+                    pass
+                self.cur_moves += 1
         else:
             #Go to next plane
             #Reset movement?
             return
-        return
         
 
 class A_10A(Plane):

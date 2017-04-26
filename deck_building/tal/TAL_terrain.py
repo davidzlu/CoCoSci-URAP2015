@@ -131,4 +131,50 @@ class Tile:
         if edge == self.F:
             return self.C
         
-        
+    def remove_piece(self, piece):
+        if piece in self.center:
+            self.center.remove(piece)
+        if piece in self.apiece:
+            self.apiece.remove(piece)
+        if piece in self.bpiece:
+            self.bpiece.remove(piece)
+        if piece in self.cpiece:
+            self.cpiece.remove(piece)
+        if piece in self.dpiece:
+            self.dpiece.remove(piece)
+        if piece in self.epiece:
+            self.epiece.remove(piece)
+        if piece in self.fpiece:
+            self.fpiece.remove(piece)
+            
+    def add_piece(self, piece, edge):
+        if edge == self.CENTER:
+            self.center.append(piece)
+        if edge == self.A:
+            self.apiece.append(piece)
+        if edge == self.B:
+            self.bpiece.append(piece)
+        if edge == self.C:
+            self.cpiece.append(piece)
+        if edge == self.D:
+            self.dpiece.append(piece)
+        if edge == self.E:
+            self.epiece.append(piece)
+        if edge == self.F:
+            self.fpiece.append(piece)
+            
+    def edge_has_ridge(self, edge):
+        if edge == self.A:
+            return self.a
+        if edge == self.B:
+            return self.b
+        if edge == self.C:
+            return self.c
+        if edge == self.D:
+            return self.d
+        if edge == self.E:
+            return self.e
+        if edge == self.F:
+            return self.f
+    
+    
