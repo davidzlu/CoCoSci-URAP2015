@@ -74,19 +74,16 @@ class Plane:
         if self.cur_moves < self.movements:
             cur_tile, cur_edge = self.get_location()
             if self.check_valid_movement(cur_tile, cur_edge, dest_hex, dest_edge):
-                crossing_ridge = cur_tile.edge_has_ridge(cur_edge) or dest_hex.edge_has_ridge(dest_hex.get_opposite_edge(cur_edge))
-                if self.altitude or not crossing_ridge:
-                    cur_tile.remove_piece(self)
-                    dest_hex.add_piece(self, dest_edge)
-                else:
-                    #ridge evasion
-                    pass
+                crossing_ridge = cur_tile.edge_has_ridge(cur_edge) or dest_hex.edge_has_ridge(dest_hex.get_opposite_edge(cur_edge))    
+                if not self.altitude and crossing_ridge:
+                    result = self.ridge_evasion()
+                cur_tile.remove_piece(self)
+                dest_hex.add_piece(self, dest_edge)
                 self.cur_moves += 1
         else:
             #Go to next plane
             #Reset movement?
-            return
-        
+            return        
 
 class A_10A(Plane):
     def __init__(self):
