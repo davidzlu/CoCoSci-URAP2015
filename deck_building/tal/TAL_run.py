@@ -4,9 +4,9 @@ from . import TAL_battalions as batt
 from . import TAL_planes as planes
 from . import TAL_pilots as pilots
 from . import TAL_specialCondition as spec_cond
-import deck_building.DeckBuilding.DeckBuilding as DeckBuilding
+import deck_building.DeckBuilding as DeckBuilding
 import random
-from deck_building.tal.TAL_battalions import Battalion
+
 
 class TALInstance(DeckBuilding):
     
@@ -129,13 +129,14 @@ class TALInstance(DeckBuilding):
             roll = self.dice_roll(1, 10)
             map[roll - 1].center['enemy'].append(unit)
 
-    def loiter_turn_setup(self):
+    def loiter_turn_setup(self, planes):
         """Sets up loiter turn.
         This includes:
           - Drawing pop-up counters
           - Enemy cover roll
         """
-        pass
+        self.draw_popups(planes)
+        self.cover_roll()
     
     def loiter_turn_setup_done(self):
         pass
@@ -168,11 +169,150 @@ class TALInstance(DeckBuilding):
             roll = self.dice_roll(1, 10)
             map[roll - 1].center['enemy'].append(unit)
 
+    def aircraft_hexes(self):
+        hexes = []
+        map = self.campaign.hex_map
+        for tile in map:
+            flag = False
+            if tile.center['friends']:
+                flag = True
+            if tile.apiece['friends']:
+                flag = True
+            if tile.bpiece['friends']:
+                flag = True
+            if tile.cpiece['friends']:
+                flag = True
+            if tile.dpiece['friends']:
+                flag = True
+            if tile.epiece['friends']:
+                flag = True
+            if tile.fpiece['friends']:
+                flag = True
+            if flag:
+                hexes.append(tile)
+        return hexes
+
+    def destroyed_hexes(self):
+        hexes = []
+        map = self.campaign.hex_map
+        for tile in map:
+            flag = False
+            if tile.center['enemy']:
+                for unit in tile.center['enemy']:
+                    if not unit.active:
+                        flag = True
+            if flag:
+                hexes.append(tile)
+        return hexes
+
+    def most_active(self):
+        hexes = []
+        map = self.campaign.hex_map
+        max = 0
+        for tile in map:
+            count = 0
+            if tile.center['enemy']:
+                for unit in tile.center['enemy']:
+                    if unit.active:
+                        count += 1
+            if count > max:
+                max = count
+                hexes = [tile]
+            elif count == max:
+                hexes.append(tile)
+        return hexes
+
+    def move_all_units(self, hexes):
+        for hex in hexes:
+            sides = [hex.a, hex.b, hex.c, hex.d, hex.e, hex.f]
+            buildings = []
+            for unit in hex.center['enemy']:
+                if unit.unit_name == batt.EnemyUnitNames.BUILDING:
+                    removed = hex.center['enemy'].remove(unit)
+                    buildings.append(removed)
+            if 1 in sides:
+                if hex.a == 1:
+                    hex.apiece['enemy'].append(hex.center['enemy'])
+                    hex.center['enemy'].clear()
+                    hex.center['enemy'].append(buildings)
+                elif hex.b == 1:
+                    hex.bpiece['enemy'].append(hex.center['enemy'])
+                    hex.center['enemy'].clear()
+                    hex.center['enemy'].append(buildings)
+                elif hex.c == 1:
+                    hex.cpiece['enemy'].append(hex.center['enemy'])
+                    hex.center['enemy'].clear()
+                    hex.center['enemy'].append(buildings)
+                elif hex.d == 1:
+                    hex.dpiece['enemy'].append(hex.center['enemy'])
+                    hex.center['enemy'].clear()
+                    hex.center['enemy'].append(buildings)
+                elif hex.e == 1:
+                    hex.epiece['enemy'].append(hex.center['enemy'])
+                    hex.center['enemy'].clear()
+                    hex.center['enemy'].append(buildings)
+                else:
+                    hex.fpiece['enemy'].append(hex.center['enemy'])
+                    hex.center['enemy'].clear()
+                    hex.center['enemy'].append(buildings)
+            else:
+                hex.center['enemy'].append(buildings)
+                continue
+
     def cover_roll(self):
-        pass
+        # TODO: Finish implementing rolls 8, 9, and 10
+        map = self.campaign.hex_map
+        roll = self.dice_roll(1, 10)
+        if roll == 1:
+            pass
+        elif roll == 2 or roll == 3:
+            hexes = self.aircraft_hexes()
+            self.move_all_units(hexes)
+        elif roll == 4 or roll == 5:
+            hexes = self.destroyed_hexes()
+            self.move_all_units(hexes)
+        elif roll == 6:
+            for hex in map:
+                infantry = []
+                if hex.center['enemy']:
+                    for unit in hex.center['enemy']:
+                        if unit.unit_name == batt.EnemyUnitNames.INFANTRY:
+                            infantry.append(unit)
+                            hex.center['enemy'].remove(unit)
+                if infantry:
+                    if hex.a == 1:
+                        hex.apiece['enemy'].append(infantry)
+                    elif hex.b == 1:
+                        hex.bpiece['enemy'].append(infantry)
+                    elif hex.c == 1:
+                        hex.cpiece['enemy'].append(infantry)
+                    elif hex.d == 1:
+                        hex.dpiece['enemy'].append(infantry)
+                    elif hex.e == 1:
+                        hex.epiece['enemy'].append(infantry)
+                    elif hex.f == 1:
+                        hex.fpiece['enemy'].append(infantry)
+                    else:
+                        hex.center['enemy'].append(infantry)
+        elif roll == 7:
+            roll2 = self.dice_roll(1, 10)
+            hexes = [map[roll2 - 1]]
+            self.move_all_units(hexes)
+        elif roll == 8:
+            self.phase = "choose unit to go into cover"
+            self.policy()
+        elif roll == 9:
+            hexes = self.most_active()
+            if len(hexes) > 1:
+                self.phase = "choose a hex for cover"
+                hexes = self.policy()
+                self.move_all_units(hexes)
+            else:
+                self.move_all_units(hexes)
+        elif roll == 10:
+            self.phase = "emerge from cover"
+            hex = self.policy()
 
-
-    
 """Utility to check for bad input. Prompt should be a string while acceptable_answers should be a list of strings."""
 def check_input(prompt, acceptable_answers):
     print("The responses available for the following question are: " + acceptable_answers)
@@ -527,6 +667,12 @@ def human_policy(gameInstance):
         #         tile.center['friends'].append(plane)
 
 
+        pass
+    elif curphase == "choose unit to go into cover":
+        pass
+    elif curphase == "choose a hex for cover":
+        pass
+    elif curphase == "emerge from cover":
         pass
 
 def random_policy(gameInstance):
