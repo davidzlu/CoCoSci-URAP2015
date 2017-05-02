@@ -44,7 +44,7 @@ class TALInstance(DeckBuilding):
     def setup_environment(self):
         self.sm = batt.SectorMap()
         self.total_vp = self.sm.total_vp
-        #TODO: adjustment needed after inital placement, probably through special effects
+        #TODO: adjustment needed after initial placement, probably through special effects
     
     def setup_enemy_units(self, game):
         return game.board.setup_enemy_units()
@@ -127,7 +127,7 @@ class TALInstance(DeckBuilding):
         map = self.campaign.hex_map
         for unit in units:
             roll = self.dice_roll(1, 10)
-            map[roll - 1].center.append(unit)
+            map[roll - 1].center['enemy'].append(unit)
 
     def loiter_turn_setup(self):
         """Sets up loiter turn.
@@ -166,7 +166,10 @@ class TALInstance(DeckBuilding):
         map = self.campaign.hex_map
         for unit in new_enemies:
             roll = self.dice_roll(1, 10)
-            map[roll - 1].center.append(unit)
+            map[roll - 1].center['enemy'].append(unit)
+
+    def cover_roll(self):
+        pass
 
 
     
@@ -449,10 +452,9 @@ def human_policy(gameInstance):
                     arm = False
         gameInstance.situation.SOpoints -= SOpts_spent
     elif curphase == "place aircraft":
-        # should probably combine select altitude with this
         # figure out what the current mission is
         # map = gameInstance.campaign.hex_map
-        # mission_planes = cur_mission.planes
+        # mission_planes = cur_mission.planes #figure out how to access the mission planes
         # for plane in mission_planes:
         #     print(plane.get_name())
         #     response = check_input("Which tile do you wish to start this plane on?: ", ["1", "2", "3", "4", "7", "8", "9", "10"])
@@ -470,7 +472,7 @@ def human_policy(gameInstance):
         #             alt = check_input("Select an altitude for this aircraft: ", ["high", "low"])
         #             if alt == "low":
         #                 plane.altitude = 0
-        #         tile.apiece.append(plane)
+        #         tile.apiece['friends'].append(plane)
         #     elif response2 == "E":
         #         if tile.b == 1:
         #             plane.altitude = 1
@@ -480,7 +482,7 @@ def human_policy(gameInstance):
         #             alt = check_input("Select an altitude for this aircraft: ", ["high", "low"])
         #             if alt == "low":
         #                 plane.altitude = 0
-        #         tile.bpiece.append(plane)
+        #         tile.bpiece['friends'].append(plane)
         #     elif response2 == "SE":
         #         if tile.c == 1:
         #             plane.altitude = 1
@@ -490,7 +492,7 @@ def human_policy(gameInstance):
         #             alt = check_input("Select an altitude for this aircraft: ", ["high", "low"])
         #             if alt == "low":
         #                 plane.altitude = 0
-        #         tile.cpiece.append(plane)
+        #         tile.cpiece['friends'].append(plane)
         #     elif response2 == "SW":
         #         if tile.d == 1:
         #             plane.altitude = 1
@@ -500,7 +502,7 @@ def human_policy(gameInstance):
         #             alt = check_input("Select an altitude for this aircraft: ", ["high", "low"])
         #             if alt == "low":
         #                 plane.altitude = 0
-        #         tile.dpiece.append(plane)
+        #         tile.dpiece['friends'].append(plane)
         #     elif response2 == "W":
         #         if tile.e == 1:
         #             plane.altitude = 1
@@ -510,7 +512,7 @@ def human_policy(gameInstance):
         #             alt = check_input("Select an altitude for this aircraft: ", ["high", "low"])
         #             if alt == "low":
         #                 plane.altitude = 0
-        #         tile.epiece.append(plane)
+        #         tile.epiece['friends'].append(plane)
         #     elif response2 == "NW":
         #         if tile.f == 1:
         #             plane.altitude = 1
@@ -520,9 +522,9 @@ def human_policy(gameInstance):
         #             alt = check_input("Select an altitude for this aircraft: ", ["high", "low"])
         #             if alt == "low":
         #                 plane.altitude = 0
-        #         tile.fpiece.append(plane)
+        #         tile.fpiece['friends'].append(plane)
         #     elif response2 == "Center":
-        #         tile.center.append(plane)
+        #         tile.center['friends'].append(plane)
 
 
         pass

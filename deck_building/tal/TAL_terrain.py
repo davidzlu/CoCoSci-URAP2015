@@ -60,9 +60,9 @@ class Tile:
     F = "f"
     CENTER = "center"
 
-    def __init__(self, a, b, c, d, e, f, center=[],
-                 apiece=[], bpiece=[], cpiece=[], dpiece=[], epiece=[], fpiece=[],
-                 anext=None, bnext=None, cnext=None, dnext=None, enext=None, fnext=None):
+    def __init__(self, a, b, c, d, e, f, center={'friends': [], 'enemy': []},
+                 apiece={'friends': [], 'enemy': []}, bpiece={'friends': [], 'enemy': []}, cpiece={'friends': [], 'enemy': []},
+                 dpiece={'friends': [], 'enemy': []}, epiece={'friends': [], 'enemy': []}, fpiece={'friends': [], 'enemy': []}, anext=None, bnext=None, cnext=None, dnext=None, enext=None, fnext=None):
         self.a = a
         self.b = b
         self.c = c
