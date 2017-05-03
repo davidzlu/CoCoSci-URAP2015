@@ -313,6 +313,28 @@ class TALInstance(DeckBuilding):
             self.phase = "emerge from cover"
             hex = self.policy()
 
+
+    def get_all_enemies_in_tile(self, tile):
+        enemies = []
+        enemies.append(tile.center['enemy'])
+        enemies.append(tile.apiece['enemy'])
+        enemies.append(tile.bpiece['enemy'])
+        enemies.append(tile.cpiece['enemy'])
+        enemies.append(tile.dpiece['enemy'])
+        enemies.append(tile.epiece['enemy'])
+        enemies.append(tile.fpiece['enemy'])
+        return enemies
+
+    def enemy_attacks(self):
+        map = self.campaign.hex_map
+        for tile in map:
+            enemies = self.get_all_enemies_in_tile(tile)
+            for unit in enemies:
+                # pick an aircraft to attack
+                # draw hit counters
+                # resolve attacks
+                pass
+
 """Utility to check for bad input. Prompt should be a string while acceptable_answers should be a list of strings."""
 def check_input(prompt, acceptable_answers):
     print("The responses available for the following question are: " + acceptable_answers)
