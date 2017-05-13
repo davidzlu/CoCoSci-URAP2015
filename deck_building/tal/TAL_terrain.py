@@ -48,7 +48,9 @@ class Tile:
     in a clockwise manner starting from that arrow i.e. side a is the
     top-right side while side f is the top-left
     
-    *piece refers to whether there is a piece on the side labeled *
+    *piece refers to whether there is a piece on the side labeled. These pieces
+    are stored in a dictionary depending on whether they are enemy pieces or your own aircraft ('friends').
+    This makes searching for particular pieces on the board slightly easier.
     *next refers to which tile is adjacent to the current tile on that side"""
     
     # Edge location values
@@ -82,7 +84,8 @@ class Tile:
         self.dnext = dnext
         self.enext = enext
         self.fnext = fnext
-        
+
+    # TODO: The following methods all need to account for the new dictionary method of access as opposed to a singular list
     def get_location(self, piece):
         """Returns location of the piece. Location represented by class variables.
         """

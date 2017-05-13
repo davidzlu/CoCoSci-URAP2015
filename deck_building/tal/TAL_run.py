@@ -302,7 +302,7 @@ class TALInstance(DeckBuilding):
             self.phase = "choose unit to go into cover"
             self.policy()
         elif roll == 9:
-            hexes = self.most_active()
+            hexes = self.most_active() #copy this part into policy
             if len(hexes) > 1:
                 self.phase = "choose a hex for cover"
                 hexes = self.policy()
@@ -615,8 +615,9 @@ def human_policy(gameInstance):
         gameInstance.situation.SOpoints -= SOpts_spent
     elif curphase == "place aircraft":
         # figure out what the current mission is
+        # TODO: Change the edge options so that only edges that border other tiles are selectable
         # map = gameInstance.campaign.hex_map
-        # mission_planes = cur_mission.planes #figure out how to access the mission planes
+        # mission_planes = cur_mission.planes # TODO: figure out how to access the mission planes
         # for plane in mission_planes:
         #     print(plane.get_name())
         #     response = check_input("Which tile do you wish to start this plane on?: ", ["1", "2", "3", "4", "7", "8", "9", "10"])
@@ -700,7 +701,7 @@ def human_policy(gameInstance):
 def random_policy(gameInstance):
     """Pseudocode placeholder for what the policies should look like when written"""
     curphase = gameInstance.phase
-    if curphase == "choose planes": #this comparator can be/should be changed
+    if curphase == "choose planes":
         choice = random.choice([True, False])
         if choice:
             choice = random.choice(planes.legal_actions(gameInstance.campaign))
