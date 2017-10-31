@@ -62,6 +62,6 @@ Once you are running the main game file (the file that doesn't have "markov" in 
 
 ### URAP Apprentices
 ---------------------
-* Fall 2015 - present: Priyam D., Jackie D., David L.
-
+* Fall 2015 - Spring 2017: Priyam Das, David Lu
+* Fall 2015 - Fall 2016: Jackie Dong
 
