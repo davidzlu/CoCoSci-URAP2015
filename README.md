@@ -1,6 +1,6 @@
 # Board Games URAP Project :game_die:
 
-This repository contains models of board games for an undergraduate research project started in Fall 2015, carried out under the direction and supervision of Falk Lieder, Elizabeth Kon, and Tom Griffiths of the [Computational Cognitive Science Lab](http://cocosci.berkeley.edu/) at UC Berkeley.
+This repository contains models of board games for an undergraduate research project started in Fall 2015, carried out under the direction and supervision of Falk Lieder, Elizabeth Kon, and Dr. Tom Griffiths of the [Computational Cognitive Science Lab](http://cocosci.berkeley.edu/) at UC Berkeley.
 
 ## Games List
 
